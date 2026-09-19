@@ -9,7 +9,11 @@
 #  C'est tout. Ce script s'occupe du reste, dans cet ordre :
 #
 #    1. il telecharge le projet depuis GitHub ;
-#    2. il verifie que le projet est COMPLET (bin/xozhub.js, src/) ;
+#    2. il verifie que le projet est COMPLET (bin/xozhub.js, src/) et,
+#       si le depot a ete rempli « a plat » (les fichiers de bin/ et de src/
+#       ranges a la racine, sans leurs dossiers - l'erreur la plus courante
+#       quand on met le projet en ligne depuis l'interface de GitHub),
+#       il RECONSTRUIT les dossiers bin/ et src/ avant de continuer ;
 #    3. il remet les fichiers .cmd / .bat en CRLF - sans quoi cmd.exe se
 #       trompe de position des qu'il croise un goto ou un bloc if ( ... )
 #       et sort une cascade d'erreurs du genre
@@ -111,6 +115,40 @@ function Chercher-Racine {
   return $null
 }
 
+# ------------------------ depot « a plat » : on reconstruit les dossiers
+# Remplir un depot depuis l'interface de GitHub en glissant les FICHIERS de
+# bin\ et de src\ (au lieu des dossiers) range tout a la racine : le projet
+# est complet, mais sans ses dossiers, donc impossible a copier.
+# On les refabrique : bin\xozhub.js, et src\ pour tous les autres .js.
+function Reparer-Dossiers {
+  param([string]$Racine)
+
+  if (Test-Path (Join-Path $Racine 'bin\xozhub.js')) { return $null }
+
+  $pistes = @($Racine) + @(Get-ChildItem -LiteralPath $Racine -Directory -ErrorAction SilentlyContinue |
+    ForEach-Object { $_.FullName })
+
+  foreach ($d in $pistes) {
+    if (-not (Test-Path (Join-Path $d 'xozhub.js'))) { continue }
+    # Un dossier « a plat » : le point d'entree ET les modules de src cote a cote.
+    $modules = @(Get-ChildItem -LiteralPath $d -File -Filter '*.js' -ErrorAction SilentlyContinue |
+      Where-Object { $_.Name -ne 'xozhub.js' })
+    if ($modules.Count -lt 5) { continue }
+
+    $bin = Join-Path $d 'bin'
+    $src = Join-Path $d 'src'
+    New-Item -ItemType Directory -Force -Path $bin | Out-Null
+    New-Item -ItemType Directory -Force -Path $src | Out-Null
+    Move-Item -LiteralPath (Join-Path $d 'xozhub.js') -Destination (Join-Path $bin 'xozhub.js') -Force
+    foreach ($m in $modules) {
+      Move-Item -LiteralPath $m.FullName -Destination (Join-Path $src $m.Name) -Force
+    }
+    return $d
+  }
+
+  return $null
+}
+
 # =====================================================================
 #  Debut
 # =====================================================================
@@ -181,6 +219,14 @@ try {
 }
 
 $Src = Chercher-Racine -Depuis $Extrait
+
+# Depot rempli « a plat » : on refabrique bin\ et src\ au lieu d'abandonner.
+if (-not $Src) {
+  $Src = Reparer-Dossiers -Racine $Extrait
+  if ($Src) {
+    Ecrire-Alerte 'Depot servi sans ses dossiers : bin\ et src\ reconstitues - OK'
+  }
+}
 
 if (-not $Src) {
   try { Remove-Item -LiteralPath $Dossier -Recurse -Force -ErrorAction SilentlyContinue } catch { }

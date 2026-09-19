@@ -13,22 +13,16 @@ XozHub.GPT discute avec ton compte X.GPT, peut proposer des commandes shell et l
 
 ### Le site + l'installateur `.exe`
 
-`docs/index.html` est la page d'installation. Elle commence par un **bouton « Installer XozHub.GPT »** :
-un clic télécharge l'installateur, la personne l'ouvre, et l'icône **XozHub.GPT** apparaît sur son Bureau
-(un clic dessus ouvre l'IA dans une fenêtre de terminal). Suivent le tuto en quatre étapes, la ligne de
-commande à copier (l'autre méthode, pour qui n'a rien à télécharger) et un dépannage des erreurs
-courantes. Publie-la gratuitement avec **GitHub Pages** (Settings → Pages → Source : `main` / `/docs`) :
-elle est alors en ligne sur `https://qays67.github.io/XozHubCmdIA/`.
+Le site, c'est deux pages HTML pures (aucune dépendance, aucun fichier à côté) :
 
-Le bouton vise `releases/latest/download/XozHub-GPT-Setup.exe` : **pour qu'il marche, il faut donc que le
-`.exe` existe**, au choix :
+- **`docs/index.html`** — la page d'installation : **la ligne unique à coller dans `cmd`**, mise en avant
+  avec un bouton « copier », ce qu'elle fait, comment lancer l'IA et la première demande ;
+- **`docs/tutoriel.html`** — le tutoriel complet de A à Z : la version web de `TUTORIEL.md`, avec
+  sommaire collant, blocs à copier, tableaux de dépannage et aide-mémoire.
 
-- joins-le à une **Release** GitHub (recommandé : tu mets à jour le `.exe` sans retoucher le site) ;
-- ou pose-le **à côté d'`index.html`** (dans `docs/`) : la page le détecte toute seule au chargement et
-télécharge celui-là.
-
-Sans l'un des deux, le bouton tombe sur une page « 404 » — c'est le seul réglage à ne pas oublier. La
-ligne de commande, elle, marche tout de suite, sans rien publier.
+Publie-les gratuitement avec **GitHub Pages** (Settings → Pages → Source : `main` / `/docs`) : le site est
+alors en ligne sur `https://qays67.github.io/XozHubCmdIA/`, et la ligne d'installation marche **tout de
+suite** — elle ne dépend d'aucun fichier hébergé à côté.
 
 `fabriquer-exe.cmd` (double-clic) construit **`XozHub-GPT-Setup.exe`** : un seul fichier, que la personne
 double-clique pour installer. Rien n'est téléchargé pendant l'installation, donc pas de `.cmd` abîmé par
@@ -37,11 +31,10 @@ Windows (IExpress, présent sur tous les Windows) — aucun outil à installer p
 obtient exactement la même installation que par la ligne de commande : icône sur le Bureau, dossier
 masqué, code chiffré.
 
-- la page marche sur **n'importe quel hébergement** : si le `.exe` est posé à côté d'`index.html`, le
-  bouton de téléchargement pointe dessus tout seul (Netlify Drop, Vercel, un dossier partagé, ton
-  propre serveur…). Sinon il garde le lien de la Release GitHub ;
-- joins `XozHub-GPT-Setup.exe` et `install.cmd` à une **Release** : la page pointe dessus
-  (`releases/latest/download/…`), donc tu mets à jour le `.exe` sans retoucher le site ;
+- les pages marchent sur **n'importe quel hébergement** : GitHub Pages, Netlify Drop, Vercel, un dossier
+  partagé, ton propre serveur… c'est du HTML pur, il n'y a rien à installer ;
+- joins `XozHub-GPT-Setup.exe` à une **Release** si tu veux pouvoir le donner à quelqu'un par un lien :
+  ce n'est pas la méthode mise en avant sur le site, mais elle reste la plus simple à transférer ;
 - ⚠️ si un `.env` est à côté de `fabriquer-exe.ps1`, la clé API part **dans** le `.exe` : pour un `.exe`
   public, renomme `.env` avant de le fabriquer et l'installateur demandera la clé à la personne ;
 - Windows affichera « Windows a protégé votre PC » au premier lancement (pas de signature payante) :
