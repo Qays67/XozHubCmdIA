@@ -142,6 +142,29 @@ Write-Host '    Laisse cette fenetre ouverte, ca prend une minute.' -ForegroundC
 # ------------------------------------------------------- 1/5  Node.js
 Ecrire-Titre '1/5  Verification de Node.js'
 
+# Node.js 18 (obligatoire) ne s'installe plus sur Windows 7 ni avant. Autant le
+# dire clairement, plutot que d'envoyer la personne vers une installation qui
+# echouera de toute facon. Au moindre doute, on ne bloque pas.
+$osTropVieux = $false
+$osMajeur = 0
+$osMineur = 0
+try {
+  $cv = Get-ItemProperty 'HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion' -ErrorAction Stop
+  if ($cv.CurrentMajorVersionNumber) { $osMajeur = [int]$cv.CurrentMajorVersionNumber }
+  if ($cv.CurrentVersion) {
+    $morceaux = $cv.CurrentVersion -split '\\.'
+    if (-not $osMajeur -and $morceaux.Count -ge 2) { $osMajeur = [int]$morceaux[0] }
+    if ($morceaux.Count -ge 2) { $osMineur = [int]$morceaux[1] }
+  }
+  if ($osMajeur -gt 0 -and ($osMajeur -lt 6 -or ($osMajeur -eq 6 -and $osMineur -lt 2))) { $osTropVieux = $true }
+} catch {
+  $osTropVieux = $false
+}
+if ($osTropVieux) {
+  Stop-Lisible ("Ce PC est sous Windows " + $osMajeur + "." + $osMineur + " : $Nom demande Windows 8, 10 ou 11." +
+    " La version de Node.js dont il a besoin ne s'installe pas sur cette version de Windows.")
+}
+
 $majeur = 0
 if (Get-Command 'node' -ErrorAction SilentlyContinue) {
   try { $majeur = [int]((& node -p 'process.versions.node') -split '\\.')[0] } catch { $majeur = 0 }
@@ -202,6 +225,29 @@ if (-not (Test-Path (Join-Path $Dossier 'bin\\xozhub.js'))) {
   Stop-Lisible "L'installation est incomplete : bin\\xozhub.js n'a pas pu etre ecrit dans $Dossier."
 }
 Ecrire-Ok 'Fichiers installes - OK'
+
+# Mise a jour d'une installation plus ancienne : les versions precedentes
+# laissaient des scripts lisibles (src\\, install.cmd, ...). On les efface, pour
+# que rien de lisible ne survive sur une machine deja installee. La liste est
+# EXPLICITE : rien d'autre n'est jamais touche.
+$anciens = @(
+  'src', 'docs', '.tmp-qa',
+  'install.cmd', 'install-en-ligne.ps1', 'install-depuis-le-depot.ps1',
+  'xoz.cmd', 'link-dev.cmd', 'forcer.cmd', 'verifier.cmd', 'reparer.cmd', 'partager.cmd',
+  'fabriquer.cmd', 'fabriquer-exe.cmd', 'fabriquer.ps1', 'fabriquer-exe.ps1',
+  'fabriquer-en-ligne.mjs', 'fabriquer-installeur.mjs', 'fabriquer-protege.mjs',
+  'corriger-crlf.mjs', 'publier.cmd', 'publier.ps1',
+  'README.md', 'TUTORIEL.md', 'UNE-LIGNE.md', 'XozHub.md',
+  '.xozhub-session.json', '.xozhub-linked'
+)
+$nettoyes = 0
+foreach ($vieux in $anciens) {
+  $chemin = Join-Path $Dossier $vieux
+  if (Test-Path $chemin) {
+    try { Remove-Item -LiteralPath $chemin -Recurse -Force; $nettoyes++ } catch { }
+  }
+}
+if ($nettoyes -gt 0) { Ecrire-Ok "Ancienne version nettoyee ($nettoyes element(s)) - OK" }
 
 # Si aucune cle n'a voyage, on la demande ici (une seule fois).
 $fichierEnv = Join-Path $Dossier '.env'
