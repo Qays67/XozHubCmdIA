@@ -9,8 +9,8 @@
 # Rien n'est telecharge pendant l'installation : tout est dans le .exe.
 #
 # COMMENT CA MARCHE
-#   1. le code (bin, src, package.json, xozhub.cmd, install.cmd, .env) est
-#      compresse puis encode en base64 ;
+#   1. le code (bin, src, package.json, xozhub.cmd, install.cmd, fabriquer-protege.mjs,
+#      .env) est compresse puis encode en base64 ;
 #   2. ce paquet est colle a la fin d'un petit lanceur .cmd (celui-ci s'extrait
 #      tout seul, puis appelle install.cmd) ;
 #   3. ce lanceur est emballe dans un .exe auto-extractible par IExpress, un
@@ -56,13 +56,14 @@ foreach ($dir in @('bin', 'src')) {
   else { Write-Host "  ATTENTION : dossier manquant : $dir" }
 }
 
-foreach ($f in @('package.json', 'xozhub.cmd', 'xoz.cmd', 'install.cmd', 'README.md', '.env')) {
+foreach ($f in @('package.json', 'xozhub.cmd', 'xoz.cmd', 'install.cmd', 'fabriquer-protege.mjs', '.env')) {
   $p = Join-Path $root $f
   if (Test-Path $p) {
     Copy-Item $p -Destination $stage -Force
     if ($f -eq '.env') { $avecCle = $true }
   }
   elseif ($f -eq 'install.cmd') { Write-Host '  ATTENTION : install.cmd manquant, l''installation ne pourra pas se faire.' }
+  elseif ($f -eq 'fabriquer-protege.mjs') { Write-Host '  ATTENTION : fabriquer-protege.mjs manquant, le code installe restera LISIBLE.' }
 }
 
 if ($avecCle) {

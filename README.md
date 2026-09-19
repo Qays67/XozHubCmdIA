@@ -13,15 +13,29 @@ XozHub.GPT discute avec ton compte X.GPT, peut proposer des commandes shell et l
 
 ### Le site + l'installateur `.exe`
 
-`docs/index.html` est la page d'installation : le tuto en trois étapes, le bouton de téléchargement du
-`.exe`, la ligne de commande à copier et un dépannage des erreurs courantes. Publie-la gratuitement avec
-**GitHub Pages** (Settings → Pages → Source : `main` / `/docs`) : elle est alors en ligne sur
-`https://qays67.github.io/ai-cmd-hub/`.
+`docs/index.html` est la page d'installation. Elle commence par un **bouton « Installer XozHub.GPT »** :
+un clic télécharge l'installateur, la personne l'ouvre, et l'icône **XozHub.GPT** apparaît sur son Bureau
+(un clic dessus ouvre l'IA dans une fenêtre de terminal). Suivent le tuto en quatre étapes, la ligne de
+commande à copier (l'autre méthode, pour qui n'a rien à télécharger) et un dépannage des erreurs
+courantes. Publie-la gratuitement avec **GitHub Pages** (Settings → Pages → Source : `main` / `/docs`) :
+elle est alors en ligne sur `https://qays67.github.io/XozHubCmdIA/`.
+
+Le bouton vise `releases/latest/download/XozHub-GPT-Setup.exe` : **pour qu'il marche, il faut donc que le
+`.exe` existe**, au choix :
+
+- joins-le à une **Release** GitHub (recommandé : tu mets à jour le `.exe` sans retoucher le site) ;
+- ou pose-le **à côté d'`index.html`** (dans `docs/`) : la page le détecte toute seule au chargement et
+télécharge celui-là.
+
+Sans l'un des deux, le bouton tombe sur une page « 404 » — c'est le seul réglage à ne pas oublier. La
+ligne de commande, elle, marche tout de suite, sans rien publier.
 
 `fabriquer-exe.cmd` (double-clic) construit **`XozHub-GPT-Setup.exe`** : un seul fichier, que la personne
 double-clique pour installer. Rien n'est téléchargé pendant l'installation, donc pas de `.cmd` abîmé par
-les fins de ligne. Il emballe le code et `install.cmd` dans un auto-extractible Windows (IExpress, présent
-sur tous les Windows) — aucun outil à installer pour le fabriquer.
+les fins de ligne. Il emballe le code, `install.cmd` et `fabriquer-protege.mjs` dans un auto-extractible
+Windows (IExpress, présent sur tous les Windows) — aucun outil à installer pour le fabriquer. La personne
+obtient exactement la même installation que par la ligne de commande : icône sur le Bureau, dossier
+masqué, code chiffré.
 
 - la page marche sur **n'importe quel hébergement** : si le `.exe` est posé à côté d'`index.html`, le
   bouton de téléchargement pointe dessus tout seul (Netlify Drop, Vercel, un dossier partagé, ton
@@ -49,18 +63,19 @@ Le projet est en ligne : la personne n'a **rien à récupérer à la main**, ell
 dans l'invite de commandes et l'IA s'installe.
 
 ```cmd
-powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/Qays67/ai-cmd-hub/main/install-en-ligne.ps1 | iex"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/Qays67/XozHubCmdIA/main/install-en-ligne.ps1 | iex"
 ```
 
-`install-en-ligne.ps1` fait quatre choses, et rien d'autre : il télécharge le projet, **rétablit les
-fins de ligne CRLF** des `.cmd` (c'est ce qui supprime l'erreur « 'rrorlevel' n'est pas reconnu »),
-pose la clé commune si tu l'as remplie en haut du fichier, puis confie l'installation à `install.cmd`
-— donc **une seule logique d'installation** dans tout le projet. Tout est détaillé pas à pas dans
-**`UNE-LIGNE.md`** : mise en ligne du projet (avec ou sans compte GitHub), clé commune, vérification
-et dépannage.
+`install-en-ligne.ps1` fait quatre choses, et rien d'autre : il télécharge le projet, vérifie qu'il est
+**complet** (`bin\` et `src\`), **rétablit les fins de ligne CRLF** des `.cmd` (c'est ce qui supprime
+l'erreur « 'rrorlevel' n'est pas reconnu » y compris sur les dépôts servis en LF), puis confie
+l'installation à `install.cmd` — donc **une seule logique d'installation** dans tout le projet. Son
+seul réglage est en haut du fichier : `$Depot` (`Qays67/XozHubCmdIA`) et `$Branche` (`main`).
+Tout est détaillé pas à pas dans **`UNE-LIGNE.md`** : mise en ligne du projet (avec ou sans compte
+GitHub), clé commune, vérification et dépannage.
 
 > Méthode plus ancienne, toujours possible : joindre `install.cmd` à une Release et donner
-> `curl -L -o "%TEMP%\xozhub-install.cmd" https://github.com/Qays67/ai-cmd-hub/releases/latest/download/install.cmd && "%TEMP%\xozhub-install.cmd"`.
+> `curl -L -o "%TEMP%\xozhub-install.cmd" https://github.com/Qays67/XozHubCmdIA/releases/latest/download/install.cmd && "%TEMP%\xozhub-install.cmd"`.
 > Elle dépend d'un `.cmd` servi avec ses fins de ligne CRLF, ce qui est fragile : la ligne ci-dessus
 > est préférable.
 
@@ -73,7 +88,37 @@ et dépannage.
 4. il ajoute la commande `xozhub` au PATH de l'utilisateur ;
 5. il pose un raccourci **XozHub.GPT** sur le **Bureau** : double-clic, et l'IA s'ouvre dans une
    fenêtre cmd. Le raccourci vise directement `xozhub.cmd` dans `%LOCALAPPDATA%\XozHub`, donc il
-   marche même si le PATH de Windows n'a pas encore été rafraîchi — inutile de rouvrir une fenêtre.
+   marche même si le PATH de Windows n'a pas encore été rafraîchi — inutile de rouvrir une fenêtre ;
+6. il **rassemble le code en un seul fichier chiffré** et **efface les sources** : chez la personne,
+   il ne reste que ce fichier illisible, plus aucun script à lire ni à recopier. Le dossier
+   d'installation est en plus **masqué** par Windows : on ne voit que l'icône du Bureau.
+
+### Ce qui arrive chez la personne (et ce qui n'arrive pas)
+
+Ce dépôt est public : son code, lui, est lisible par tout le monde. Ce que la protection change,
+c'est ce qui **s'installe** sur la machine.
+
+| | Sans protection | Avec `fabriquer-protege.mjs` |
+| --- | --- | --- |
+| chez la personne | `bin/` + `src/` en clair, `install.cmd`, `README.md` | **un seul fichier** `bin/xozhub.js`, chiffré |
+| à l'écran | dossier visible dans `%LOCALAPPDATA%\XozHub` | dossier **masqué**, icône du Bureau seule |
+| réutilisable ? | on ouvre, on lit, on recopie | illisible sans passer par le lanceur |
+
+`fabriquer-protege.mjs` lit tous les modules (`bin/` + `src/`), les rassemble en un seul bloc, le
+range dans une enveloppe **AES-256-GCM** et écrit à la place un petit lanceur qui déchiffre le bloc
+**en mémoire** au démarrage — rien n'est jamais réécrit sur le disque. C'est le dernier pas de
+`install.cmd`, et `fabriquer-installeur.mjs` s'en sert aussi pour le fichier unique.
+
+Pour la voir à l'œuvre côté développement :
+
+```cmd
+node fabriquer-protege.mjs . dist\bin\xozhub.js
+```
+
+> ⚠️ **Ce n'est pas du chiffrement fort.** La clé voyage dans le lanceur : quelqu'un de déterminé
+> peut la retrouver et lire le code. Ce qui est empêché, c'est la copie simple — ouvrir un fichier,
+> lire l'agent, le reprendre tel quel. Pour une vraie protection, il faudrait que le code reste sur
+> **ton** serveur et que le client ne soit qu'un afficheur ; c'est un autre projet.
 
 Ensuite, double-clique sur l'icône **XozHub.GPT** du Bureau, ou ouvre une **nouvelle** fenêtre cmd et
 tape `xozhub` : l'interface démarre et tu peux lui parler.
@@ -85,17 +130,17 @@ tape `xozhub` : l'interface démarre et tu peux lui parler.
    `src` eux-mêmes : glisser seulement les fichiers qu'ils contiennent ne recrée pas le dossier, et
    l'installation échoue alors à la copie.
 2. Les **deux adresses** doivent pointer sur ton dépôt — elles sont déjà remplies pour
-   `Qays67/ai-cmd-hub` :
+   `Qays67/XozHubCmdIA` :
    - dans `install-en-ligne.ps1` (`$SourceZip`) et `install.cmd` (`SRC_URL`) :
-     `https://github.com/Qays67/ai-cmd-hub/archive/refs/heads/main.zip` ;
+     `https://github.com/Qays67/XozHubCmdIA/archive/refs/heads/main.zip` ;
    - dans la ligne à donner :
-     `https://raw.githubusercontent.com/Qays67/ai-cmd-hub/main/install-en-ligne.ps1`.
-3. Règle la **clé** en haut de `install-en-ligne.ps1` :
-   - `$Cle = 'xgpt_...'` → clé commune, tout le monde s'en sert sans rien taper. Simple, mais ce
-     fichier doit être public pour que la ligne fonctionne : cette clé devient donc **publique**, et
-     n'importe qui peut la lire et l'utiliser à ta place ;
-   - `$Cle = ''` → l'installateur **demande la clé** à la personne qui installe. Aucune fuite, mais
-     il faut une clé X.GPT par personne.
+     `https://raw.githubusercontent.com/Qays67/XozHubCmdIA/main/install-en-ligne.ps1`.
+3. La **clé** n'est à régler nulle part : elle est déjà dans le `.env` du dépôt, et `install.cmd` le
+   reprend tel quel. Chacun s'en sert donc sans rien taper. La contrepartie est à connaître : ce
+   dépôt est **public**, donc cette clé est lisible par n'importe qui (robots qui scannent GitHub
+   compris) et c'est ton compte qui paie. Le seul cas où quelqu'un doit taper quelque chose, c'est
+   si tu supprimes `.env` du dépôt : `install.cmd` demande alors la clé à la personne qui installe,
+   et il faut une clé X.GPT par personne.
 
 **Rien d'autre à faire, aucune Release à fabriquer** : `install-en-ligne.ps1` rétablit lui-même les
 fins de ligne **CRLF** des `.cmd` après le téléchargement, donc le `.zip` automatique de GitHub
@@ -587,9 +632,10 @@ meilleur modèle possible, sans rien régler.
 ```
 install.cmd      installateur Windows (une ligne à coller dans cmd)
 fabriquer-exe.cmd fabrique l'installateur XozHub-GPT-Setup.exe (un seul fichier à donner)
-docs/index.html  page d'installation (GitHub Pages) : bouton .exe, ligne de commande, dépannage
+docs/index.html  page d'installation (GitHub Pages) : la ligne à coller dans cmd, les autres méthodes, dépannage
 docs/tutoriel.html le tutoriel complet en page web (sommaire, blocs à copier, dépannage)
 TUTORIEL.md      le tutoriel complet en texte, à joindre à l'installateur
+fabriquer-protege.mjs rassemble bin/ + src/ en UN SEUL fichier chiffré (le code livré est illisible)
 install-en-ligne.ps1 moteur de la ligne à coller dans cmd (télécharge, répare les CRLF, installe)
 UNE-LIGNE.md     comment mettre le projet en ligne et quelle ligne donner à tout le monde
 link-dev.cmd     installation « live » : le dossier du projet devient la commande xozhub

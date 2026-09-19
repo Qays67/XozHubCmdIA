@@ -47,7 +47,7 @@ complémentaires* → *Exécuter quand même*. L'installation se fait toute seul
 Colle-la dans l'invite de commandes (clic droit = coller) et appuie sur Entrée. Elle ressemble à :
 
 ```cmd
-powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/Qays67/ai-cmd-hub/main/install-en-ligne.ps1 | iex"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/Qays67/XozHubCmdIA/main/install-en-ligne.ps1 | iex"
 ```
 
 Cette ligne va chercher le projet, prépare les fichiers, vérifie Node.js, et te **demande ta clé** si
@@ -275,7 +275,7 @@ fabriquer : l'installateur demandera la clé à la personne qui installe.
 
 Pour publier la page d'installation (celle que tu peux donner comme lien d'accueil) : le fichier
 `docs/index.html` est prêt. Sur GitHub, active **Settings → Pages → Source : `main` / `/docs`** et
-elle sera en ligne sur `https://qays67.github.io/ai-cmd-hub/`.
+elle sera en ligne sur `https://qays67.github.io/XozHubCmdIA/`.
 
 ## 12. Aide-mémoire
 

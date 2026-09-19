@@ -16,7 +16,7 @@ rem
 rem  UTILISATION : coller cette ligne dans l'invite de commandes, ou double-clic.
 rem ===========================================================================
 set "API_KEY=xgpt_ta_cle_ici"
-set "SRC_URL=https://github.com/Qays67/ai-cmd-hub/archive/refs/heads/main.zip"
+set "SRC_URL=https://github.com/Qays67/XozHubCmdIA/archive/refs/heads/main.zip"
 set "INSTALL_DIR=%LOCALAPPDATA%\XozHub"
 rem ===========================================================================
 
@@ -132,10 +132,34 @@ xcopy "%SRC%bin" "%INSTALL_DIR%\bin" /E /I /Y /Q >nul
 xcopy "%SRC%src" "%INSTALL_DIR%\src" /E /I /Y /Q >nul
 copy /Y "%SRC%package.json" "%INSTALL_DIR%\package.json" >nul
 copy /Y "%SRC%xozhub.cmd" "%INSTALL_DIR%\xozhub.cmd" >nul
-if exist "%SRC%README.md" copy /Y "%SRC%README.md" "%INSTALL_DIR%\README.md" >nul
-if exist "%SRC%install.cmd" copy /Y "%SRC%install.cmd" "%INSTALL_DIR%\install.cmd" >nul
+rem Le reste (README, install.cmd, scripts de developpement) n'est PAS recopie :
+rem ce sont des scripts, ils n'ont rien a faire chez la personne qui installe.
+if exist "%SRC%fabriquer-protege.mjs" copy /Y "%SRC%fabriquer-protege.mjs" "%INSTALL_DIR%\fabriquer-protege.mjs" >nul
 if not exist "%INSTALL_DIR%\bin\xozhub.js" goto :copy_fail
 echo         Fichiers installes - OK
+goto :protection
+
+rem --------------------- 3b. code protege : UN SEUL fichier, illisible
+:protection
+rem Le code est rassemble en un seul fichier chiffre, puis les sources sont
+rem effacees : la personne qui installe n'a aucun script lisible a recopier.
+if not exist "%INSTALL_DIR%\fabriquer-protege.mjs" goto :sans_protection
+echo         Protection du code (rassemblement + chiffrement)...
+node "%INSTALL_DIR%\fabriquer-protege.mjs" "%INSTALL_DIR%" "%INSTALL_DIR%\bin\xozhub.js" --remplacer >nul 2>nul
+if errorlevel 1 goto :protection_ratee
+rd /s /q "%INSTALL_DIR%\src" >nul 2>nul
+del /q "%INSTALL_DIR%\fabriquer-protege.mjs" >nul 2>nul
+if exist "%INSTALL_DIR%\src" goto :protection_ratee
+if not exist "%INSTALL_DIR%\bin\xozhub.js" goto :protection_ratee
+echo         Code protege : plus aucun script lisible - OK
+goto :step4
+
+:protection_ratee
+echo         ATTENTION : protection impossible. L'IA marche, mais le code reste lisible.
+goto :step4
+
+:sans_protection
+echo         ATTENTION : fabriquer-protege.mjs absent de l'archive - code non protege.
 goto :step4
 
 :copy_fail
@@ -192,6 +216,9 @@ if errorlevel 1 (
 ) else (
   echo         PATH mis a jour - OK
 )
+rem Dossier masque : la personne ne voit que l'icone du Bureau, pas les fichiers.
+attrib +h "%INSTALL_DIR%" >nul 2>nul
+echo         Dossier d'installation masque - OK
 
 rem ------------------------------------------------------- 6. raccourci Bureau
 :step6

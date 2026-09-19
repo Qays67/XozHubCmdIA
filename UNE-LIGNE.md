@@ -8,14 +8,14 @@ s'installe tout seul. Rien à télécharger à la main, rien à décompresser.
 ## 1. La ligne, prête à envoyer
 
 ```
-powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/Qays67/ai-cmd-hub/main/install-en-ligne.ps1 | iex"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/Qays67/XozHubCmdIA/main/install-en-ligne.ps1 | iex"
 ```
 
 Copie-la telle quelle dans un message (Discord, SMS, mail…). C'est tout.
 
 Ce que le script fait, dans l'ordre :
 
-1. il télécharge le projet depuis `https://github.com/Qays67/ai-cmd-hub/archive/refs/heads/main.zip` ;
+1. il télécharge le projet depuis `https://github.com/Qays67/XozHubCmdIA/archive/refs/heads/main.zip` ;
 2. il vérifie que le projet est **complet** (`bin/` et `src/`) et s'arrête avec un message clair sinon ;
 3. il **rétablit les fins de ligne CRLF** sur les `.cmd` — c'est ce qui évite l'erreur
    *« 'rrorlevel' n'est pas reconnu en tant que commande »* ;
@@ -29,7 +29,7 @@ Ce que le script fait, dans l'ordre :
 
 | | |
 | --- | --- |
-| Adresse | `https://github.com/Qays67/ai-cmd-hub` |
+| Adresse | `https://github.com/Qays67/XozHubCmdIA` |
 | Branche utilisée | `main` |
 | Visibilité | **Public** (un dépôt privé = ligne qui ne marche pour personne) |
 
@@ -52,8 +52,8 @@ Pour savoir si c'est bon, ouvre ces deux adresses dans ton navigateur — elles 
 code**, pas « 404 » :
 
 ```
-https://raw.githubusercontent.com/Qays67/ai-cmd-hub/main/bin/xozhub.js
-https://raw.githubusercontent.com/Qays67/ai-cmd-hub/main/src/app.js
+https://raw.githubusercontent.com/Qays67/XozHubCmdIA/main/bin/xozhub.js
+https://raw.githubusercontent.com/Qays67/XozHubCmdIA/main/src/app.js
 ```
 
 ---
@@ -64,12 +64,16 @@ Ton fichier **`.env` est dans le dépôt** : le `.zip` téléchargé le contient
 et le pose dans `%LOCALAPPDATA%\XozHub\.env`. **Personne n'a donc rien à taper** : tout le monde
 utilise la même clé, automatiquement.
 
-L'autre endroit possible est en haut de `install-en-ligne.ps1` :
+C'est aussi la **seule source** de la clé : il n'y a rien à remplir dans `install-en-ligne.ps1`, qui
+pose telle quelle la clé du projet. Le seul réglage de ce fichier est son adresse, tout en haut :
 
 ```
-$Cle = ''     # remplir : 'xgpt_...' — posé dans le .env si le projet n'en a pas
-$Cle = ''     # vide   : la clé sera DEMANDEE a la personne
+$Depot   = 'Qays67/XozHubCmdIA'   # proprietaire/nom du depot GitHub
+$Branche = 'main'                 # branche utilisee (un depot prive ne marche pour personne)
 ```
+
+Si un jour tu supprimes `.env` du dépôt, `install.cmd` **demande la clé** à la personne qui installe :
+c'est le seul cas où quelqu'un doit taper quelque chose.
 
 > ⚠️ **À savoir, sans détour.** Ton `.env` est dans un dépôt **public** : ta clé est donc lisible par
 > n'importe qui, y compris des robots qui scannent GitHub en permanence. Elle peut être utilisée par
@@ -88,7 +92,7 @@ sienne** — exactement ce que tu ne veux pas. C'est corrigé : `.env` n'est plu
 Vérifie quand même que le fichier est bien arrivé. Ouvre cette adresse dans ton navigateur :
 
 ```
-https://github.com/Qays67/ai-cmd-hub/blob/main/.env
+https://github.com/Qays67/XozHubCmdIA/blob/main/.env
 ```
 
 - elle **affiche tes trois lignes** → c'est bon, rien à faire ;
@@ -164,7 +168,7 @@ Si tu veux qu'elle se débrouille seule : envoie-lui aussi **`TUTORIEL.md`**, ou
 | **Fichier unique** | double-clic sur `fabriquer.cmd` → tu obtiens `XozHub-GPT-Installer.cmd` → envoie-le, la personne **double-clique** | le plus simple, aucun hébergement, aucun terminal |
 | **`.exe`** | double-clic sur `fabriquer-exe.cmd` → `XozHub-GPT-Setup.exe` | le plus rassurant, ne télécharge rien (mais ⚠️ contient ta clé : ne le mets pas en téléchargement public) |
 | **Le dossier** | clic droit sur le dossier → Compresser → envoie le `.zip` | quand la personne est à côté de toi |
-| **Le site** | active **Settings → Pages → Source : `main` / `/docs`** → ta page est en ligne sur `https://qays67.github.io/ai-cmd-hub/` | pour donner un lien d'installation propre, avec le tutoriel |
+| **Le site** | active **Settings → Pages → Source : `main` / `/docs`** → ta page est en ligne sur `https://qays67.github.io/XozHubCmdIA/` | pour donner un lien d'installation propre, avec le tutoriel |
 
 ---
 
@@ -176,11 +180,11 @@ Si tu veux qu'elle se débrouille seule : envoie-lui aussi **`TUTORIEL.md`**, ou
 - [ ] à la **racine** (pas dans un sous-dossier) : `bin/`, `src/`, `package.json`, `.env`,
       `install.cmd`, `install-en-ligne.ps1`, `xozhub.cmd`, `xoz.cmd` ;
 - [ ] les deux adresses de contrôle **affichent du code** (voir point 2) — pas « 404 » ;
-- [ ] `https://github.com/Qays67/ai-cmd-hub/blob/main/.env` **affiche ta clé** (voir point 3) ;
+- [ ] `https://github.com/Qays67/XozHubCmdIA/blob/main/.env` **affiche ta clé** (voir point 3) ;
 - [ ] tu as testé **la ligne toi-même** dans une nouvelle fenêtre cmd, après avoir supprimé
       `%LOCALAPPDATA%\XozHub` (voir point 4) ;
 - [ ] *(facultatif)* **Settings → Pages → Source : `main` / `/docs`** : le site d'installation est en
-      ligne sur `https://qays67.github.io/ai-cmd-hub/` et tu peux donner ce lien-là, c'est le plus
+      ligne sur `https://qays67.github.io/XozHubCmdIA/` et tu peux donner ce lien-là, c'est le plus
       propre ;
 - [ ] *(facultatif)* un `.exe` pour ceux qui préfèrent les boutons : double-clic sur
       `fabriquer-exe.cmd`, puis joins `XozHub-GPT-Setup.exe` à une **Release** (le bouton du site le
@@ -190,7 +194,7 @@ Si tu veux qu'elle se débrouille seule : envoie-lui aussi **`TUTORIEL.md`**, ou
 ### La ligne à envoyer, prête à copier
 
 ```
-powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/Qays67/ai-cmd-hub/main/install-en-ligne.ps1 | iex"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/Qays67/XozHubCmdIA/main/install-en-ligne.ps1 | iex"
 ```
 
 C'est tout ce dont les gens ont besoin : ils la collent dans **cmd**, appuient sur Entrée, et
