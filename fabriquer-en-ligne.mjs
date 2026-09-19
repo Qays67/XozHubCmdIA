@@ -21,6 +21,7 @@
 //
 // Aucune dependance : uniquement Node.js.
 
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -48,6 +49,39 @@ for (const f of ['package.json', 'xozhub.cmd', '.env']) {
 }
 
 const paquet = Buffer.from(JSON.stringify(fichiers), 'utf8').toString('base64');
+
+// Empreinte du CONTENU embarque (et non du fichier produit) : elle est calculee
+// sur les sources EN CLAIR, donc deux fabrications du meme code donnent la meme
+// empreinte — alors que le chiffrement, lui, tire une cle differente a chaque
+// fois. C'est ce qui permet a publier.cmd de verifier que le depot sert bien
+// cette version-la : la taille, elle, ne prouve rien, puisque deux versions
+// differentes pesent exactement le meme poids.
+function empreinteContenu() {
+  const h = crypto.createHash('sha256');
+  const ajouter = (relatif, contenu) => {
+    h.update(relatif.replace(/\\/g, '/') + '\n');
+    h.update(crypto.createHash('sha256').update(contenu).digest('hex') + '\n');
+  };
+  const lister = (dossier) => {
+    if (!fs.existsSync(dossier)) return;
+    const entrees = fs.readdirSync(dossier, { withFileTypes: true })
+      .sort((a, b) => (a.name < b.name ? -1 : 1));
+    for (const e of entrees) {
+      const abs = path.join(dossier, e.name);
+      if (e.isDirectory()) lister(abs);
+      else if (/\.js$/i.test(e.name)) ajouter(path.relative(racine, abs), fs.readFileSync(abs));
+    }
+  };
+  lister(path.join(racine, 'bin'));
+  lister(path.join(racine, 'src'));
+  for (const f of ['package.json', 'xozhub.cmd', '.env']) {
+    const abs = path.join(racine, f);
+    if (fs.existsSync(abs)) ajouter(f, fs.readFileSync(abs));
+  }
+  return h.digest('hex').slice(0, 16);
+}
+
+const empreinte = empreinteContenu();
 // ⚠ Pas de virgule apres le DERNIER bloc : PowerShell refuse un tableau qui
 // se termine par une virgule (@('a',) est une erreur).
 const morceaux = paquet.match(new RegExp(`.{1,${CHUNK}}`, 'g')) || [];
@@ -83,6 +117,7 @@ const ps1 = `# =================================================================
 #
 #  ---------------------------------------------------------------------
 #  FICHIER GENERE - ne pas modifier a la main.
+#  Contenu embarque : ${empreinte}
 #  Pour le refabriquer apres une modification du code :
 #      node fabriquer-en-ligne.mjs
 #  ---------------------------------------------------------------------
@@ -351,6 +386,7 @@ console.log('');
 console.log(`  Fichier ecrit : ${OUT}`);
 console.log(`  Taille        : ${ko} Ko  (${fichiers.length} fichiers embarques, code chiffre)`);
 console.log(`  Modules       : ${protege.modules}`);
+console.log(`  Contenu       : ${empreinte}   (empreinte du code embarque)`);
 console.log('');
 console.log('  La personne colle la ligne, et rien d autre :');
 console.log('    powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/Qays67/XozHubCmdIA/main/install-en-ligne.ps1 | iex"');

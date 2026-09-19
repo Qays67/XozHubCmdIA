@@ -233,19 +233,27 @@ if ($aPousser) {
 # ---------------------------------------------- 6. verifier
 Ecrire-Vide
 Ecrire-Etape '6' 'Verification : ce que le depot sert vraiment'
-# Controle EXACT : on compare la taille servie a la taille du fichier local.
-# « c'est gros donc c'est bon » ne suffit pas - c'est ainsi qu'on annonce OK
-# alors que le depot sert encore la version precedente.
-$empreinteLocal = (Get-FileHash -LiteralPath $Artefact -Algorithm SHA256).Hash
-$sha = [Security.Cryptography.SHA256]::Create()
+# Controle par l'EMPREINTE DU CONTENU, ecrite dans l'en-tete du fichier.
+#
+# Pourquoi pas la taille, ni l'empreinte du fichier : le code est chiffre avec
+# une cle tiree au hasard a chaque fabrication. Deux versions differentes ont
+# donc EXACTEMENT la meme taille, et le cache de GitHub peut servir la version
+# precedente sans qu'on le voie. L'empreinte du contenu, elle, ne change que
+# si le code change : si elle correspond, c'est bien cette version-la.
+$motif = 'Contenu embarque\s*:\s*([0-9a-f]{16})'
+$empreinteLocal = ''
+$trouve = [regex]::Match([IO.File]::ReadAllText($Artefact), $motif)
+if ($trouve.Success) { $empreinteLocal = $trouve.Groups[1].Value }
+
 $octets = $null
 $empreinteServie = ''
 for ($i = 1; $i -le 12; $i++) {
   try {
     $wc = New-Object Net.WebClient
     $octets = $wc.DownloadData("$Adresse`?controle=$([Guid]::NewGuid().ToString('N'))")
-    $empreinteServie = ([BitConverter]::ToString($sha.ComputeHash($octets)) -replace '-', '')
-    if ($empreinteServie -eq $empreinteLocal) { break }
+    $vu = [regex]::Match([Text.Encoding]::UTF8.GetString($octets), $motif)
+    $empreinteServie = if ($vu.Success) { $vu.Groups[1].Value } else { '' }
+    if ($empreinteLocal -and $empreinteServie -eq $empreinteLocal) { break }
   } catch {
     $octets = $null
     $empreinteServie = ''
@@ -254,23 +262,22 @@ for ($i = 1; $i -le 12; $i++) {
 }
 
 Write-Host ''
-if ($empreinteServie -and $empreinteServie -eq $empreinteLocal) {
-  Ecrire-Ok "Le depot sert EXACTEMENT ce fichier (empreinte identique) - OK"
-} elseif ($octets -and $octets.Length -eq $Taille) {
-  Ecrire-Note 'Meme taille, empreinte differente : le fichier a ete refabrique apres l''envoi.'
-  Ecrire-Ok 'Le depot sert bien la version publiee - OK'
+if (-not $empreinteLocal) {
+  Ecrire-Alerte 'Pas d''empreinte de contenu dans le fichier : relance la refabrication.'
+} elseif ($empreinteServie -eq $empreinteLocal) {
+  Ecrire-Ok "Le depot sert bien CETTE version (contenu $empreinteLocal) - OK"
+} elseif ($octets -and $octets.Length -lt 200KB) {
+  Ecrire-Alerte 'Le depot sert encore l''ANCIENNE version : la ligne echouera chez tout le monde.'
+  Montrer-PlanB 'le fichier publie n''est pas celui attendu'
 } elseif ($octets) {
-  $recuKo = [Math]::Round($octets.Length / 1KB)
+  $vu = if ($empreinteServie) { $empreinteServie } else { 'inconnu' }
   Write-Host '   ------------------------------------------------------------' -ForegroundColor Yellow
-  Write-Host "    Le depot ne sert pas encore ce fichier : $($octets.Length) octets" -ForegroundColor Yellow
-  Write-Host "    au lieu de $Taille. C'est le cache de GitHub, il se vide en" -ForegroundColor Yellow
-  Write-Host '    2 a 3 minutes : relance publier.cmd dans un moment.' -ForegroundColor Yellow
+  Write-Host "    Le depot sert une AUTRE version (contenu $vu," -ForegroundColor Yellow
+  Write-Host "    attendu $empreinteLocal)." -ForegroundColor Yellow
+  Write-Host '    C''est le cache de GitHub : il se vide en 2 a 3 minutes.' -ForegroundColor Yellow
+  Write-Host '    Relance publier.cmd dans un moment : il reessaiera.' -ForegroundColor Yellow
   Write-Host '   ------------------------------------------------------------' -ForegroundColor Yellow
   Write-Host ''
-  if ($octets.Length -lt 200KB) {
-    Ecrire-Alerte 'Le depot sert encore l''ANCIENNE version : la ligne echouera chez tout le monde.'
-    Montrer-PlanB 'le fichier publie n''est pas celui attendu'
-  }
 } else {
   Ecrire-Alerte 'Impossible de relire le fichier depuis le depot (connexion ?).'
   Ecrire-Note "Va voir a la main : $Adresse"
