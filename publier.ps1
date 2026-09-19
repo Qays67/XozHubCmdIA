@@ -185,6 +185,20 @@ foreach ($vieux in @('.xozhub-session.json', '.xozhub-linked')) {
 }
 Ecrire-Ok "$copies element(s) copie(s) - OK"
 
+# Le depot doit refleter ce dossier : un fichier qui n'existe plus ici (une page
+# supprimee, un ancien script) doit disparaitre du depot lui aussi. Sans ca, le
+# site continue de servir une page morte et la ligne un fichier perime.
+$supprimes = 0
+foreach ($relatif in (& git -C $Tour ls-files)) {
+  if (-not $relatif) { continue }
+  $ici = Join-Path $Projet ($relatif -replace '/', '\')
+  if (-not (Test-Path $ici)) {
+    $la = Join-Path $Tour ($relatif -replace '/', '\')
+    try { Remove-Item -LiteralPath $la -Force -ErrorAction Stop; $supprimes++ } catch { }
+  }
+}
+if ($supprimes -gt 0) { Ecrire-Ok "$supprimes fichier(s) retire(s) du depot - OK" }
+
 # ------------------------------ 4. enregistrer la version
 Ecrire-Vide
 Ecrire-Etape '4' 'Enregistrement de la version'

@@ -151,8 +151,8 @@ Pour retester comme si tu n'avais rien installé : supprime le dossier
    double-clic, et l'IA s'ouvre dans une fenêtre cmd.
 6. Ensuite, `xozhub` marche dans n'importe quel dossier, pour toujours.
 
-Si tu veux qu'elle se débrouille seule : envoie-lui aussi **`TUTORIEL.md`**, ou l'adresse de la page
-`docs/tutoriel.html` si tu publies le site (voir point 7).
+Si tu veux qu'elle se débrouille seule : envoie-lui aussi **`TUTORIEL.md`**, ou l'adresse du site
+(`docs/index.html`, voir point 7).
 
 ---
 
@@ -182,7 +182,7 @@ Si tu veux qu'elle se débrouille seule : envoie-lui aussi **`TUTORIEL.md`**, ou
 | **Fichier unique** | double-clic sur `fabriquer.cmd` → tu obtiens `XozHub-GPT-Installer.cmd` → envoie-le, la personne **double-clique** | le plus simple, aucun hébergement, aucun terminal |
 | **`.exe`** | double-clic sur `fabriquer-exe.cmd` → `XozHub-GPT-Setup.exe` | le plus rassurant, ne télécharge rien (mais ⚠️ contient ta clé : ne le mets pas en téléchargement public) |
 | **Le dossier** | clic droit sur le dossier → Compresser → envoie le `.zip` | quand la personne est à côté de toi |
-| **Le site** | active **Settings → Pages → Source : `main` / `/docs`** → ta page est en ligne sur `https://qays67.github.io/XozHubCmdIA/` | pour donner un lien d'installation propre, avec le tutoriel |
+| **Le site** | active **Settings → Pages → Source : `main` / `/docs`** → ta page est en ligne sur `https://qays67.github.io/XozHubCmdIA/` | pour donner un lien d'installation propre, sans rien transférer |
 
 ---
 

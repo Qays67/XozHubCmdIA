@@ -13,14 +13,13 @@ XozHub.GPT discute avec ton compte X.GPT, peut proposer des commandes shell et l
 
 ### Le site + l'installateur `.exe`
 
-Le site, c'est deux pages HTML pures (aucune dépendance, aucun fichier à côté) :
+Le site, c'est **une seule page HTML pure** (aucune dépendance, aucun fichier à côté) :
 
-- **`docs/index.html`** — la page d'installation : **la ligne unique à coller dans `cmd`**, mise en avant
-  avec un bouton « copier », ce qu'elle fait, comment lancer l'IA et la première demande ;
-- **`docs/tutoriel.html`** — le tutoriel complet de A à Z : la version web de `TUTORIEL.md`, avec
-  sommaire collant, blocs à copier, tableaux de dépannage et aide-mémoire.
+- **`docs/index.html`** — **la ligne unique à coller dans `cmd`** avec son bouton « copier », ce qui se
+  passe, comment lancer l'IA, la première demande, **ce qui marche et ce qui peut bloquer**, les autres
+  façons d'installer, le dépannage et les commandes utiles. Rien de plus.
 
-Publie-les gratuitement avec **GitHub Pages** (Settings → Pages → Source : `main` / `/docs`) : le site est
+Publie-la gratuitement avec **GitHub Pages** (Settings → Pages → Source : `main` / `/docs`) : le site est
 alors en ligne sur `https://qays67.github.io/XozHubCmdIA/`, et la ligne d'installation marche **tout de
 suite** — elle ne dépend d'aucun fichier hébergé à côté.
 
@@ -157,15 +156,13 @@ GitHub** (on envoie alors le fichier unique `XozHub-GPT-Installer.cmd`).
 > Avec la méthode « on envoie le dossier », rien n'est à régler : les fichiers sont déjà à côté du
 > `install.cmd` et le `.env` est repris tel quel.
 
-## Le tutoriel pour tout le monde
+## Le guide pour tout le monde
 
-Le guide pas-à-pas destiné aux personnes qui n'ont jamais ouvert un terminal : installer, première
-demande, comment bien demander, créer un site propre, les retouches à demander, tout ce qu'il sait
-faire d'autre, raccourcis, dépannage et comment le partager. Donne-le avec l'installateur : la
-personne est autonome en dix minutes.
+Le guide destiné aux personnes qui n'ont jamais ouvert un terminal : installer, première demande,
+comment bien demander, commandes utiles, dépannage. Donne-le avec l'installateur : la personne est
+autonome en dix minutes.
 
-- **`docs/tutoriel.html`** — la même chose en page web, à donner comme lien ou à héberger à côté de la
-  page d'installation (nav collante, sommaire, blocs à copier, dépannage repliable) ;
+- **`docs/index.html`** — la page web, à donner comme lien ou à héberger (GitHub Pages) ;
 - **`TUTORIEL.md`** — la version texte, pour le dépôt et les pièces jointes.
 
 ## Installation manuelle
@@ -639,8 +636,7 @@ meilleur modèle possible, sans rien régler.
 ```
 install.cmd      installateur Windows (une ligne à coller dans cmd)
 fabriquer-exe.cmd fabrique l'installateur XozHub-GPT-Setup.exe (un seul fichier à donner)
-docs/index.html  page d'installation (GitHub Pages) : la ligne à coller dans cmd, les autres méthodes, dépannage
-docs/tutoriel.html le tutoriel complet en page web (sommaire, blocs à copier, dépannage)
+docs/index.html  LE site (GitHub Pages) : la ligne à coller dans cmd, ce qui marche, les autres méthodes, dépannage
 TUTORIEL.md      le tutoriel complet en texte, à joindre à l'installateur
 fabriquer-protege.mjs rassemble bin/ + src/ en UN SEUL fichier chiffré (le code livré est illisible)
 fabriquer-en-ligne.mjs fabrique install-en-ligne.ps1 : le fichier unique qui contient tout (code chiffré inclus)
