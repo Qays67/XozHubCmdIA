@@ -59,13 +59,27 @@ dans l'invite de commandes et l'IA s'installe.
 powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/Qays67/XozHubCmdIA/main/install-en-ligne.ps1 | iex"
 ```
 
-`install-en-ligne.ps1` fait quatre choses, et rien d'autre : il télécharge le projet, vérifie qu'il est
-**complet** (`bin\` et `src\`), **rétablit les fins de ligne CRLF** des `.cmd` (c'est ce qui supprime
-l'erreur « 'rrorlevel' n'est pas reconnu » y compris sur les dépôts servis en LF), puis confie
-l'installation à `install.cmd` — donc **une seule logique d'installation** dans tout le projet. Son
-seul réglage est en haut du fichier : `$Depot` (`Qays67/XozHubCmdIA`) et `$Branche` (`main`).
-Tout est détaillé pas à pas dans **`UNE-LIGNE.md`** : mise en ligne du projet (avec ou sans compte
-GitHub), clé commune, vérification et dépannage.
+`install-en-ligne.ps1` est un **fichier unique et complet** : le code de l'agent (déjà chiffré par
+`fabriquer-protege.mjs`), `package.json`, `xozhub.cmd` et le `.env` voyagent **dedans**, en base64. Il fait
+cinq choses, dans cet ordre : Node.js 18+ (avec installation via `winget` si besoin), écriture des fichiers
+dans `%LOCALAPPDATA%\XozHub`, ajout de `xozhub` au PATH, dossier masqué + raccourci **XozHub.GPT** sur le
+Bureau, puis lancement.
+
+Conséquence, et c'est tout l'intérêt : **le dépôt n'a besoin d'aucun sous-dossier** — ni `bin\`, ni `src\`.
+Ce seul fichier suffit, et l'installation ne télécharge rien d'autre : pas de `.zip`, pas de fins de ligne
+CRLF à réparer, pas de dossiers à reconstituer, aucun risque d'archive incomplète. C'est la méthode
+impossible à rater.
+
+⚠ C'est un **artefact** : après une modification du code, refais-le — `node fabriquer-en-ligne.mjs` — et
+remonte ce seul fichier sur le dépôt (le générateur embarque toujours la version chiffrée à jour).
+Le plus simple : **double-clic sur `publier.cmd`** — il refait le fichier, le remonte sur le dépôt et
+**vérifie que c'est bien la nouvelle version qui est servie**. Sans quoi la ligne échoue chez tout le
+monde en annonçant un projet « incomplet ».
+
+`install-depuis-le-depot.ps1` est l'ancienne version, qui téléchargeait le projet depuis le dépôt avant
+d'installer : elle reste utile si tu veux que le dépôt serve le code source lisible, ou pour installer
+depuis un dépôt déjà correctement rempli. Tout est détaillé pas à pas dans **`UNE-LIGNE.md`** : mise en
+ligne du projet (avec ou sans compte GitHub), clé commune, vérification et dépannage.
 
 > Méthode plus ancienne, toujours possible : joindre `install.cmd` à une Release et donner
 > `curl -L -o "%TEMP%\xozhub-install.cmd" https://github.com/Qays67/XozHubCmdIA/releases/latest/download/install.cmd && "%TEMP%\xozhub-install.cmd"`.
@@ -629,7 +643,11 @@ docs/index.html  page d'installation (GitHub Pages) : la ligne à coller dans cm
 docs/tutoriel.html le tutoriel complet en page web (sommaire, blocs à copier, dépannage)
 TUTORIEL.md      le tutoriel complet en texte, à joindre à l'installateur
 fabriquer-protege.mjs rassemble bin/ + src/ en UN SEUL fichier chiffré (le code livré est illisible)
-install-en-ligne.ps1 moteur de la ligne à coller dans cmd (télécharge, répare les CRLF, installe)
+fabriquer-en-ligne.mjs fabrique install-en-ligne.ps1 : le fichier unique qui contient tout (code chiffré inclus)
+publier.cmd      publie la ligne d'installation : refabrique le fichier, le remonte sur le dépôt, vérifie (double-clic)
+publier.ps1      ce que fait publier.cmd (récupération du dépôt, copie, commit, envoi, contrôle)
+install-en-ligne.ps1 CE QUE LA LIGNE TÉLÉCHARGE : installation complète, code chiffré embarqué (artefact)
+install-depuis-le-depot.ps1 ancienne méthode : télécharge le dépôt, répare les CRLF, appelle install.cmd
 UNE-LIGNE.md     comment mettre le projet en ligne et quelle ligne donner à tout le monde
 link-dev.cmd     installation « live » : le dossier du projet devient la commande xozhub
 forcer.cmd       force la commande xozhub à lancer le dossier du projet

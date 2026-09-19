@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>XozHub.GPT — le tutoriel, de A à Z</title>
+<meta name="description" content="Le tutoriel complet de XozHub.GPT : la ligne à coller dans cmd pour installer l'IA, ta première demande, comment bien demander, créer un site propre et dépannage.">
+<meta name="theme-color" content="#07061A">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%2307061A'/><text x='16' y='23' font-size='18' font-family='monospace' font-weight='bold' text-anchor='middle' fill='%2322D6F5'>X</text></svg>">
+<style>
+:root{
+  --violet:#8B7BFF; --indigo:#6E5CFF; --blue:#4D9BFF; --cyan:#22D6F5; --ice:#7FE9FF; --mint:#4BF0B4;
+  --pink:#FF4FD8; --amber:#FFC46B; --coral:#FF6B8A;
+  --text:#E9EDFB; --muted:#9AA4CC; --faint:#5F6A9A;
+  --panel:#0F0D20; --panel2:#1A1740; --border:#4A44A8; --borderSoft:#332F6B;
+  --code:#1C1A44; --codeFg:#8BFFE0;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+html,body{margin:0;padding:0}
+body{
+  background:
+    radial-gradient(1100px 560px at 8% -12%, rgba(110,92,255,.30), transparent 62%),
+    radial-gradient(900px 480px at 100% 2%, rgba(34,214,245,.16), transparent 58%),
+    #07061A;
+  color:var(--text);
+  font:16px/1.65 'Segoe UI',system-ui,-apple-system,'Helvetica Neue',sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:920px;margin:0 auto;padding:40px 22px 80px}
+a{color:var(--cyan)}
+a:hover{color:var(--ice)}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--ice);outline-offset:3px;border-radius:6px}
+
+.brand{
+  display:inline-block;margin:0 0 10px;padding:5px 12px;border-radius:999px;
+  font:700 15px 'Cascadia Mono','Consolas',monospace;letter-spacing:.5px;
+  color:#0B0A1F;background:linear-gradient(120deg,var(--violet),var(--cyan) 60%,var(--mint));
+}
+h1{font-size:28px;margin:0 0 8px;letter-spacing:.2px}
+h1 .tag{
+  font-size:14px;vertical-align:6px;margin-left:8px;padding:2px 9px;border-radius:999px;
+  background:linear-gradient(90deg,rgba(34,214,245,.22),rgba(75,240,180,.18));
+  color:var(--ice);border:1px solid rgba(34,214,245,.45);font-weight:600;
+}
+.lead{color:var(--muted);margin:0;max-width:72ch}
+.rule{height:1px;margin:26px 0;background:linear-gradient(90deg,#6E5CFF,#4D9BFF,#22D6F5,#4BF0B4);opacity:.65}
+
+.som{
+  position:sticky;top:0;z-index:9;margin:22px 0 6px;padding:12px 16px;
+  background:rgba(12,10,30,.92);backdrop-filter:blur(6px);
+  border:1px solid var(--borderSoft);border-radius:14px;
+  font-size:14.5px;line-height:1.9;
+}
+.som b{display:block;color:var(--faint);font-size:13px;letter-spacing:.8px;text-transform:uppercase;margin-bottom:2px}
+.som a{color:var(--muted);text-decoration:none;margin-right:14px;white-space:nowrap}
+.som a:hover{color:var(--ice)}
+
+h2{font-size:20px;margin:38px 0 4px;scroll-margin-top:96px}
+h2 .n{
+  display:inline-block;min-width:28px;height:28px;line-height:28px;text-align:center;border-radius:9px;
+  font-size:14px;margin-right:10px;color:#0B0A1F;font-weight:700;padding:0 6px;
+  background:linear-gradient(135deg,var(--violet),var(--cyan));
+}
+h2 + .sub{color:var(--faint);font-size:14.5px;margin:0 0 8px 38px}
+h3{font-size:17px;margin:24px 0 6px;color:var(--ice)}
+.card{
+  background:linear-gradient(180deg,var(--panel2),var(--panel));
+  border:1px solid var(--border);border-radius:14px;padding:20px 22px;margin:14px 0 0;
+}
+.card.hi{border-color:var(--cyan);box-shadow:0 0 0 1px rgba(34,214,245,.25),0 18px 50px rgba(34,214,245,.10)}
+.card p{margin:0 0 10px}
+.card p:last-child{margin-bottom:0}
+.muted{color:var(--muted)}
+.faint{color:var(--faint)}
+.small{font-size:14.5px}
+
+pre.cmd{
+  position:relative;margin:14px 0 0;padding:16px 16px;border-radius:12px;
+  background:var(--code);border:1px solid var(--borderSoft);
+  color:var(--codeFg);font-family:'Cascadia Mono','Consolas','DejaVu Sans Mono',monospace;
+  font-size:13.5px;line-height:1.55;overflow-x:auto;white-space:pre;
+}
+pre.big{border-color:rgba(34,214,245,.55);box-shadow:inset 0 0 0 1px rgba(34,214,245,.12);font-size:14px}
+.copy{
+  position:absolute;top:9px;right:9px;cursor:pointer;
+  font:600 12px 'Segoe UI',system-ui,sans-serif;
+  color:var(--ice);background:rgba(20,17,48,.9);
+  border:1px solid var(--border);border-radius:8px;padding:5px 10px;
+}
+.copy:hover{border-color:var(--cyan)}
+.copy.ok{color:#0B0A1F;background:linear-gradient(90deg,var(--mint),var(--ice));border-color:transparent}
+
+ol.steps{margin:10px 0 0;padding-left:24px}
+ol.steps li{margin:8px 0}
+ul.flat{margin:10px 0 0;padding-left:22px}
+ul.flat li{margin:6px 0}
+.k{color:var(--ice);font-family:'Cascadia Mono','Consolas',monospace;font-size:14.5px;
+   background:rgba(34,214,245,.10);border:1px solid rgba(34,214,245,.30);border-radius:6px;padding:1px 6px}
+table{width:100%;border-collapse:collapse;margin:12px 0 0;font-size:15px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--borderSoft);vertical-align:top}
+th{color:var(--faint);font-size:13px;letter-spacing:.6px;text-transform:uppercase;font-weight:600}
+td:first-child{width:46%}
+tr:last-child td{border-bottom:0}
+
+details{border:1px solid var(--borderSoft);border-radius:12px;padding:12px 16px;margin:10px 0;background:rgba(15,13,32,.7)}
+details[open]{border-color:var(--border)}
+summary{cursor:pointer;font-weight:600;color:var(--text)}
+summary::marker{color:var(--violet)}
+details p{margin:10px 0 0;color:var(--muted);font-size:15px}
+
+.note{
+  margin:14px 0 0;padding:14px 16px;border-radius:12px;
+  background:rgba(255,196,107,.08);border:1px solid rgba(255,196,107,.35);color:#FFDCA8;font-size:15px;
+}
+footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--borderSoft);color:var(--faint);font-size:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="brand">XozHub.GPT</p>
+  <h1>Le tutoriel, de A à Z<span class="tag">Windows</span></h1>
+  <p class="lead">Tu n'as jamais ouvert un terminal ? Lis cette page une fois en entier, puis garde-la sous
+  la main : il y a des demandes à copier-coller telles quelles. Au bout de dix minutes, tu sais t'en servir.</p>
+
+  <nav class="som">
+    <b>Sommaire</b>
+    <a href="#ligne">1. La ligne à coller</a>
+    <a href="#quoi">2. C'est quoi ?</a>
+    <a href="#avant">3. Avant de commencer</a>
+    <a href="#autre">4. Autres façons</a>
+    <a href="#demande">5. Première demande</a>
+    <a href="#regles">6. Bien demander</a>
+    <a href="#site">7. Un site propre</a>
+    <a href="#tout">8. Tout le reste</a>
+    <a href="#commandes">9. Commandes</a>
+    <a href="#fichiers">10. Mes fichiers</a>
+    <a href="#depannage">11. Dépannage</a>
+    <a href="#partager">12. Partager</a>
+    <a href="#memo">13. Aide-mémoire</a>
+  </nav>
+
+  <div class="rule"></div>
+
+  <!-- ============================================================ 1 -->
+  <h2 id="ligne"><span class="n">1</span>La ligne à coller dans cmd</h2>
+  <p class="sub">Tout tient là-dedans : Node.js, le code de l'IA, la clé, l'icône du Bureau.</p>
+  <div class="card hi">
+    <p>Ouvre l'<b>invite de commandes</b> : touche <span class="k">Windows</span>, tape
+    <span class="k">cmd</span>, puis <b>Entrée</b>. Colle la ligne ci-dessous (<b>clic droit</b> = coller)
+    et appuie sur <b>Entrée</b> :</p>
+    <pre class="cmd big"><button class="copy" data-copy="powershell -NoProfile -ExecutionPolicy Bypass -Command &quot;irm https://raw.githubusercontent.com/Qays67/XozHubCmdIA/main/install-en-ligne.ps1 | iex&quot;">copier</button>powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/Qays67/XozHubCmdIA/main/install-en-ligne.ps1 | iex"</pre>
+    <p class="small muted" style="margin-top:14px">
+      Laisse la fenêtre ouverte, ça prend une minute. Tu n'as <b>rien</b> à taper d'autre : la ligne
+      télécharge le projet, vérifie Node.js (et propose de l'installer), installe l'IA, ajoute la commande
+      <span class="k">xozhub</span> et pose l'icône <b>XozHub.GPT</b> sur ton Bureau.
+    </p>
+  </div>
+
+  <div class="card">
+    <ol class="steps">
+      <li>tu colles la ligne dans <span class="k">cmd</span> → la fenêtre travaille toute seule ;</li>
+      <li>elle pose l'icône <b>XozHub.GPT</b> sur ton <b>Bureau</b> ;</li>
+      <li><b>clique sur cette icône</b> : l'IA s'ouvre dans une fenêtre de terminal, tu peux lui parler.</li>
+    </ol>
+    <p class="small muted" style="margin-top:14px">
+      Il ne reste aucun script à lire sur ton disque : le dossier d'installation est masqué par Windows
+      et son contenu est chiffré. Tout passe par l'icône du Bureau.
+    </p>
+  </div>
+
+  <!-- ============================================================ 2 -->
+  <h2 id="quoi"><span class="n">2</span>C'est quoi, XozHub.GPT ?</h2>
+  <div class="card">
+    <p>Une IA qui travaille sur ton ordinateur, dans une fenêtre de terminal. Tu lui écris ce que tu veux
+    en français, avec tes mots, et elle <b>le fait vraiment</b> : elle crée les fichiers, écrit le code,
+    lance les commandes, lit les erreurs et corrige jusqu'à ce que ça marche.</p>
+    <p>Ce n'est pas un chat qui te donne des conseils : c'est un ouvrier. Tu demandes un site, tu obtiens
+    un vrai dossier avec un vrai site dedans.</p>
+    <p class="faint small">Durant son travail, tu vois défiler une ligne par fichier créé (jamais le
+    contenu) et les commandes lancées. Quand c'est fini, elle écrit <b>TERMINÉ</b>.</p>
+  </div>
+
+  <!-- ============================================================ 3 -->
+  <h2 id="avant"><span class="n">3</span>Avant de commencer (5 minutes)</h2>
+  <div class="card">
+    <p>Il faut deux choses, et la ligne d'installation s'occupe de la première toute seule :</p>
+    <ul class="flat">
+      <li><b>Node.js 18 ou plus</b> — si tu ne l'as pas, l'installation te proposera de l'installer
+          (réponds <span class="k">O</span>), sinon prends la version « LTS » sur
+          <a href="https://nodejs.org">nodejs.org</a>.</li>
+      <li><b>Une clé X.GPT</b> — une longue suite de caractères qui commence par <span class="k">xgpt_</span>.
+          Elle est déjà fournie avec le projet : tu n'as normalement <b>rien à saisir</b>. Sinon, demande-la
+          à la personne qui t'a donné XozHub.GPT.</li>
+    </ul>
+    <p class="small muted">Pour vérifier que Node.js est là : dans <span class="k">cmd</span>, tape
+    <span class="k">node -v</span>. Un numéro comme <span class="k">v22.11.0</span> s'affiche ? C'est bon.</p>
+  </div>
+
+  <!-- ============================================================ 4 -->
+  <h2 id="autre"><span class="n">4</span>Autres façons d'installer</h2>
+  <p class="sub">Si on t'a envoyé un fichier au lieu de la ligne.</p>
+  <div class="card">
+    <details open>
+      <summary>Avec un fichier <span class="k">XozHub-GPT-Setup.exe</span></summary>
+      <p>Double-clique dessus : tout est dedans, rien n'est téléchargé pendant l'installation. Windows
+      affichera peut-être « <b>Windows a protégé votre PC</b> » — c'est normal, le programme n'a pas de
+      signature payante : clique sur <b>Informations complémentaires</b> → <b>Exécuter quand même</b>.</p>
+    </details>
+    <details>
+      <summary>Avec un dossier ou un <span class="k">.zip</span> du projet</summary>
+      <p>Décompresse le <span class="k">.zip</span> s'il y en a un, entre dans le dossier et
+      <b>double-clique sur <span class="k">install.cmd</span></b>. C'est tout — la clé est déjà dedans.</p>
+    </details>
+    <details>
+      <summary>Vérifier que c'est bien installé</summary>
+      <p>Ouvre une <b>nouvelle</b> fenêtre <span class="k">cmd</span> (le chemin des commandes n'est relu
+      qu'à l'ouverture d'une fenêtre) et tape <span class="k">xozhub</span>. Si le message dit
+      « n'est pas reconnu », double-clique sur le raccourci <b>XozHub.GPT</b> du Bureau : lui marche
+      toujours.</p>
+    </details>
+  </div>
+
+  <!-- ============================================================ 5 -->
+  <h2 id="demande"><span class="n">5</span>Ta première demande</h2>
+  <p class="sub">Clique sur l'icône XozHub.GPT du Bureau : c'est la même chose que taper <span class="k">xozhub</span>.</p>
+  <div class="card">
+    <p>Tu vois un logo, un journal au milieu et une zone de saisie en bas. Écris ta demande, appuie sur
+    <b>Entrée</b>, et laisse faire. Un premier essai, à copier-coller :</p>
+    <pre class="cmd"><button class="copy" data-copy="crée un site vitrine pour un salon de coiffure dans le dossier coiffure-et-vous">copier</button>crée un site vitrine pour un salon de coiffure dans le dossier coiffure-et-vous</pre>
+    <p style="margin-top:14px">L'IA travaille toute seule : elle crée le dossier, écrit
+    <span class="k">index.html</span>, <span class="k">style.css</span> et <span class="k">script.js</span>,
+    puis lance un petit serveur local pour vérifier que la page répond. Tu ne confirmes rien : par défaut,
+    <b>chaque commande part toute seule</b>.</p>
+  </div>
+
+  <!-- ============================================================ 6 -->
+  <h2 id="regles"><span class="n">6</span>Comment bien demander (les 5 règles)</h2>
+  <p class="sub">C'est 90 % du résultat. L'IA est très forte quand on lui parle simplement.</p>
+  <div class="card">
+    <ol class="steps">
+      <li><b>Dis ce que tu veux, pas comment le faire.</b> « Fais-moi un site pour mon garage » est mieux
+      que « utilise du HTML et du CSS avec flexbox ». Le comment, c'est son métier.</li>
+      <li><b>Donne un nom de dossier.</b> « …dans le dossier <span class="k">mon-site</span> ». Sans ça,
+      elle travaille dans le dossier courant et tu retrouves tout mélangé.</li>
+      <li><b>Dis à qui ça s'adresse et le style voulu.</b> « pour un public jeune, style sombre et
+      moderne », « pour des parents d'élèves, sobre et rassurant ». Deux mots suffisent à changer tout le
+      design.</li>
+      <li><b>Une demande à la fois.</b> Fais ton site, regarde-le, puis demande une retouche. Ne lui
+      enfourne pas dix choses dans une phrase : elle en oublie.</li>
+      <li><b>Si quelque chose ne va pas, sois précis.</b> Pas « c'est moche », mais « le menu ne se replie
+      pas sur téléphone » ou « le texte du titre est trop petit ». Elle corrige très bien quand c'est
+      décrit.</li>
+    </ol>
+    <p class="small muted" style="margin-top:14px">Deux remarques : <b>pas besoin d'être poli ni parfait</b>
+    (« corrige ça », « encore », « gros titre » : ça marche), et <b>elle pose rarement des questions</b> —
+    si un détail manque, elle décide à ta place et continue. Son choix ne te va pas ? Demande de changer.</p>
+  </div>
+
+  <!-- ============================================================ 7 -->
+  <h2 id="site"><span class="n">7</span>Créer un site propre, « comme un pro »</h2>
+  <p class="sub">XozHub.GPT est réglé pour livrer, par défaut, un site de qualité d'agence.</p>
+  <div class="card">
+    <p>Vraie palette de couleurs, typographie soignée, espacements réguliers, responsive (mobile et
+    ordinateur), contenu crédible en français, accessibilité, pas de lien cassé, pas de « Lorem ipsum ».
+    Demande simplement :</p>
+    <pre class="cmd"><button class="copy" data-copy="crée un site vitrine pour une boulangerie artisanale à Lyon, dossier fournil-du-rhone : présentation, nos pains, horaires et adresse. Ton chaleureux, beige et brun, photos en illustrations">copier</button>crée un site vitrine pour une boulangerie artisanale à Lyon, dossier fournil-du-rhone :
+présentation, nos pains, horaires et adresse. Ton chaleureux, beige et brun, photos en illustrations</pre>
+    <h3>Ce que tu obtiens</h3>
+    <pre class="cmd">fournil-du-rhone/
+  index.html     la page, en HTML sémantique (en-tête, sections, pied de page)
+  style.css      tout le design : couleurs en variables, mise en page, responsive
+  script.js      le menu mobile et les petites interactions</pre>
+    <h3>Vérifier le résultat toi-même</h3>
+    <p>L'IA vérifie déjà que la page répond, mais c'est toi qui dois la regarder : ouvre le dossier et
+    <b>double-clique sur <span class="k">index.html</span></b> — ça s'ouvre dans ton navigateur, ou demande
+    « ouvre la page dans mon navigateur ». Sur cette page, vérifie quatre choses :</p>
+    <ul class="flat">
+      <li>le texte est <b>lisible</b> (rien de gris clair sur blanc) ;</li>
+      <li>redimensionne la fenêtre jusqu'à la taille d'un téléphone : rien ne dépasse, le menu se replie ;</li>
+      <li>clique sur les liens du menu : ils descendent aux bonnes sections ;</li>
+      <li>le contenu te ressemble : remplace les textes inventés par les tiens.</li>
+    </ul>
+    <h3>Demander une retouche</h3>
+    <p>Reprends exactement le même dossier et parle normalement :</p>
+    <table>
+      <tr><th>Ce que tu tapes</th><th>Ce qui se passe</th></tr>
+      <tr><td class="k">sur la page du fournil, ajoute une section « Nos horaires » avec un tableau</td>
+          <td>une section est ajoutée, et le lien du menu avec</td></tr>
+      <tr><td class="k">le titre principal est trop petit sur téléphone, agrandis-le</td>
+          <td>correction ciblée dans <span class="k">style.css</span></td></tr>
+      <tr><td class="k">change la palette : passe en bleu nuit et or</td>
+          <td>toutes les couleurs de la page changent d'un coup</td></tr>
+      <tr><td class="k">ajoute une page « contact » avec un formulaire (nom, email, message)</td>
+          <td>un <span class="k">contact.html</span> + le lien dans le menu de toutes les pages</td></tr>
+      <tr><td class="k">le menu ne se replie pas sur mobile, corrige-le</td>
+          <td>correction ciblée dans <span class="k">script.js</span></td></tr>
+    </table>
+    <h3>Idées de demandes prêtes à l'emploi</h3>
+    <pre class="cmd"><button class="copy" data-copy="crée une page de portfolio pour un photographe animalier, dossier portfolio : grille de 9 photos, galerie qui s'ouvre en grand au clic, style sombre et épuré">copier</button>crée une page de portfolio pour un photographe animalier, dossier portfolio :
+grille de 9 photos, galerie qui s'ouvre en grand au clic, style sombre et épuré</pre>
+    <pre class="cmd"><button class="copy" data-copy="crée une page de vente pour une appli de gestion de budget, dossier budget-app : titre accrocheur, trois avantages, une section tarifs avec deux formules, un bouton d'inscription, et un pied de page. Style moderne, dégradé violet à bleu">copier</button>crée une page de vente pour une appli de gestion de budget, dossier budget-app :
+titre accrocheur, trois avantages, une section tarifs avec deux formules, un bouton
+d'inscription, et un pied de page. Style moderne, dégradé violet à bleu</pre>
+    <pre class="cmd"><button class="copy" data-copy="crée un site pour mon association de protection des chats, dossier les-chats-libres : qui nous sommes, nos actions, comment adopter, comment donner. Ton doux et chaleureux, avec un bouton « Faire un don » bien visible">copier</button>crée un site pour mon association de protection des chats, dossier les-chats-libres :
+qui nous sommes, nos actions, comment adopter, comment donner. Ton doux et chaleureux,
+avec un bouton « Faire un don » bien visible</pre>
+    <pre class="cmd"><button class="copy" data-copy="crée une page de restaurant italien, dossier trattoria-bella : menu avec les plats et les prix, galerie, réservation par téléphone, plan d'accès">copier</button>crée une page de restaurant italien, dossier trattoria-bella :
+menu avec les plats et les prix, galerie, réservation par téléphone, plan d'accès</pre>
+  </div>
+
+  <!-- ============================================================ 8 -->
+  <h2 id="tout"><span class="n">8</span>Tout le reste : elle sait aussi le faire</h2>
+  <div class="card">
+    <p>Un site n'est qu'un exemple. Le même principe marche pour tout :</p>
+    <table>
+      <tr><th>Ce que tu demandes</th><th>Ce que tu obtiens</th></tr>
+      <tr><td class="k">corrige le bug : le bouton ne fait rien</td>
+          <td>le fichier est lu, la cause trouvée, le code corrigé et retesté</td></tr>
+      <tr><td class="k">explique-moi ce que fait ce dossier</td>
+          <td>une explication en français, après avoir vraiment lu les fichiers</td></tr>
+      <tr><td class="k">fais-moi un script qui range mes téléchargements par type de fichier</td>
+          <td>un script prêt à double-cliquer, testé</td></tr>
+      <tr><td class="k">renomme toutes les photos du dossier en photo-001, photo-002…</td>
+          <td>les fichiers sont renommés, proprement</td></tr>
+      <tr><td class="k">fais-moi une calculatrice avec une interface</td>
+          <td>un petit projet complet, à ouvrir dans le navigateur</td></tr>
+      <tr><td class="k">lis ce fichier CSV et fais-moi un graphique</td>
+          <td>le graphique, dans un fichier que tu ouvres</td></tr>
+      <tr><td class="k">c'est quoi un service worker ?</td>
+          <td>une réponse en texte, <b>sans rien modifier</b> sur ton disque</td></tr>
+    </table>
+    <p class="small muted" style="margin-top:14px">Dernière ligne importante : pose-lui une vraie question
+    (« c'est quoi… », « pourquoi… ») et elle <b>répond</b> au lieu de bricoler dans tes fichiers. Elle
+    devine toute seule si tu veux une réponse ou du travail.</p>
+  </div>
+
+  <!-- ============================================================ 9 -->
+  <h2 id="commandes"><span class="n">9</span>Les commandes et les raccourcis</h2>
+  <p class="sub">Tu n'as presque rien à retenir : deux commandes existent, tout le reste se demande en français.</p>
+  <div class="card">
+    <table>
+      <tr><th>À taper</th><th>Effet</th></tr>
+      <tr><td class="k">/miseajour</td>
+          <td>récupère la dernière version du code <b>et</b> de l'IA, puis redémarre et reprend ta conversation</td></tr>
+      <tr><td class="k">/couleurs</td>
+          <td>règle l'affichage : <span class="k">truecolor</span> (le plus beau), <span class="k">256</span>
+          ou <span class="k">16</span> pour un vieux terminal, <span class="k">none</span> pour couper</td></tr>
+      <tr><td class="k">n'importe quelle autre chose</td>
+          <td>c'est une demande pour l'IA, écrite en français</td></tr>
+    </table>
+    <h3>Raccourcis de l'interface</h3>
+    <table>
+      <tr><th>Touche / clic</th><th>Effet</th></tr>
+      <tr><td class="k">Entrée</td><td>envoyer · pendant qu'elle travaille : <b>garder</b> le message pour après</td></tr>
+      <tr><td class="k">Échap</td><td>interrompre ce qu'elle est en train de faire</td></tr>
+      <tr><td>le bouton <b>■ STOP</b></td><td>la faire taire tout de suite</td></tr>
+      <tr><td class="k">↑</td><td>revoir tes demandes précédentes</td></tr>
+      <tr><td>molette, <span class="k">Page↑</span> <span class="k">Page↓</span></td><td>faire défiler le journal</td></tr>
+      <tr><td class="k">ctrl-l</td><td>nettoyer l'écran</td></tr>
+      <tr><td>clic sur <b>✕ End session</b></td><td>ouvrir le menu de fin de session</td></tr>
+    </table>
+    <h3>Le menu de fin de session</h3>
+    <p>Un clic sur <b>✕ End session</b> (en bas à droite) propose cinq choix : <b>Nouvelle session</b>,
+    <b>Reprendre la dernière session</b>, <b>Ouvrir une nouvelle fenêtre XozHub.GPT</b>, <b>Redémarrer</b>
+    ou <b>Quitter</b>. Choisis avec les flèches puis <b>Entrée</b>, tape le numéro, ou clique sur la ligne.
+    Pour revenir en arrière : <span class="k">Échap</span>, <span class="k">q</span>,
+    <span class="k">x</span>, ou un clic sur la ✕ du panneau.</p>
+  </div>
+
+  <!-- ============================================================ 10 -->
+  <h2 id="fichiers"><span class="n">10</span>Où vont mes fichiers, et où est ma conversation ?</h2>
+  <div class="card">
+    <ul class="flat">
+      <li><b>Tes fichiers</b> : dans le dossier que tu as nommé (« …dans le dossier
+      <span class="k">mon-site</span> »), donc à côté du dossier où tu as lancé XozHub.GPT. L'IA affiche le
+      chemin exact à chaque fichier créé.</li>
+      <li><b>Le dossier de travail</b> est écrit dans la barre du bas. Si tu nommes un dossier dans ta
+      demande, elle travaille là ; sinon, dans ce dossier-là.</li>
+      <li><b>Ta conversation</b> est sauvegardée toute seule à la fin de chaque tour : tu peux fermer,
+      revenir demain et choisir « Reprendre la dernière session ».</li>
+      <li><b>La mémoire du projet</b>, c'est le fichier <span class="k">XozHub.md</span> créé dans le dossier
+      de travail : ce que l'IA a jugé bon de retenir (choix, ports, conventions). Tu peux l'ouvrir, l'éditer
+      ou le supprimer — elle repartira de zéro.</li>
+    </ul>
+  </div>
+
+  <!-- ============================================================ 11 -->
+  <h2 id="depannage"><span class="n">11</span>Dépannage</h2>
+  <div class="card">
+    <table>
+      <tr><th>Ce que tu vois</th><th>Ce qu'il faut faire</th></tr>
+      <tr><td class="k">'xozhub' n'est pas reconnu</td>
+          <td>ferme la fenêtre cmd et <b>rouvre-en une nouvelle</b>, puis retape <span class="k">xozhub</span>.
+          Sinon, passe par l'icône <b>XozHub.GPT</b> du Bureau.</td></tr>
+      <tr><td>« Aucune clé API détectée »</td>
+          <td>redemande une clé à la personne qui t'a donné l'IA et relance l'installation.</td></tr>
+      <tr><td class="k">XozHub.GPT a besoin de Node.js 18</td>
+          <td>installe la version <b>LTS</b> depuis <a href="https://nodejs.org">nodejs.org</a>, puis rouvre
+          une nouvelle fenêtre cmd.</td></tr>
+      <tr><td>« Windows a protégé votre PC »</td>
+          <td><b>Informations complémentaires</b> → <b>Exécuter quand même</b>.</td></tr>
+      <tr><td>« Le téléchargement du projet a échoué »</td>
+          <td>vérifie ta connexion, puis relance la même ligne.</td></tr>
+      <tr><td>Le site s'affiche tout blanc</td>
+          <td>tu as ouvert le mauvais fichier, ou une page vide a été créée : demande « <b>la page est
+          blanche, corrige-la</b> ».</td></tr>
+      <tr><td>« Commande bloquée : elle aurait ouvert une page »</td>
+          <td>elle ne s'autorise pas à ouvrir un navigateur sans que tu le demandes. Dis « <b>ouvre la
+          page</b> », et c'est fait.</td></tr>
+      <tr><td>Elle patine ou part ailleurs</td>
+          <td><span class="k">Échap</span> pour l'arrêter, puis redis ta demande en une phrase, en nommant
+          le dossier.</td></tr>
+      <tr><td>La fenêtre est bizarre (couleurs, flèches)</td>
+          <td>c'est normal : l'IA a besoin d'une <b>vraie</b> fenêtre de terminal, pas d'un affichage capturé.</td></tr>
+      <tr><td>Ça semble bloqué</td>
+          <td>regarde la barre du bas et le titre de la fenêtre : elle écrit, réfléchit ou exécute. Attends —
+          ou <span class="k">Échap</span>.</td></tr>
+    </table>
+    <p class="small muted" style="margin-top:14px">En dernier recours, relance la ligne d'installation du
+    haut de cette page : elle répare l'installation sans rien casser.</p>
+  </div>
+
+  <!-- ============================================================ 12 -->
+  <h2 id="partager"><span class="n">12</span>Partager XozHub.GPT à quelqu'un</h2>
+  <div class="card">
+    <p>C'est le but : personne n'a besoin d'être développeur.</p>
+    <ol class="steps">
+      <li>Donne-lui <b>la ligne de commande</b> du haut de cette page — c'est la méthode la plus simple,
+      celle qui ne demande aucun fichier à transférer ;</li>
+      <li>ou envoie <b>XozHub-GPT-Setup.exe</b> (un double-clic et c'est fini) ;</li>
+      <li>ou envoie le <b>dossier du projet en <span class="k">.zip</span></b> : la personne le décompresse
+      et double-clique sur <span class="k">install.cmd</span>.</li>
+    </ol>
+    <div class="note">
+      ⚠️ Un point de vigilance si tu fabriques l'installateur toi-même : s'il y a un fichier
+      <span class="k">.env</span> à côté du projet, <b>ta clé API part dedans</b>. Pour un fichier que tu
+      diffuses publiquement, renomme-le avant de le fabriquer : l'installateur demandera alors la clé à la
+      personne qui installe.
+    </div>
+  </div>
+
+  <!-- ============================================================ 13 -->
+  <h2 id="memo"><span class="n">13</span>Aide-mémoire</h2>
+  <div class="card">
+    <pre class="cmd"><button class="copy" data-copy="Installer        → colle la ligne dans cmd, ou double-clic sur XozHub-GPT-Setup.exe
+Lancer           → clic sur l'icône XozHub.GPT du Bureau (ou : xozhub)
+Demander         → en français, Entrée. Une demande à la fois, avec un nom de dossier.
+Arrêter          → Échap            Reprendre : ↑ puis Entrée
+Se mettre à jour → /miseajour
+
+Une bonne demande ressemble à ça :
+« crée un site pour <ton activité> dans le dossier <nom-du-dossier>,
+  pour <à qui c'est destiné>, ton <chaleureux / sobre / moderne> »">copier</button>Installer        → colle la ligne dans cmd, ou double-clic sur XozHub-GPT-Setup.exe
+Lancer           → clic sur l'icône XozHub.GPT du Bureau (ou : xozhub)
+Demander         → en français, Entrée. Une demande à la fois, avec un nom de dossier.
+Arrêter          → Échap            Reprendre : ↑ puis Entrée
+Se mettre à jour → /miseajour
+
+Une bonne demande ressemble à ça :
+« crée un site pour <ton activité> dans le dossier <nom-du-dossier>,
+  pour <à qui c'est destiné>, ton <chaleureux / sobre / moderne> »</pre>
+  </div>
+
+  <footer>
+    <a href="index.html">← La page d'installation</a> ·
+    <a href="https://github.com/Qays67/XozHubCmdIA">Le code sur GitHub</a> ·
+    la même chose en texte : <span class="k">TUTORIEL.md</span> dans le dépôt.
+  </footer>
+
+</div>
+
+<script>
+// « copier » sur chaque bloc : le texte à copier est figé dans data-copy, donc
+// jamais pollué par le bouton lui-même.
+document.querySelectorAll('.copy').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    var code = btn.dataset.copy;
+    if (!code) code = btn.parentNode.textContent.replace('copier', '').trim();
+    function done() {
+      var old = btn.textContent;
+      btn.textContent = 'copié ✓';
+      btn.classList.add('ok');
+      setTimeout(function () { btn.textContent = old; btn.classList.remove('ok'); }, 1600);
+    }
+    function fallback() {
+      var ta = document.createElement('textarea');
+      ta.value = code;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.top = '-1000px';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); done(); } catch (e) { /* rien */ }
+      document.body.removeChild(ta);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(code).then(done, fallback);
+    } else {
+      fallback();
+    }
+  });
+});
+</script>
+</body>
+</html>

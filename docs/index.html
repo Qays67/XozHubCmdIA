@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>XozHub.GPT — installer l'IA : une ligne dans cmd</title>
+<meta name="description" content="Colle une seule ligne dans l'invite de commandes : XozHub.GPT s'installe, la commande xozhub est créée et l'icône apparaît sur ton Bureau. Node.js compris.">
+<meta name="theme-color" content="#07061A">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%2307061A'/><text x='16' y='23' font-size='18' font-family='monospace' font-weight='bold' text-anchor='middle' fill='%2322D6F5'>X</text></svg>">
+<style>
+:root{
+  --violet:#8B7BFF; --indigo:#6E5CFF; --blue:#4D9BFF; --cyan:#22D6F5; --ice:#7FE9FF; --mint:#4BF0B4;
+  --pink:#FF4FD8; --amber:#FFC46B; --coral:#FF6B8A;
+  --text:#E9EDFB; --muted:#9AA4CC; --faint:#5F6A9A;
+  --panel:#0F0D20; --panel2:#1A1740; --border:#4A44A8; --borderSoft:#332F6B;
+  --code:#1C1A44; --codeFg:#8BFFE0;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:
+    radial-gradient(1100px 560px at 8% -12%, rgba(110,92,255,.30), transparent 62%),
+    radial-gradient(900px 480px at 100% 2%, rgba(34,214,245,.16), transparent 58%),
+    #07061A;
+  color:var(--text);
+  font:16px/1.65 'Segoe UI',system-ui,-apple-system,'Helvetica Neue',sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:920px;margin:0 auto;padding:46px 22px 80px}
+a{color:var(--cyan)}
+a:hover{color:var(--ice)}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--ice);outline-offset:3px;border-radius:6px}
+
+.logo{
+  font-family:'Cascadia Mono','Consolas','DejaVu Sans Mono',monospace;
+  font-size:clamp(5px,1.55vw,12px);
+  line-height:1.05;
+  margin:0 0 14px;
+  white-space:pre;
+  background:linear-gradient(92deg,#6E5CFF 0%,#8B7BFF 22%,#4D9BFF 48%,#22D6F5 74%,#4BF0B4 100%);
+  -webkit-background-clip:text;background-clip:text;
+  color:transparent;
+  font-variant-ligatures:none;
+  overflow:hidden;
+}
+h1{font-size:27px;margin:0 0 6px;letter-spacing:.2px}
+h1 .tag{
+  font-size:14px;vertical-align:6px;margin-left:8px;padding:2px 9px;border-radius:999px;
+  background:linear-gradient(90deg,rgba(34,214,245,.22),rgba(75,240,180,.18));
+  color:var(--ice);border:1px solid rgba(34,214,245,.45);font-weight:600;
+}
+.lead{color:var(--muted);margin:0 0 6px;max-width:72ch}
+.rule{height:1px;margin:26px 0;background:linear-gradient(90deg,#6E5CFF,#4D9BFF,#22D6F5,#4BF0B4);opacity:.65}
+h2{font-size:19px;margin:34px 0 10px}
+h2 .n{
+  display:inline-block;width:26px;height:26px;line-height:26px;text-align:center;border-radius:8px;
+  font-size:14px;margin-right:10px;color:#0B0A1F;font-weight:700;
+  background:linear-gradient(135deg,var(--violet),var(--cyan));
+}
+.card{
+  background:linear-gradient(180deg,var(--panel2),var(--panel));
+  border:1px solid var(--border);border-radius:14px;padding:20px 22px;margin:16px 0 0;
+}
+.card p{margin:0 0 10px}
+.card p:last-child{margin-bottom:0}
+.card.hi{border-color:var(--cyan);box-shadow:0 0 0 1px rgba(34,214,245,.25),0 18px 50px rgba(34,214,245,.10)}
+.muted{color:var(--muted)}
+.small{font-size:14px}
+
+pre.cmd{
+  position:relative;margin:14px 0 0;padding:16px;border-radius:12px;
+  background:var(--code);border:1px solid var(--borderSoft);
+  color:var(--codeFg);font-family:'Cascadia Mono','Consolas','DejaVu Sans Mono',monospace;
+  font-size:13.5px;line-height:1.55;overflow-x:auto;white-space:pre;
+}
+pre.big{border-color:rgba(34,214,245,.55);box-shadow:inset 0 0 0 1px rgba(34,214,245,.12);font-size:14px}
+.copy{
+  position:absolute;top:9px;right:9px;cursor:pointer;
+  font:600 12px 'Segoe UI',system-ui,sans-serif;
+  color:var(--ice);background:rgba(20,17,48,.9);
+  border:1px solid var(--border);border-radius:8px;padding:5px 10px;
+}
+.copy:hover{border-color:var(--cyan)}
+.copy.ok{color:#0B0A1F;background:linear-gradient(90deg,var(--mint),var(--ice));border-color:transparent}
+
+ol.steps{margin:10px 0 0;padding-left:24px}
+ol.steps li{margin:8px 0}
+ul.flat{margin:10px 0 0;padding-left:22px}
+ul.flat li{margin:6px 0}
+.k{color:var(--ice);font-family:'Cascadia Mono','Consolas',monospace;font-size:14.5px;
+   background:rgba(34,214,245,.10);border:1px solid rgba(34,214,245,.30);border-radius:6px;padding:1px 6px}
+.btn{
+  display:inline-block;margin-top:14px;padding:11px 20px;border-radius:11px;text-decoration:none;
+  font-weight:700;color:#0B0A1F;background:linear-gradient(135deg,var(--violet),var(--cyan) 70%,var(--mint));
+}
+.btn:hover{color:#0B0A1F;filter:brightness(1.08)}
+details{border:1px solid var(--borderSoft);border-radius:12px;padding:12px 16px;margin:10px 0;background:rgba(15,13,32,.7)}
+details[open]{border-color:var(--border)}
+summary{cursor:pointer;font-weight:600;color:var(--text)}
+summary::marker{color:var(--violet)}
+details p{margin:10px 0 0;color:var(--muted);font-size:15px}
+footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--borderSoft);color:var(--faint);font-size:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<pre class="logo">███  ███   ██████   ████████  ███  ███  ███  ███  ███████
+███  ███  ███  ███  ████████  ███  ███  ███  ███  ███  ███
+ ██████   ██    ██      ████  ███  ███  ███  ███  ███  ███
+  ████    ██    ██     ████   ████████  ███  ███  ███████
+  ████    ██    ██    ████    ████████  ███  ███  ███████
+ ██████   ██    ██   ████     ███  ███  ███  ███  ███  ███
+███  ███  ███  ███  ████████  ███  ███  ███  ███  ███  ███
+███  ███   ██████   ████████  ███  ███   ██████   ███████</pre>
+
+<h1>XozHub.GPT<span class="tag">.GPT</span></h1>
+<p class="lead">Agent de développement en ligne de commande : tu lui parles en français, il écrit les
+fichiers, exécute les commandes et vérifie son travail. Installation en <b>une seule ligne</b>, sur Windows.</p>
+
+<div class="rule"></div>
+
+<h2><span class="n">1</span>Colle cette ligne dans cmd</h2>
+<div class="card hi">
+  <p>Ouvre l'<b>invite de commandes</b> (touche <span class="k">Windows</span>, tape <span class="k">cmd</span>, Entrée),
+  colle la ligne ci-dessous (<b>clic droit</b> = coller) puis appuie sur <b>Entrée</b> :</p>
+  <pre class="cmd big"><button class="copy" data-copy="powershell -NoProfile -ExecutionPolicy Bypass -Command &quot;irm https://raw.githubusercontent.com/Qays67/XozHubCmdIA/main/install-en-ligne.ps1 | iex&quot;">copier</button>powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/Qays67/XozHubCmdIA/main/install-en-ligne.ps1 | iex"</pre>
+  <p class="small muted" style="margin-top:14px">
+    Rien à télécharger à la main, rien à décompresser, rien à taper d'autre. Laisse la fenêtre ouverte :
+    ça prend une minute.
+  </p>
+</div>
+
+<h2><span class="n">2</span>Ce qui se passe</h2>
+<div class="card">
+  <ol class="steps">
+    <li>elle vérifie <b>Node.js 18+</b> et propose de l'installer automatiquement s'il manque ;</li>
+    <li>elle installe l'IA dans <span class="k">%LOCALAPPDATA%\XozHub</span> : <b>le code voyage dans
+        cette ligne</b>, donc rien d'autre n'est téléchargé (pas de <span class="k">.zip</span>, rien à
+        décompresser) ;</li>
+    <li>elle ajoute la commande <span class="k">xozhub</span> et pose le raccourci <b>XozHub.GPT</b> sur
+        ton <b>Bureau</b> ;</li>
+    <li>elle <b>masque le dossier</b> et n'y dépose <b>aucun script lisible</b> : le code y est chiffré ;</li>
+    <li>la clé X.GPT est déjà fournie dedans : <b>tu n'as rien à saisir</b>.</li>
+  </ol>
+</div>
+
+<h2><span class="n">3</span>Lancer l'IA</h2>
+<div class="card">
+  <p>Deux façons, au choix :</p>
+  <ol class="steps">
+    <li><b>double-clique sur l'icône XozHub.GPT</b> posée sur ton Bureau : l'IA s'ouvre dans une fenêtre
+        de terminal (c'est la façon la plus simple, elle marche toujours) ;</li>
+    <li>ou ouvre une <b>nouvelle</b> fenêtre <span class="k">cmd</span> et tape :</li>
+  </ol>
+  <pre class="cmd"><button class="copy" data-copy="xozhub">copier</button>xozhub</pre>
+  <p class="small muted" style="margin-top:14px">
+    La commande marche ensuite depuis n'importe quel dossier. Si elle n'est pas trouvée, c'est que la fenêtre
+    cmd était ouverte avant l'installation : ferme-la et rouvre-en une.
+  </p>
+</div>
+
+<div class="rule"></div>
+
+<h2>Ta première demande</h2>
+<div class="card">
+  <p>Écris en français, avec tes mots, puis appuie sur <b>Entrée</b>. Par exemple :</p>
+  <pre class="cmd"><button class="copy" data-copy="crée une page de vente pour une appli de gestion de budget, dossier budget-app : titre accrocheur, trois avantages, une section tarifs avec deux formules, un bouton d'inscription, et un pied de page. Style moderne, dégradé violet à bleu">copier</button>crée une page de vente pour une appli de gestion de budget, dossier budget-app :
+titre accrocheur, trois avantages, une section tarifs avec deux formules, un bouton
+d'inscription, et un pied de page. Style moderne, dégradé violet à bleu</pre>
+  <p class="small muted" style="margin-top:14px">
+    Il travaille tout seul : il crée le dossier, écrit les fichiers, lance un serveur local pour vérifier
+    que la page répond, corrige ce qui ne va pas, puis écrit <b>TERMINÉ</b>.
+  </p>
+  <a class="btn" href="tutoriel.html">Lire le tutoriel complet →</a>
+</div>
+
+<div class="rule"></div>
+
+<h2>Autres façons d'installer</h2>
+
+<details>
+  <summary>Avec un fichier <span class="k">XozHub-GPT-Setup.exe</span> (si on te l'a envoyé)</summary>
+  <p>Double-clique dessus : tout est dedans, rien n'est téléchargé pendant l'installation. Windows affichera
+  « Windows a protégé votre PC » (le programme n'a pas de signature payante) : clique sur
+  <b>Informations complémentaires</b> → <b>Exécuter quand même</b>.</p>
+</details>
+
+<details>
+  <summary>Avec un dossier ou un <span class="k">.zip</span> du projet</summary>
+  <p>Décompresse le <span class="k">.zip</span> s'il y en a un, entre dans le dossier et double-clique sur
+  <span class="k">install.cmd</span>. La clé est déjà dans le dossier : rien à saisir.</p>
+</details>
+
+<div class="rule"></div>
+
+<h2>Ça ne marche pas ?</h2>
+
+<details>
+  <summary>« 'xozhub' n'est pas reconnu en tant que commande »</summary>
+  <p>Windows ne relit le chemin des commandes qu'à l'ouverture d'une fenêtre. Ferme celle-ci et
+  <b>ouvre-en une nouvelle</b>, puis retape <span class="k">xozhub</span>. Autre méthode qui marche toujours :
+  double-clique sur le raccourci <b>XozHub.GPT</b> du Bureau.</p>
+</details>
+
+<details>
+  <summary>« XozHub.GPT a besoin de Node.js 18 ou plus »</summary>
+  <p>L'installateur propose de l'installer automatiquement via <span class="k">winget</span> : réponds
+  <span class="k">O</span>. Sinon, installe Node.js LTS depuis <a href="https://nodejs.org">nodejs.org</a>,
+  puis relance l'installation.</p>
+</details>
+
+<details>
+  <summary>La ligne ne fait rien, ou « le fichier d'installation est incomplet »</summary>
+  <p>Vérifie ta connexion internet, puis relance la même ligne : elle retélécharge le fichier entier.
+  Si le dépôt a été renommé ou passé en privé, la ligne ne marche plus pour personne — un dépôt public
+  est obligatoire.</p>
+</details>
+
+<details>
+  <summary>« Aucune clé API détectée »</summary>
+  <p>La clé X.GPT (<span class="k">xgpt_…</span>) voyage dans le <span class="k">.env</span> du projet : elle
+  s'installe toute seule. Si ce message apparaît quand même, demande une clé à la personne qui t'a donné
+  XozHub.GPT et relance l'installation.</p>
+</details>
+
+<details>
+  <summary>Où est installé XozHub.GPT, et comment le mettre à jour ?</summary>
+  <p>Tout est dans <span class="k">%LOCALAPPDATA%\XozHub</span> (dossier <b>masqué</b> par Windows : c'est
+  normal, tu n'as rien à y faire), et la clé X.GPT est dans le <span class="k">.env</span> de ce dossier.
+  Dans l'interface, la commande <span class="k">/miseajour</span> récupère la dernière version du code et de
+  l'IA, puis redémarre : tu ne perds ni ta conversation, ni tes fichiers de travail.</p>
+</details>
+
+<footer>
+  <a href="tutoriel.html">Le tutoriel complet, de A à Z</a> ·
+  <a href="https://github.com/Qays67/XozHubCmdIA">Code source sur GitHub</a> ·
+  installation, commandes et réglages : voir le <span class="k">README.md</span> du dépôt.
+</footer>
+
+</div>
+
+<script>
+// « copier » sur chaque bloc : le texte à copier est figé dans data-copy, donc
+// jamais pollué par le bouton lui-même.
+document.querySelectorAll('.copy').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    var code = btn.dataset.copy;
+    if (!code) code = btn.parentNode.textContent.replace('copier', '').trim();
+    function done() {
+      var old = btn.textContent;
+      btn.textContent = 'copié ✓';
+      btn.classList.add('ok');
+      setTimeout(function () { btn.textContent = old; btn.classList.remove('ok'); }, 1600);
+    }
+    function fallback() {
+      var ta = document.createElement('textarea');
+      ta.value = code;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.top = '-1000px';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); done(); } catch (e) { /* rien */ }
+      document.body.removeChild(ta);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(code).then(done, fallback);
+    } else {
+      fallback();
+    }
+  });
+});
+</script>
+</body>
+</html>

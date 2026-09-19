@@ -13,15 +13,18 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubus
 
 Copie-la telle quelle dans un message (Discord, SMS, mail…). C'est tout.
 
-Ce que le script fait, dans l'ordre :
+Ce que ce fichier fait, dans l'ordre :
 
-1. il télécharge le projet depuis `https://github.com/Qays67/XozHubCmdIA/archive/refs/heads/main.zip` ;
-2. il vérifie que le projet est **complet** (`bin/` et `src/`) et s'arrête avec un message clair sinon ;
-3. il **rétablit les fins de ligne CRLF** sur les `.cmd` — c'est ce qui évite l'erreur
-   *« 'rrorlevel' n'est pas reconnu en tant que commande »* ;
-4. il confie l'installation à `install.cmd`, celui qui est dans le projet : **une seule logique
-   d'installation**, deux façons de la lancer ;
-5. il efface ses fichiers temporaires.
+1. il vérifie **Node.js 18+** et propose de l'installer automatiquement (`winget`) s'il manque ;
+2. il écrit l'IA dans `%LOCALAPPDATA%\XozHub` — le code y arrive **chiffré** : aucun script lisible
+   n'est déposé sur le disque ;
+3. il ajoute la commande `xozhub` au PATH de l'utilisateur ;
+4. il masque le dossier d'installation et pose le raccourci **XozHub.GPT** sur le Bureau
+   (double-clic = l'IA s'ouvre dans une fenêtre de terminal) ;
+5. il lance l'IA.
+
+Le code ne vient **pas** du dépôt : il voyage *dans* `install-en-ligne.ps1`. Rien d'autre n'est
+téléchargé, rien n'est décompressé, et aucun sous-dossier du dépôt n'est nécessaire.
 
 ---
 
@@ -33,28 +36,39 @@ Ce que le script fait, dans l'ordre :
 | Branche utilisée | `main` |
 | Visibilité | **Public** (un dépôt privé = ligne qui ne marche pour personne) |
 
-Ces éléments doivent être **à la racine** du dépôt (visibles dès la page d'accueil, pas dans un
-sous-dossier) :
+**Un seul fichier est indispensable, à la racine du dépôt :**
 
 ```
-bin/                      (dossier entier → bin/xozhub.js)
-src/                      (dossier entier → src/app.js, src/ui.js…)
-install.cmd               install-en-ligne.ps1
-xozhub.cmd                xoz.cmd
-package.json              .env
+install-en-ligne.ps1      ← ce que la ligne télécharge, et qui contient tout
 ```
 
-Pour en ajouter : sur la page du dépôt → **Add file** → **Upload files** → glisse les **dossiers**
-`bin` et `src` eux-mêmes. ⚠️ Glisser seulement les *fichiers* qu'ils contiennent ne recrée pas le
-dossier : c'est l'erreur la plus courante, et l'installation échoue alors à la copie.
+C'est tout. Ce fichier embarque le code de l'agent (chiffré), `package.json`, `xozhub.cmd` et le `.env` :
+la personne qui l'exécute n'a besoin de rien d'autre, et **aucun sous-dossier n'est nécessaire** — ni
+`bin/`, ni `src/`. Pas de dossier à glisser correctement, pas d'archive à décompresser, pas de fichier
+qui manque : c'est ce qui rend cette méthode impossible à rater.
 
-Pour savoir si c'est bon, ouvre ces deux adresses dans ton navigateur — elles doivent **afficher du
-code**, pas « 404 » :
+⚠️ Ce fichier est un **artefact** : ne l'édite pas à la main. Après une modification du code, refais-le
+et remonte-le :
 
 ```
-https://raw.githubusercontent.com/Qays67/XozHubCmdIA/main/bin/xozhub.js
-https://raw.githubusercontent.com/Qays67/XozHubCmdIA/main/src/app.js
+node fabriquer-en-ligne.mjs
 ```
+
+Le plus simple, et c'est ce qui évite l'erreur la plus fréquente : **double-clic sur `publier.cmd`**.
+Il refait le fichier, le remonte sur le dépôt et **vérifie que c'est bien la nouvelle version qui est
+servie**. Si le dépôt sert encore l'ancienne, la ligne échoue chez tout le monde en annonçant un
+projet « incomplet » — ce contrôle le dit tout de suite.
+
+Pour savoir si c'est bon, ouvre cette adresse dans ton navigateur — elle doit **afficher du code**,
+pas « 404 » :
+
+```
+https://raw.githubusercontent.com/Qays67/XozHubCmdIA/main/install-en-ligne.ps1
+```
+
+*(Si tu veux aussi pouvoir utiliser l'autre méthode — `install-depuis-le-depot.ps1`, qui télécharge le
+projet depuis le dépôt —, remonte en plus les dossiers `bin/` et `src/` **eux-mêmes**, pas les fichiers
+qu'ils contiennent. Ce n'est plus nécessaire pour la ligne du point 1.)*
 
 ---
 
@@ -146,8 +160,8 @@ Si tu veux qu'elle se débrouille seule : envoie-lui aussi **`TUTORIEL.md`**, ou
 
 | Ce qui arrive | Quoi faire |
 | --- | --- |
-| `Le projet telecharge est INCOMPLET : ... bin/, src/` | Les dossiers `bin` et `src` ne sont pas dans le dépôt. Renvoie-les depuis ton PC (**les dossiers**, pas les fichiers). |
-| `Impossible de telecharger le projet` | Mauvaise adresse dans `$SourceZip`, ou dépôt passé en privé. Le script affiche l'adresse utilisée : ouvre-la dans le navigateur. |
+| `Le fichier d'installation est incomplet ou abime` | Le téléchargement s'est mal terminé : relance simplement la ligne. |
+| `Impossible d'ecrire les fichiers dans ...` | Dossier verrouillé (antivirus, sauvegarde en cours) : réessaie dans une minute, ou redémarre le PC. |
 | `irm : ... n'est pas reconnu` | Ligne collée dans autre chose que cmd (PowerShell très ancien, Git Bash…). Fais-la coller dans une vraie fenêtre **cmd**. |
 | L'écran se ferme aussitôt | cmd a été lancé depuis un raccourci, ou un `exit` a été tapé. Relance la ligne dans une fenêtre cmd ouverte par la personne elle-même. |
 | `'rrorlevel' n'est pas reconnu` | Elle utilise une vieille consigne qui télécharge `install.cmd` directement. Redonne-lui **la ligne du point 1**. |
@@ -177,10 +191,11 @@ Si tu veux qu'elle se débrouille seule : envoie-lui aussi **`TUTORIEL.md`**, ou
 À faire une fois, puis c'est fini :
 
 - [ ] le dépôt est **public** et sa branche s'appelle **`main`** ;
-- [ ] à la **racine** (pas dans un sous-dossier) : `bin/`, `src/`, `package.json`, `.env`,
-      `install.cmd`, `install-en-ligne.ps1`, `xozhub.cmd`, `xoz.cmd` ;
-- [ ] les deux adresses de contrôle **affichent du code** (voir point 2) — pas « 404 » ;
-- [ ] `https://github.com/Qays67/XozHubCmdIA/blob/main/.env` **affiche ta clé** (voir point 3) ;
+- [ ] `install-en-ligne.ps1` est **à la racine** du dépôt et vient d'être régénéré
+      (`node fabriquer-en-ligne.mjs`) : c'est lui qui porte tout le code ;
+- [ ] l'adresse de contrôle **affiche du code** (voir point 2) — pas « 404 » ;
+- [ ] la clé X.GPT que tu veux diffuser est bien dans le `.env` de ton dossier **avant** de lancer
+      `fabriquer-en-ligne.mjs` (voir point 3) ;
 - [ ] tu as testé **la ligne toi-même** dans une nouvelle fenêtre cmd, après avoir supprimé
       `%LOCALAPPDATA%\XozHub` (voir point 4) ;
 - [ ] *(facultatif)* **Settings → Pages → Source : `main` / `/docs`** : le site d'installation est en
@@ -206,8 +221,8 @@ XozHub.GPT s'installe — clé comprise.
 
 | Tu modifies | À refaire |
 | --- | --- |
-| `bin/`, `src/` (le code de l'IA) | rien : le `.zip` du dépôt est téléchargé à chaque installation |
-| la clé API | remplace `.env` dans le dépôt, puis teste la ligne à nouveau |
-| `.env` (le modèle par défaut) | remplace la ligne `XOZHUB_MODEL=…` dans le dépôt |
-| la ligne elle-même (`install-en-ligne.ps1`) | ça s'applique tout de suite aux nouvelles installations |
+| le code de l'IA (`bin/`, `src/`) | **double-clic sur `publier.cmd`** : il refabrique `install-en-ligne.ps1`, le remonte sur le dépôt et vérifie que c'est bien la nouvelle version qui est servie |
+| la clé API | remplace `.env` dans ton dossier, puis double-clic sur `publier.cmd` |
+| les réglages par défaut (`.env`, modèle…) | pareil : `.env` → `publier.cmd` |
+| `install-depuis-le-depot.ps1` | rien à remonter : cette méthode lit le dépôt à chaque installation |
 | `install.cmd` | attention : il est repris par le `.exe` et par `fabriquer.cmd`, qui gardent une **copie** |
