@@ -182,7 +182,7 @@ Si tu veux qu'elle se débrouille seule : envoie-lui aussi **`TUTORIEL.md`**, ou
 | **Fichier unique** | double-clic sur `fabriquer.cmd` → tu obtiens `XozHub-GPT-Installer.cmd` → envoie-le, la personne **double-clique** | le plus simple, aucun hébergement, aucun terminal |
 | **`.exe`** | double-clic sur `fabriquer-exe.cmd` → `XozHub-GPT-Setup.exe` | le plus rassurant, ne télécharge rien (mais ⚠️ contient ta clé : ne le mets pas en téléchargement public) |
 | **Le dossier** | clic droit sur le dossier → Compresser → envoie le `.zip` | quand la personne est à côté de toi |
-| **Le site** | active **Settings → Pages → Source : `main` / `/docs`** → ta page est en ligne sur `https://qays67.github.io/XozHubCmdIA/` | pour donner un lien d'installation propre, sans rien transférer |
+| **Le site** | déjà en ligne : `https://qays67.github.io/XozHubCmdIA/` (GitHub Pages, source `main` / `/docs`) → donne simplement ce lien | pour donner un lien d'installation propre, sans rien transférer |
 
 ---
 
@@ -198,9 +198,9 @@ Si tu veux qu'elle se débrouille seule : envoie-lui aussi **`TUTORIEL.md`**, ou
       `fabriquer-en-ligne.mjs` (voir point 3) ;
 - [ ] tu as testé **la ligne toi-même** dans une nouvelle fenêtre cmd, après avoir supprimé
       `%LOCALAPPDATA%\XozHub` (voir point 4) ;
-- [ ] *(facultatif)* **Settings → Pages → Source : `main` / `/docs`** : le site d'installation est en
-      ligne sur `https://qays67.github.io/XozHubCmdIA/` et tu peux donner ce lien-là, c'est le plus
-      propre ;
+- [x] le site est **en ligne** sur `https://qays67.github.io/XozHubCmdIA/` (GitHub Pages, source
+      `main` / `/docs`) : tu peux donner ce lien-là, c'est le plus propre. Il se reconstruit tout seul à
+      chaque publication ;
 - [ ] *(facultatif)* un `.exe` pour ceux qui préfèrent les boutons : double-clic sur
       `fabriquer-exe.cmd`, puis joins `XozHub-GPT-Setup.exe` à une **Release** (le bouton du site le
       récupère tout seul). ⚠️ cet `.exe` **contient ta clé** : ne le pose jamais en téléchargement

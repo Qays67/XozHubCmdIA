@@ -19,9 +19,10 @@ Le site, c'est **une seule page HTML pure** (aucune dépendance, aucun fichier �
   passe, comment lancer l'IA, la première demande, **ce qui marche et ce qui peut bloquer**, les autres
   façons d'installer, le dépannage et les commandes utiles. Rien de plus.
 
-Publie-la gratuitement avec **GitHub Pages** (Settings → Pages → Source : `main` / `/docs`) : le site est
-alors en ligne sur `https://qays67.github.io/XozHubCmdIA/`, et la ligne d'installation marche **tout de
-suite** — elle ne dépend d'aucun fichier hébergé à côté.
+Le site est **en ligne** (`https://qays67.github.io/XozHubCmdIA/`), servi par **GitHub Pages** depuis
+`main` / `/docs`. Rien à faire pour le mettre à jour : chaque publication de `publier.cmd` le reconstruit
+tout seul, en une minute. Et la ligne d'installation marche **tout de suite** — elle ne dépend d'aucun
+fichier hébergé à côté du site.
 
 `fabriquer-exe.cmd` (double-clic) construit **`XozHub-GPT-Setup.exe`** : un seul fichier, que la personne
 double-clique pour installer. Rien n'est téléchargé pendant l'installation, donc pas de `.cmd` abîmé par
