@@ -152,9 +152,18 @@ footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--borderSoft);c
     et appuie sur <b>Entrée</b> :</p>
     <pre class="cmd big"><button class="copy" data-copy="powershell -NoProfile -ExecutionPolicy Bypass -Command &quot;irm https://raw.githubusercontent.com/Qays67/XozHubCmdIA/main/install-en-ligne.ps1 | iex&quot;">copier</button>powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/Qays67/XozHubCmdIA/main/install-en-ligne.ps1 | iex"</pre>
     <p class="small muted" style="margin-top:14px">
-      Laisse la fenêtre ouverte, ça prend une minute. Tu n'as <b>rien</b> à taper d'autre : la ligne
-      télécharge le projet, vérifie Node.js (et propose de l'installer), installe l'IA, ajoute la commande
-      <span class="k">xozhub</span> et pose l'icône <b>XozHub.GPT</b> sur ton Bureau.
+      Laisse la fenêtre ouverte, ça prend une minute. Tu n'as <b>rien</b> à taper d'autre : la ligne télécharge
+      l'IA <b>en un seul fichier</b> (rien à décompresser), vérifie Node.js (et propose de l'installer),
+      installe l'IA, ajoute la commande <span class="k">xozhub</span> et pose l'icône <b>XozHub.GPT</b> sur
+      ton Bureau.
+    </p>
+    <p class="small muted">
+      Ça marche sur <b>Windows 8, 10 et 11</b> (32 ou 64 bits), que tu colles la ligne dans
+      <span class="k">cmd</span> ou dans PowerShell. Si une version plus ancienne est déjà installée, elle est
+      remplacée et ses vieux fichiers lisibles sont effacés. Sur <b>Windows 7</b> ce n'est pas possible :
+      Node.js 18 ne s'y installe pas, l'installation te le dit et s'arrête. Et si l'antivirus ou le réseau
+      de ta machine bloque les scripts, la ligne ne passera pas : passe alors par un fichier qu'on
+      t'envoie (section 4).
     </p>
   </div>
 
@@ -203,10 +212,16 @@ footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--borderSoft);c
   <p class="sub">Si on t'a envoyé un fichier au lieu de la ligne.</p>
   <div class="card">
     <details open>
+      <summary>Avec un seul fichier <span class="k">XozHub-GPT-Installer.cmd</span></summary>
+      <p>On te l'envoie (Discord, mail, clé USB), tu <b>double-cliques dessus</b> : l'IA s'installe et
+      s'ouvre. Rien n'est téléchargé, donc ni l'antivirus ni le réseau ne peuvent le bloquer — c'est la
+      méthode qui passe partout.</p>
+    </details>
+    <details>
       <summary>Avec un fichier <span class="k">XozHub-GPT-Setup.exe</span></summary>
-      <p>Double-clique dessus : tout est dedans, rien n'est téléchargé pendant l'installation. Windows
-      affichera peut-être « <b>Windows a protégé votre PC</b> » — c'est normal, le programme n'a pas de
-      signature payante : clique sur <b>Informations complémentaires</b> → <b>Exécuter quand même</b>.</p>
+      <p><b>Double-clique dessus</b> : tout est dedans, rien n'est téléchargé pendant l'installation.
+      Windows affichera peut-être « <b>Windows a protégé votre PC</b> » — c'est normal, le programme n'a pas
+      de signature payante : clique sur <b>Informations complémentaires</b> → <b>Exécuter quand même</b>.</p>
     </details>
     <details>
       <summary>Avec un dossier ou un <span class="k">.zip</span> du projet</summary>
@@ -397,12 +412,26 @@ menu avec les plats et les prix, galerie, réservation par téléphone, plan d'a
       <tr><td>« Aucune clé API détectée »</td>
           <td>redemande une clé à la personne qui t'a donné l'IA et relance l'installation.</td></tr>
       <tr><td class="k">XozHub.GPT a besoin de Node.js 18</td>
-          <td>installe la version <b>LTS</b> depuis <a href="https://nodejs.org">nodejs.org</a>, puis rouvre
-          une nouvelle fenêtre cmd.</td></tr>
+          <td>l'installation propose de l'installer pour toi : réponds <span class="k">O</span> (Windows peut
+          demander une autorisation). Sinon, installe la version <b>LTS</b> depuis
+          <a href="https://nodejs.org">nodejs.org</a>, puis relance la ligne.</td></tr>
+      <tr><td>Windows 7 ou antérieur</td>
+          <td><b>impossible</b> : Node.js 18, dont l'IA a besoin, ne s'installe pas sur cette version de
+          Windows.</td></tr>
       <tr><td>« Windows a protégé votre PC »</td>
           <td><b>Informations complémentaires</b> → <b>Exécuter quand même</b>.</td></tr>
-      <tr><td>« Le téléchargement du projet a échoué »</td>
-          <td>vérifie ta connexion, puis relance la même ligne.</td></tr>
+      <tr><td>Erreur rouge tout de suite : la ligne n'a rien fait</td>
+          <td>ta connexion, un DNS filtrant, ou un réseau qui bloque GitHub (école, entreprise). Essaie
+          depuis un autre réseau ; sinon fais-toi envoyer le <span class="k">.exe</span> ou le
+          <span class="k">.zip</span>, qui n'ont besoin d'aucun téléchargement.</td></tr>
+      <tr><td>« Le fichier d'installation est incomplet ou abîmé »</td>
+          <td>le téléchargement s'est mal terminé : relance <b>la même ligne</b>, elle reprend tout. Si ça
+          revient, c'est un antivirus ou un réseau qui coupe le fichier — passe par le
+          <span class="k">.exe</span>.</td></tr>
+      <tr><td>L'antivirus bloque ou supprime des fichiers</td>
+          <td>un script qui télécharge et exécute du code, certains antivirus n'en veulent pas : utilise le
+          <span class="k">.exe</span> (il ne télécharge rien), ou autorise le dossier
+          <span class="k">%LOCALAPPDATA%\XozHub</span>.</td></tr>
       <tr><td>Le site s'affiche tout blanc</td>
           <td>tu as ouvert le mauvais fichier, ou une page vide a été créée : demande « <b>la page est
           blanche, corrige-la</b> ».</td></tr>
@@ -427,12 +456,17 @@ menu avec les plats et les prix, galerie, réservation par téléphone, plan d'a
   <div class="card">
     <p>C'est le but : personne n'a besoin d'être développeur.</p>
     <ol class="steps">
-      <li>Donne-lui <b>la ligne de commande</b> du haut de cette page — c'est la méthode la plus simple,
-      celle qui ne demande aucun fichier à transférer ;</li>
+      <li>Donne-lui <b>la ligne de commande</b> du haut de cette page — c'est la plus simple, elle ne demande
+      aucun fichier à transférer. Elle a besoin d'internet, d'un dépôt GitHub public, et d'un antivirus qui
+      ne bloque pas les scripts ;</li>
+      <li>ou envoie <b>XozHub-GPT-Installer.cmd</b> : un seul fichier, elle le double-clique, rien n'est
+      téléchargé — <b>c'est ce qui passe partout</b>, même derrière un antivirus strict ;</li>
       <li>ou envoie <b>XozHub-GPT-Setup.exe</b> (un double-clic et c'est fini) ;</li>
       <li>ou envoie le <b>dossier du projet en <span class="k">.zip</span></b> : la personne le décompresse
       et double-clique sur <span class="k">install.cmd</span>.</li>
     </ol>
+    <p class="small muted">Dans tous les cas, <b>garde une copie de l'installeur</b> : si le dépôt est
+    supprimé ou renommé, la ligne ne marche plus pour personne.</p>
     <div class="note">
       ⚠️ Un point de vigilance si tu fabriques l'installateur toi-même : s'il y a un fichier
       <span class="k">.env</span> à côté du projet, <b>ta clé API part dedans</b>. Pour un fichier que tu

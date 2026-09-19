@@ -87,6 +87,12 @@ ol.steps{margin:10px 0 0;padding-left:24px}
 ol.steps li{margin:8px 0}
 ul.flat{margin:10px 0 0;padding-left:22px}
 ul.flat li{margin:6px 0}
+table{width:100%;border-collapse:collapse;margin:12px 0 0;font-size:15px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--borderSoft);vertical-align:top}
+th{color:var(--faint);font-size:13px;letter-spacing:.6px;text-transform:uppercase;font-weight:600}
+tr:last-child td{border-bottom:0}
+.yes{color:var(--mint);font-weight:700}
+.no{color:var(--amber);font-weight:700}
 .k{color:var(--ice);font-family:'Cascadia Mono','Consolas',monospace;font-size:14.5px;
    background:rgba(34,214,245,.10);border:1px solid rgba(34,214,245,.30);border-radius:6px;padding:1px 6px}
 .btn{
@@ -134,13 +140,16 @@ fichiers, exécute les commandes et vérifie son travail. Installation en <b>une
 <h2><span class="n">2</span>Ce qui se passe</h2>
 <div class="card">
   <ol class="steps">
-    <li>elle vérifie <b>Node.js 18+</b> et propose de l'installer automatiquement s'il manque ;</li>
+    <li>elle vérifie <b>Node.js 18+</b> et propose de l'installer automatiquement s'il manque — sinon elle
+        te donne le lien officiel ;</li>
     <li>elle installe l'IA dans <span class="k">%LOCALAPPDATA%\XozHub</span> : <b>le code voyage dans
-        cette ligne</b>, donc rien d'autre n'est téléchargé (pas de <span class="k">.zip</span>, rien à
-        décompresser) ;</li>
+        cette ligne</b>, donc rien d'autre n'est téléchargé. Pas de <span class="k">.zip</span>, rien à
+        décompresser, aucun dossier à reconstituer ;</li>
     <li>elle ajoute la commande <span class="k">xozhub</span> et pose le raccourci <b>XozHub.GPT</b> sur
         ton <b>Bureau</b> ;</li>
     <li>elle <b>masque le dossier</b> et n'y dépose <b>aucun script lisible</b> : le code y est chiffré ;</li>
+    <li>si une <b>version plus ancienne</b> était déjà installée, elle est remplacée et ses anciens scripts
+        lisibles sont <b>effacés</b> ;</li>
     <li>la clé X.GPT est déjà fournie dedans : <b>tu n'as rien à saisir</b>.</li>
   </ol>
 </div>
@@ -158,6 +167,39 @@ fichiers, exécute les commandes et vérifie son travail. Installation en <b>une
     La commande marche ensuite depuis n'importe quel dossier. Si elle n'est pas trouvée, c'est que la fenêtre
     cmd était ouverte avant l'installation : ferme-la et rouvre-en une.
   </p>
+</div>
+
+<h2><span class="n">4</span>Ce qui marche, et ce qui peut bloquer</h2>
+<div class="card">
+  <p class="small muted" style="margin-top:0">Vérifié sur une installation réelle. Les autres lignes
+  viennent du code de l'installateur, pas d'une supposition.</p>
+  <table>
+    <tr><th>Ton cas</th><th>Résultat</th></tr>
+    <tr><td>Windows 8, 10 ou 11, en 32 ou 64 bits</td><td><span class="yes">marche</span></td></tr>
+    <tr><td>Ligne collée dans <span class="k">cmd</span> <b>ou</b> dans PowerShell</td><td><span class="yes">marche</span></td></tr>
+    <tr><td>Node.js 18 ou plus déjà installé</td><td><span class="yes">marche</span></td></tr>
+    <tr><td>Pas de Node.js, avec <span class="k">winget</span></td>
+        <td><span class="yes">marche</span> — réponds <span class="k">O</span> à la question ; Windows peut
+        demander une autorisation</td></tr>
+    <tr><td>Pas de Node.js, sans <span class="k">winget</span></td>
+        <td><span class="yes">marche</span> après avoir installé Node.js <b>LTS</b> depuis
+        <a href="https://nodejs.org">nodejs.org</a> : le message te le dit, puis relance la ligne</td></tr>
+    <tr><td>Une version plus ancienne est déjà installée</td>
+        <td><span class="yes">marche</span> — l'ancienne est remplacée et ses scripts lisibles effacés</td></tr>
+    <tr><td>Windows 7 ou antérieur</td>
+        <td><span class="no">non</span> — Node.js 18 ne s'y installe pas. L'installation le dit et s'arrête
+        proprement, au lieu de t'envoyer dans le mur</td></tr>
+    <tr><td>Un antivirus bloque les scripts</td>
+        <td><span class="no">non</span> — utilise le <span class="k">.exe</span> : lui ne télécharge rien</td></tr>
+    <tr><td>Réseau qui bloque <span class="k">github.com</span> (école, entreprise)</td>
+        <td><span class="no">non</span> — fais-toi envoyer le <span class="k">.exe</span> ou le
+        <span class="k">.zip</span></td></tr>
+    <tr><td>PC d'entreprise verrouillé (logiciels signés obligatoires)</td>
+        <td><span class="no">non</span> — rien à faire côté installation, c'est la machine qui décide</td></tr>
+  </table>
+  <p class="small muted" style="margin-top:14px">La ligne a besoin d'<b>internet</b> et d'un dépôt
+  GitHub <b>public</b>. Si ce dépôt est supprimé ou renommé, la ligne ne marche plus pour personne :
+  garde le <span class="k">.exe</span> ou le <span class="k">.zip</span> comme solution de secours.</p>
 </div>
 
 <div class="rule"></div>
@@ -178,18 +220,26 @@ d'inscription, et un pied de page. Style moderne, dégradé violet à bleu</pre>
 <div class="rule"></div>
 
 <h2>Autres façons d'installer</h2>
+<p class="small muted" style="margin:0 0 4px">Sert quand la ligne ne passe pas : antivirus, réseau qui
+bloque GitHub, ou machine d'entreprise.</p>
 
 <details>
-  <summary>Avec un fichier <span class="k">XozHub-GPT-Setup.exe</span> (si on te l'a envoyé)</summary>
-  <p>Double-clique dessus : tout est dedans, rien n'est téléchargé pendant l'installation. Windows affichera
-  « Windows a protégé votre PC » (le programme n'a pas de signature payante) : clique sur
+  <summary>Un seul fichier <span class="k">XozHub-GPT-Installer.cmd</span> (le plus simple sans internet)</summary>
+  <p>On te l'envoie (Discord, mail, clé USB), tu <b>double-cliques dessus</b> : l'IA s'installe et s'ouvre.
+  Rien n'est téléchargé, donc ni l'antivirus ni le réseau ne peuvent le bloquer.</p>
+</details>
+
+<details>
+  <summary>Un fichier <span class="k">XozHub-GPT-Setup.exe</span></summary>
+  <p><b>Double-clique dessus</b> : tout est dedans, rien n'est téléchargé pendant l'installation. Windows
+  affichera « Windows a protégé votre PC » (le programme n'a pas de signature payante) : clique sur
   <b>Informations complémentaires</b> → <b>Exécuter quand même</b>.</p>
 </details>
 
 <details>
-  <summary>Avec un dossier ou un <span class="k">.zip</span> du projet</summary>
-  <p>Décompresse le <span class="k">.zip</span> s'il y en a un, entre dans le dossier et double-clique sur
-  <span class="k">install.cmd</span>. La clé est déjà dans le dossier : rien à saisir.</p>
+  <summary>Un dossier ou un <span class="k">.zip</span> du projet</summary>
+  <p>Décompresse le <span class="k">.zip</span>, entre dans le dossier et <b>double-clique sur
+  <span class="k">install.cmd</span></b>. La clé est déjà dans le dossier : rien à saisir.</p>
 </details>
 
 <div class="rule"></div>
@@ -211,10 +261,25 @@ d'inscription, et un pied de page. Style moderne, dégradé violet à bleu</pre>
 </details>
 
 <details>
-  <summary>La ligne ne fait rien, ou « le fichier d'installation est incomplet »</summary>
-  <p>Vérifie ta connexion internet, puis relance la même ligne : elle retélécharge le fichier entier.
-  Si le dépôt a été renommé ou passé en privé, la ligne ne marche plus pour personne — un dépôt public
-  est obligatoire.</p>
+  <summary>Erreur rouge tout de suite, la fenêtre n'a rien fait</summary>
+  <p>La ligne n'a pas réussi à télécharger l'installation : ta connexion, un DNS filtrant, ou un réseau qui
+  bloque <span class="k">github.com</span> (école, entreprise). Essaie depuis un autre réseau ; sinon fais-toi
+  envoyer le <span class="k">.exe</span> ou le <span class="k">.zip</span>, qui n'ont besoin d'aucun
+  téléchargement.</p>
+</details>
+
+<details>
+  <summary>« Le fichier d'installation est incomplet ou abîmé »</summary>
+  <p>Le téléchargement s'est mal terminé : relance <b>la même ligne</b>, elle reprend tout depuis le début.
+  Si ça recommence, c'est un antivirus ou un réseau qui coupe le fichier : passe par le
+  <span class="k">.exe</span>.</p>
+</details>
+
+<details>
+  <summary>L'antivirus supprime des fichiers, ou bloque l'installation</summary>
+  <p>Un script qui télécharge et exécute du code, c'est aussi ce que fait un virus : certains antivirus le
+  refusent. Utilise le <span class="k">.exe</span> (il ne télécharge rien), ou demande à l'antivirus
+  d'autoriser le dossier <span class="k">%LOCALAPPDATA%\XozHub</span>.</p>
 </details>
 
 <details>
