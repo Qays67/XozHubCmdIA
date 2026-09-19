@@ -1,0 +1,17 @@
+{
+  "name": "xozhub",
+  "version": "1.0.0",
+  "private": true,
+  "description": "XozHub.GPT — agent de développement en ligne de commande, interface cyber bleu.",
+  "type": "module",
+  "bin": {
+    "xozhub": "./bin/xozhub.js"
+  },
+  "scripts": {
+    "start": "node bin/xozhub.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {}
+}

@@ -1,0 +1,30 @@
+# Fichiers locaux a la machine : ils n'ont rien a faire dans le depot.
+.xozhub.json
+.xozhub-linked
+.xozhub-session.json
+XozHub.md
+node_modules/
+npm-debug.log*
+*.log
+
+# ---------------------------------------------------------------------------
+# ATTENTION : « .env » N'EST PAS ignore ici, et c'est VOLONTAIRE.
+#
+# C'est lui qui porte la cle X.GPT commune : le .zip du depot le contient, donc
+# l'installation la reprend toute seule et PERSONNE n'a rien a taper.
+#
+# La contrepartie, a connaitre : des que le depot est public, cette cle est
+# lisible par n'importe qui (robots qui scannent GitHub compris), et c'est ce
+# compte-la qui paie les utilisations.
+#
+# Pour repasser a « une cle par personne » :
+#   1. ajoute une ligne « .env » dans cette liste ;
+#   2. supprime le fichier .env du depot ;
+#   3. remplis $Cle en haut de install-en-ligne.ps1 (ou laisse vide : la cle sera
+#      DEMANDEE a la personne qui installe).
+# ---------------------------------------------------------------------------
+
+# Fichiers fabriques (a joindre a une Release, jamais a committer)
+XozHub-GPT-Setup.exe
+XozHub-GPT-Installer.cmd
+XozHub-GPT.zip

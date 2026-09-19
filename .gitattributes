@@ -1,0 +1,6 @@
+# Les fichiers de commandes Windows DOIVENT rester en CRLF.
+# Avec des fins de ligne LF, cmd.exe se trompe de position dès qu'il croise un
+# goto ou un bloc if ( ... ) et exécute des morceaux de lignes, ce qui produit
+# une cascade d'erreurs « 'xxx' n'est pas reconnu en tant que commande… ».
+*.cmd text eol=crlf
+*.bat text eol=crlf

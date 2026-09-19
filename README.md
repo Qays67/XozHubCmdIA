@@ -1,0 +1,614 @@
+# XozHub.GPT
+
+Agent de développement en ligne de commande, dans le style de SERVAT HUB : logo ASCII en gros blocs,
+barre de modèle, boîte de saisie encadrée — mais en palette **aurore** : violet indigo, cyan et
+menthe, dégradés horizontaux, filets et panneaux qui se fondent, badges colorés pour le bouton
+d'arrêt et la fin de session.
+
+XozHub.GPT discute avec ton compte X.GPT, peut proposer des commandes shell et les exécute
+**automatiquement** — sans confirmation à valider à chaque étape. Le mode manuel
+(confirmation `o` / `n`) reste disponible avec `/auto off`.
+
+## Partager XozHub.GPT
+
+### Le site + l'installateur `.exe`
+
+`docs/index.html` est la page d'installation : le tuto en trois étapes, le bouton de téléchargement du
+`.exe`, la ligne de commande à copier et un dépannage des erreurs courantes. Publie-la gratuitement avec
+**GitHub Pages** (Settings → Pages → Source : `main` / `/docs`) : elle est alors en ligne sur
+`https://qays67.github.io/ai-cmd-hub/`.
+
+`fabriquer-exe.cmd` (double-clic) construit **`XozHub-GPT-Setup.exe`** : un seul fichier, que la personne
+double-clique pour installer. Rien n'est téléchargé pendant l'installation, donc pas de `.cmd` abîmé par
+les fins de ligne. Il emballe le code et `install.cmd` dans un auto-extractible Windows (IExpress, présent
+sur tous les Windows) — aucun outil à installer pour le fabriquer.
+
+- la page marche sur **n'importe quel hébergement** : si le `.exe` est posé à côté d'`index.html`, le
+  bouton de téléchargement pointe dessus tout seul (Netlify Drop, Vercel, un dossier partagé, ton
+  propre serveur…). Sinon il garde le lien de la Release GitHub ;
+- joins `XozHub-GPT-Setup.exe` et `install.cmd` à une **Release** : la page pointe dessus
+  (`releases/latest/download/…`), donc tu mets à jour le `.exe` sans retoucher le site ;
+- ⚠️ si un `.env` est à côté de `fabriquer-exe.ps1`, la clé API part **dans** le `.exe` : pour un `.exe`
+  public, renomme `.env` avant de le fabriquer et l'installateur demandera la clé à la personne ;
+- Windows affichera « Windows a protégé votre PC » au premier lancement (pas de signature payante) :
+  *Informations complémentaires* → *Exécuter quand même*. Le site prévient la personne.
+
+### Rien à configurer : on envoie le dossier
+
+1. Clic droit sur le dossier du projet → **Compresser** pour obtenir un `.zip`, puis envoie-le
+   (Discord, Drive, mail, clé USB…).
+2. La personne ouvre le `.zip`, entre dans le dossier et **double-clique sur `install.cmd`** :
+   installation dans `%LOCALAPPDATA%\XozHub`, commande `xozhub` créée, et c'est fini.
+
+Le `.env` voyage avec le dossier, donc la clé API n'a **rien** à régler : ni par toi, ni par
+la personne qui installe.
+
+### Version « une ligne dans cmd » (hébergement GitHub)
+
+Le projet est en ligne : la personne n'a **rien à récupérer à la main**, elle colle une seule ligne
+dans l'invite de commandes et l'IA s'installe.
+
+```cmd
+powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/Qays67/ai-cmd-hub/main/install-en-ligne.ps1 | iex"
+```
+
+`install-en-ligne.ps1` fait quatre choses, et rien d'autre : il télécharge le projet, **rétablit les
+fins de ligne CRLF** des `.cmd` (c'est ce qui supprime l'erreur « 'rrorlevel' n'est pas reconnu »),
+pose la clé commune si tu l'as remplie en haut du fichier, puis confie l'installation à `install.cmd`
+— donc **une seule logique d'installation** dans tout le projet. Tout est détaillé pas à pas dans
+**`UNE-LIGNE.md`** : mise en ligne du projet (avec ou sans compte GitHub), clé commune, vérification
+et dépannage.
+
+> Méthode plus ancienne, toujours possible : joindre `install.cmd` à une Release et donner
+> `curl -L -o "%TEMP%\xozhub-install.cmd" https://github.com/Qays67/ai-cmd-hub/releases/latest/download/install.cmd && "%TEMP%\xozhub-install.cmd"`.
+> Elle dépend d'un `.cmd` servi avec ses fins de ligne CRLF, ce qui est fragile : la ligne ci-dessus
+> est préférable.
+
+`install.cmd` affiche sa progression et fait tout le travail :
+
+1. il vérifie Node.js 18+ (et propose de l'installer via `winget` s'il manque) ;
+2. il télécharge le code du dépôt (`SRC_URL`) et l'installe dans `%LOCALAPPDATA%\XozHub` ;
+3. il écrit le fichier `.env` — clé reprise du `.env` fourni, sinon `API_KEY`, sinon **la clé est
+   demandée** à la personne qui installe ;
+4. il ajoute la commande `xozhub` au PATH de l'utilisateur ;
+5. il pose un raccourci **XozHub.GPT** sur le **Bureau** : double-clic, et l'IA s'ouvre dans une
+   fenêtre cmd. Le raccourci vise directement `xozhub.cmd` dans `%LOCALAPPDATA%\XozHub`, donc il
+   marche même si le PATH de Windows n'a pas encore été rafraîchi — inutile de rouvrir une fenêtre.
+
+Ensuite, double-clique sur l'icône **XozHub.GPT** du Bureau, ou ouvre une **nouvelle** fenêtre cmd et
+tape `xozhub` : l'interface démarre et tu peux lui parler.
+
+#### Mise en place, côté à toi (une seule fois)
+
+1. Crée un dépôt **public**, branche `main`, et mets-y le code — l'interface web de GitHub suffit
+   (*Add file → Upload files*), rien à installer sur ton PC. ⚠️ Glisse les **dossiers** `bin` et
+   `src` eux-mêmes : glisser seulement les fichiers qu'ils contiennent ne recrée pas le dossier, et
+   l'installation échoue alors à la copie.
+2. Les **deux adresses** doivent pointer sur ton dépôt — elles sont déjà remplies pour
+   `Qays67/ai-cmd-hub` :
+   - dans `install-en-ligne.ps1` (`$SourceZip`) et `install.cmd` (`SRC_URL`) :
+     `https://github.com/Qays67/ai-cmd-hub/archive/refs/heads/main.zip` ;
+   - dans la ligne à donner :
+     `https://raw.githubusercontent.com/Qays67/ai-cmd-hub/main/install-en-ligne.ps1`.
+3. Règle la **clé** en haut de `install-en-ligne.ps1` :
+   - `$Cle = 'xgpt_...'` → clé commune, tout le monde s'en sert sans rien taper. Simple, mais ce
+     fichier doit être public pour que la ligne fonctionne : cette clé devient donc **publique**, et
+     n'importe qui peut la lire et l'utiliser à ta place ;
+   - `$Cle = ''` → l'installateur **demande la clé** à la personne qui installe. Aucune fuite, mais
+     il faut une clé X.GPT par personne.
+
+**Rien d'autre à faire, aucune Release à fabriquer** : `install-en-ligne.ps1` rétablit lui-même les
+fins de ligne **CRLF** des `.cmd` après le téléchargement, donc le `.zip` automatique de GitHub
+convient très bien. `UNE-LIGNE.md` reprend tout ça pas à pas, y compris la méthode **sans compte
+GitHub** (on envoie alors le fichier unique `XozHub-GPT-Installer.cmd`).
+
+> Avec la méthode « on envoie le dossier », rien n'est à régler : les fichiers sont déjà à côté du
+> `install.cmd` et le `.env` est repris tel quel.
+
+## Le tutoriel pour tout le monde
+
+Le guide pas-à-pas destiné aux personnes qui n'ont jamais ouvert un terminal : installer, première
+demande, comment bien demander, créer un site propre, les retouches à demander, tout ce qu'il sait
+faire d'autre, raccourcis, dépannage et comment le partager. Donne-le avec l'installateur : la
+personne est autonome en dix minutes.
+
+- **`docs/tutoriel.html`** — la même chose en page web, à donner comme lien ou à héberger à côté de la
+  page d'installation (nav collante, sommaire, blocs à copier, dépannage repliable) ;
+- **`TUTORIEL.md`** — la version texte, pour le dépôt et les pièces jointes.
+
+## Installation manuelle
+
+1. Installe [Node.js 18 ou plus](https://nodejs.org) (une seule fois).
+2. Dans le dossier du projet, vérifie que ta clé est présente dans `.env` :
+
+```
+XOZHUB_API_KEY=xgpt_...
+```
+
+3. Lance l'interface :
+
+```cmd
+xozhub
+```
+
+(ou `node bin\xozhub.js`, ou `npm start`)
+
+Le plus simple : **double-clique sur `xozhub.cmd` dans le dossier du projet**. La première fois,
+il propose d'installer la commande `xozhub` en la faisant pointer sur **ce dossier** — donc la
+commande lance toujours cette version-là, jamais une copie. La question n'est posée qu'une fois.
+
+Sinon, pour lancer `xozhub` depuis n'importe quel dossier, deux autres possibilités :
+
+- **`link-dev.cmd`** — recommandé pendant le développement. Double-clic, et le dossier du projet
+devient la commande `xozhub`. Une seule version installée, donc chaque modification du code est
+prise en compte au lancement suivant, sans rien réinstaller.
+- **`install.cmd`** — copie tout dans `%LOCALAPPDATA%\XozHub` et crée la commande globale.
+Pratique pour partager, mais c'est une **copie** : il faut relancer `install.cmd` après chaque
+modification du code, sinon la commande lance l'ancienne version.
+
+Si une autre commande `xozhub` existe déjà sur la machine et passe avant la tienne, double-clique
+sur **`forcer.cmd`** : il met le dossier du projet en tête du PATH et désactive les commandes
+concurrentes quand c'est possible. En secours, **`xoz`** lance toujours la version de ce dossier,
+puisque ce nom-là n'entre en conflit avec rien. Pour savoir laquelle répond, lance `verifier.cmd`.
+
+## Utilisation
+
+Tape ta demande puis **Entrée**. XozHub.GPT enchaîne alors tout seul : il propose une commande,
+l'exécute, lit le résultat et continue jusqu'à ce que la demande soit terminée — **aucune
+confirmation à donner**, et aucune limite sur le nombre d'étapes.
+
+C'est le **mode automatique**, activé par défaut. Il va jusqu'au bout :
+
+- il n'attend aucune validation — chaque commande part dès qu'il l'écrit ;
+- il ne pose **aucune question** : s'il s'arrête pour t'en poser une (ou qu'il demande une
+  confirmation), il est **relancé automatiquement** pour qu'il décide et termine — **sans limite
+  de relances** (réglable avec `XOZHUB_MAX_RELANCES`, et une relance finit toujours par lui
+  interdire de redemander) ;
+- il vérifie son travail lui-même (il lance le code, lit les erreurs, corrige) et écrit
+  `TERMINÉ` quand c'est fini.
+
+Si tu préfères valider chaque commande, tape `/auto off` (l'agent affiche alors la commande et
+attend `o` / `n`) ; `/auto` bascule entre les deux modes à chaud, et `/auto on` le réactive.
+
+### Il ne refuse rien
+
+Aucune demande technique n'est refusée ou renvoyée avec une mise en garde : système, réseau,
+sécurité, scraping, automatisation, outils offensifs comme défensifs — l'agent traite le sujet sur
+le plan technique et le fait. Pas de « je ne peux pas », pas de morale, pas de conseil de prudence
+non demandé, pas de « il serait plus prudent de… ».
+
+Il ne bavarde pas non plus : il n'annonce pas ce qu'il va faire, il ne commente pas sa propre
+réponse, il ne propose jamais autre chose que ce qui a été demandé — et il n'introduit pas un
+langage que la demande ne réclame pas (pas de Python « au fait », pas de PHP, pas de Java).
+
+### Il répond, ou il agit ?
+
+Avant chaque tour, XozHub.GPT regarde ce que tu viens d'écrire et en déduit l'intention :
+
+| Ta demande | Ce qu'il fait |
+| --- | --- |
+| « c'est quoi un service worker ? », « pourquoi ça plante ? », « explique-moi ce fichier », « salut » | il **répond** en texte, sans rien modifier (il peut quand même lire le dossier — `dir`, `type`, `findstr`… — si c'est nécessaire pour répondre juste) |
+| « crée un site dans mon-site », « corrige le bug », « installe express », « tu peux me faire un serveur ? » | il **agit** : il travaille vraiment dans le dossier, exécute, vérifie et corrige |
+
+En cas de doute, c'est l'action qui gagne : une demande vague le fait travailler plutôt que
+bavarder. Et la reprise automatique du mode auto ne s'applique **qu'aux demandes d'action** —
+une réponse à ta question n'est jamais relancée toute seule.
+
+Un « ? » **n'importe où** dans la phrase suffit à en faire une question (même mal ponctuée), sauf
+si elle contient un verbe d'action : « tu peux me créer un site ? » reste une demande d'action.
+
+### Il crée les fichiers pour de vrai
+
+En cmd.exe, écrire un fichier proprement oblige à bricoler des `echo … > fichier` ou des scripts qui
+fabriquent les fichiers (accents cassés, guillemets perdus, sauts de ligne impossibles). L'agent
+n'a plus besoin de ça : il écrit le contenu dans un bloc `write`, et **c'est l'application qui écrit
+le fichier**, exactement comme il l'a écrit.
+
+    ```write mon-site/index.html
+    <!doctype html>
+    <html lang="fr">
+      <h1>Bonjour</h1>
+    </html>
+    ```
+
+- un bloc par fichier, avec le **contenu complet** (un fichier existant est remplacé) ;
+- les dossiers manquants sont créés : « fais un site dans mon-site » produit vraiment
+  `mon-site/index.html`, `mon-site/style.css`… ;
+- l'écran affiche **une ligne par fichier** (`✓ mon-site/index.html · 42 lignes · 1 234 o`), jamais
+  le contenu, et l'agent enchaîne aussitôt la vérification (serveur local, test, ouverture) ;
+- si le fichier contient lui-même des triples accents graves (un `README.md`, un tutoriel), le
+  bloc s'ouvre avec **quatre** accents graves et ne se ferme qu'avec autant : rien n'est jamais
+  coupé au milieu ;
+- le prompt le lui interdit explicitement : pas de `echo > fichier`, pas de script générateur, pas de
+  PowerShell pour du contenu. Il produit de vrais fichiers, du vrai code qui tourne.
+
+### Il lit et il modifie sans casser
+
+Les deux mêmes blocs existent pour **lire** et pour **modifier**, et pour la même raison : au
+lieu de bricoler des commandes shell qui cassent les accents et coûtent un tour entier, c'est
+l'application qui fait le travail.
+
+    ```read src/app.js
+    ```
+
+    ```read src/app.js 200-320
+    ```
+
+- l'application lui rend le fichier **exactement** tel qu'il est sur le disque : mêmes accents,
+  mêmes lignes. « type » en cmd.exe ne sait pas faire ça ;
+- une **plage de lignes** quand le fichier est long, et sur un très gros fichier la réponse lui
+  dit comment demander la suite — il ne noie pas son contexte ;
+- un fichier binaire ou un dossier sont refusés proprement, avec la raison ;
+- le journal affiche `◉ src/app.js · 1-500 sur 1 755 lignes lues`.
+
+Pour modifier, un bloc `edit` remplace **seulement** ce qui change :
+
+    ```edit src/app.js
+    <<<<<<< ANCIEN
+    const port = 3000;
+    =======
+    const port = 8080;
+    >>>>>>> NOUVEAU
+    ```
+
+- plusieurs paires par bloc, plusieurs blocs par réponse ;
+- si le passage apparaît **deux fois**, l'application refuse et le dit : il ajoute du contexte ;
+- si l'indentation a bougé, elle est retrouvée (comparaison ligne à ligne sans les espaces) :
+  le journal précise alors « indentation ajustée » ;
+- si le passage est introuvable, elle le dit aussi, avec le geste à faire : relire puis recopier ;
+- l'écran résume : `✓ src/app.js · 2 remplacements`.
+
+Réécrire un fichier de 400 lignes pour changer trois lignes, c'est perdre du code au passage —
+le prompt lui interdit donc `write` sur un fichier existant quand un `edit` suffit.
+
+### Il refait un site à partir d'un lien, une maquette à partir d'une capture
+
+Deux entrées de plus, et c'est toujours la même idée : au lieu de deviner, l'application va
+chercher l'information elle-même.
+
+    ```fetch https://exemple.fr
+    ```
+
+- elle **télécharge la page** (et jusqu'à trois feuilles de style liées), écarte scripts,
+  traqueurs et commentaires, et donne à l'agent : le titre, la description, la structure de la
+  page **dans l'ordre** (en-tête, navigation et ses liens, titres, sections, boutons, pied de
+  page), les vrais textes, les polices réellement chargées, les images en adresse absolue, les
+  variables CSS déclarées, et surtout la **palette** — chaque teinte avec sa part d'occupation,
+  la plus saturée marquée comme accent ;
+- avec ça, « refais-moi ce site » devient une reconstruction : les couleurs sont celles du site,
+  pas une impression. Le prompt lui interdit de recopier un fichier du site ou de réutiliser ses
+  images par lien — il redessine les visuels en SVG ou en dégradé ;
+- **pas besoin de la demander** : un lien collé dans ta phrase (`refais-moi https://exemple.fr`)
+  est visité tout seul **avant** que l'agent commence à répondre — il a déjà la palette et la
+  structure en main. Une même adresse n'est visitée qu'une fois par session ;
+- l'adresse peut s'écrire sans `https://`, et ce qui n'est pas une page (un `.css`, un `.js`, un
+  `.json`) est renvoyé tel quel ;
+- journal : `🌐 https://exemple.fr · page analysée · 15 916 caractères utiles`.
+
+    ```image maquettes/accueil.png
+    ```
+
+- l'application **décode vraiment l'image** (PNG : zlib et dé-filtrage des lignes) et en tire la
+  palette réelle : fond dominant, neutres, couleur d'accent, chacun avec sa **part de surface**
+  mesurée. Ça marche même avec un modèle qui ne voit pas les images ;
+- l'image est **jointe** en plus, pour les modèles qui savent la regarder : ils voient la mise en
+  page, pas seulement les couleurs. Si le modèle refuse les images, l'application s'en aperçoit
+  une fois, retire l'image, garde la palette et **rejoue le tour** — rien n'est perdu ;
+- journal : `🖼 capture.png · 1440×900 · png · 3 teintes extraites`.
+
+### Il refait le même, et il le retouche si tu le demandes
+
+L'analyse ne sert pas seulement à s'inspirer : tant qu'un site (ou une capture) a été analysé, il
+devient la **cible** de la session, et l'agent sait exactement ce qu'il reproduit.
+
+- « fais le même site » → reconstruction fidèle : même ordre des parties, **mêmes textes** (ils
+  sont extraits paragraphe par paragraphe, section par section), mêmes couleurs, mêmes
+  **proportions** — largeurs de conteneur, paddings, tailles de texte, rayons, grilles, points de
+  rupture sont relevés dans le CSS de l'original ;
+- « enlève la section tarifs », « change l'accent en vert », « ajoute une page contact » → il
+  repart de la même copie et n'applique **que** la différence demandée ; tout le reste ne bouge pas ;
+- la cible est rappelée au modèle **à chaque tour** (adresse, palette, parties), donc pas besoin de
+  la redonner trois messages plus loin quand tu demandes une retouche.
+
+Et parce qu'une copie se juge d'abord à sa couleur, l'application **mesure la fidélité** après
+chaque écriture : elle compare les teintes livrées à celles de la cible dans OKLab — l'espace de la
+perception — en comptant le fond et l'accent double, puisque ce sont eux qui se voient.
+
+    🎯 Fidélité des couleurs : 75 % sur 6 teintes visées — proches : #0b1020 → #111827 · à reprendre : #6366f1
+
+Sous 80 %, l'agent a droit à une **seconde relecture**, la cible et l'écart sous les yeux : une
+copie dont la palette est fausse n'est pas une copie.
+
+### Il relit avant de livrer
+
+Une page finie ne se juge pas à l'œil : elle se vérifie. À chaque fois que l'agent écrit un
+fichier, **l'application relit ce qui vient d'être écrit** — sans rien lui demander — et lui
+renvoie la liste de ce qui ne va pas :
+
+- **le travail web** : `<!doctype html>`, `charset`, `viewport`, `<title>` rempli, `lang`,
+  `header`/`nav`, `footer`, au moins deux sections, un seul `h1`, un `alt` sur chaque image,
+  les balises de partage `og:`, le favicon, et la chasse aux `Lorem ipsum` / « Texte ici » /
+  « à compléter » ;
+- **le CSS** : `:root` avec ses variables, les couleurs écrites en dur hors `:root`,
+  les `!important`, la présence d'une `@media` et d'un `:focus-visible`, le `box-sizing`, le
+  nombre de polices, les transitions ;
+- **le JavaScript** : les `console.log`, les `TODO`, les `debugger`, les `eval(` ;
+- **les références locales** : chaque `src`, `href` et `url(…)` doit mener à un fichier qui
+  existe vraiment. Une image introuvable s'affiche en rouge dans le journal, et l'agent la corrige.
+
+Tout ça tient sur **une ligne** dans le journal, du genre :
+
+    🔍 Contrôle qualité : 7 points à corriger dans index.html, style.css (dont 2 bloquants) — …
+
+Ensuite, **avant de te rendre la main**, l'agent est renvoyé une fois sur ses propres fichiers
+avec une liste de contrôle complète : le *design* pour une page (palette, espacement,
+typographie, hiérarchie, mobile, finitions) et la *propreté* pour du code (cas limites,
+exécution réelle, restes de debug). S'il reste du bloquant, il a droit à **une seconde
+relecture** — jamais plus de deux, donc jamais de boucle.
+
+Pour ça, le prompt ne lui donne pas des conseils : il lui donne des **valeurs**. Les jetons CSS
+sont écrits dans le prompt, avec trois directions artistiques complètes (« Nuit douce »,
+« Éditorial clair », « Néon maîtrisé » : fonds, surfaces, textes, accents, polices) plus les
+détails de composants qui font la différence — en-tête collant, cartes qui montent au survol,
+:focus-visible, pied de page.
+
+`XOZHUB_RELECTURE=off` coupe la relecture automatique (le contrôle des références et le
+contrôle qualité restent, eux, toujours actifs).
+
+### Il reste concentré
+
+L'agent traite **uniquement le dernier message** : les échanges précédents lui servent de contexte,
+jamais de liste de tâches à finir. Concrètement :
+
+- un **rappel d'ancrage** est collé au dernier message à chaque tour : il redit quelle est la seule
+  demande en cours (« QUESTION », « DEMANDE D'ACTION »…) et que tout le reste n'est que du contexte.
+  C'est la consigne que le modèle lit juste avant d'écrire, donc celle qui pèse le plus. Il y
+  rappelle aussi les trois interdits : aucune techno qui ne soit ni dans la demande ni dans le
+  projet (pas de Python « au fait »), aucun fait non lu ni non observé, et aucune commande qui ne
+  fasse pas avancer la demande en cours ;
+- le **contexte du projet et la mémoire** (`XozHub.md`) sont envoyés comme du **décor, pas comme un
+  sujet** : ils servent à ne pas se tromper quand la demande concerne le projet, et à rien d'autre ;
+- **aucune techno hors sujet** : un langage, un framework, un outil ou un fichier n'est nommé que
+  s'il apparaît dans la demande ou dans le projet — pas d'exemple de code dans un autre langage au
+  passage, pas de « et si on le faisait en … » ;
+- une question sans rapport avec le dossier se répond **sans jamais parler du dossier ni du projet** ;
+- l'historique envoyé au modèle est **borné** (16 derniers messages) et chaque message est **tronqué**
+  à 3 000 caractères — le journal garde toute la sortie, le modèle n'en reçoit que l'essentiel ;
+- un simple **bonjour / merci** part sans historique du tout : rien à quoi s'accrocher ;
+- la mémoire est bornée elle aussi : au-delà de 4 000 caractères, ce sont les **notes récentes** qui
+  partent (plus le titre), jamais un gros bloc de notes anciennes ;
+- l'état du projet (fichiers, git, scripts) est **relu à chaque message**, donc il ne parle jamais
+  d'un fichier qui a changé ou disparu ;
+- la **température est basse** (0.2) : il suit le sujet au lieu de divaguer ;
+- les blocs techniques (`run`, `memory`) et les annonces creuses (« je vais maintenant vérifier… »)
+  sont **retirés de l'affichage** — à l'écran il ne reste que la commande et le résultat ;
+- le prompt lui interdit explicitement le hors-sujet : pas d'actualité, pas de conseils non demandés,
+  pas de fichier bonus, pas de « prochaines étapes », rien d'inventé — un fichier se lit avant d'en parler.
+
+### Il répond court
+
+Pas de bavardage : il n'annonce pas ce qu'il va faire (« je vais maintenant vérifier… »), il ne
+récapitule pas ce que la sortie juste au-dessus montre déjà, il ne rappelle pas le dossier de
+travail ni le système (c'est écrit en haut de l'écran), pas de « n'hésite pas », pas de conseils
+non demandés. La réponse contient le résultat, la réponse ou le code — et rien d'autre.
+
+### Où il travaille
+
+Le **dossier de travail** (affiché dans la barre du bas, `/dir` pour le changer) est son point de
+départ. Ensuite, **c'est ta demande qui décide** : si tu nommes un dossier ou un projet
+(« fais un site dans `mon-site` »), il le crée si besoin et travaille dedans ; sinon il travaille
+directement dans le dossier de travail.
+
+### Commandes
+
+Il n'y a que **deux commandes** : tout le reste se demande en français.
+
+| Commande | Rôle |
+| --- | --- |
+| `/miseajour` | dernière version du code **et** de l'IA, puis redémarrage |
+| `/couleurs` | règle les couleurs : `truecolor`, `256`, `16` ou `none` |
+
+Toute autre ligne commençant par `/` affiche simplement le rappel : écris ta demande en français.
+`/miseajour code` redémarre tel quel, sans chercher de nouveau code ni de nouveau modèle.
+
+### Il connaît déjà ton projet
+
+Au démarrage (et après chaque `/dir`), l'agent fait sa propre enquête dans le dossier de travail :
+technos repérées (`package.json`, `tsconfig.json`, `pyproject.toml`, `Cargo.toml`…), scripts npm,
+dépendances, **état git** (branche + fichiers modifiés), début du `README.md` et un aperçu de
+l'arborescence. Tout ça part dans le prompt : il répond en connaissant le terrain, sans que tu
+racontes le projet. `/context` affiche exactement ce qu'il a sous les yeux.
+
+### Il se souvient (mémoire du projet)
+
+`XozHub.md`, à la racine du dossier, est la mémoire durable du projet : choix techniques, ports,
+conventions, pièges à éviter. Elle est relue à chaque tour, et tu peux l'éditer à la main.
+
+- l'agent l'enrichit **tout seul** : quand il a quelque chose de durable à retenir, il termine sa
+  réponse par un bloc `memory` et la note est ajoutée (`🧠 Mémoire du projet mise à jour`) ;
+- toi, tu fais pareil à la main avec `/remember le port de l'API est 8787` ;
+- `/memory` relit les notes, `/forget` efface tout.
+
+### Se mettre à jour : `/miseajour`
+
+Tape `/miseajour` : XozHub.GPT fait un `git pull --ff-only` dans son dossier d'installation (si
+c'est bien un dépôt git), t'annonce s'il y avait du nouveau, puis **se relance tout seul dans le
+même terminal** avec le code à jour. Comme la conversation est sauvegardée juste avant, la
+nouvelle instance **reprend la session automatiquement** — tu ne perds ni l'historique ni les
+fichiers de travail.
+
+Pendant l'opération, un **titre en haut de l'écran** annonce `MISE À JOUR EN COURS` (le titre de la
+fenêtre du terminal suit aussi) ; quand c'est terminé, la nouvelle version affiche
+`MISE À JOUR VALIDÉE` pendant **3 secondes**, puis le bandeau disparaît tout seul. Si le pull échoue
+(ou que l'installation vient d'un `.zip`, sans dépôt git), le titre indique `MISE À JOUR INCOMPLÈTE`
+— il reste affiché 3 secondes avant le redémarrage pour que tu puisses le lire.
+
+La même commande met aussi **l'IA à la dernière version** : elle redemande la liste des modèles au
+compte, compare les numéros de version dans la famille du modèle courant (« `deepseek-v4-flash` »
+→ « `deepseek-v5-flash` »), bascule dessus si une version plus récente est apparue et l'enregistre
+dans `.xozhub.json`. Le choix reste dans la même famille et, à version égale, garde la variante
+courante (`flash` reste `flash`) ; si le compte est injoignable, le redémarrage se fait quand même
+et l'ancien modèle est conservé.
+
+- `/miseajour code` : redémarre tel quel, sans chercher de nouveau code ni de nouveau modèle (utile
+  quand tu bricoles le code).
+- Installé par `.zip` (donc sans dépôt git) : le redémarrage marche quand même, il faut juste
+  remplacer les fichiers à la main pour changer de version.
+- Le menu de fin de session propose aussi « Redémarrer (recharge le code) ».
+
+### Les sessions se reprennent
+
+La conversation est **sauvegardée automatiquement** (à la fin de chaque tour et en quittant) dans
+`.xozhub-session.json`, dans le dossier de travail. Au lancement suivant dans ce dossier, tape
+`/resume` (ou choisis « Reprendre la dernière session » dans le menu de fin de session) : les
+messages, le journal affiché et le modèle reviennent comme si tu n'étais jamais parti.
+
+Ajoute `.xozhub-session.json` (et `XozHub.md` si tu ne veux pas la partager) au `.gitignore`
+de tes projets.
+
+### Écrire pendant qu'il travaille
+
+La zone de saisie reste ouverte pendant que l'agent réfléchit, écrit ou exécute : tu peux taper
+la suite tranquillement. `Entrée` ne l'envoie pas tout de suite — le message est **gardé en
+attente** (compteur `⏳` dans la case) et part automatiquement dès que le tour en cours est fini.
+
+Pour le faire taire tout de suite, deux possibilités : le bouton **■ STOP** affiché dans la case
+de saisie (clique dessus), ou `Échap` / `ctrl-c`. Après un arrêt manuel, un message gardé revient
+dans la zone de saisie au lieu de partir tout seul : tu le relis, tu le modifies, tu l'envoies.
+
+### Fin de session : le menu
+
+Un clic sur **✕ End session** ne coupe plus tout : il ouvre un **écran de choix** dans la case
+de saisie, et c'est toi (ou la personne à qui tu passes la main) qui décide de la suite.
+
+| Choix | Effet |
+| --- | --- |
+| `1` Nouvelle session | conversation vidée, écran réinitialisé, on repart de zéro dans la même fenêtre |
+| `2` Reprendre la dernière session | recharge la conversation sauvegardée dans ce dossier |
+| `3` Ouvrir une nouvelle fenêtre XozHub.GPT | lance une **vraie nouvelle fenêtre** de terminal avec un xozhub neuf, puis ferme celle-ci |
+| `4` Redémarrer | recharge le code et reprend la session en cours |
+| `5` Quitter XozHub.GPT | ferme la session |
+
+Navigation : `↑` `↓` puis `Entrée`, les touches `1` à `5`, ou un **clic** sur une ligne.
+
+Pour ressortir des choix sans rien faire, clique sur la **✕** en haut à droite du panneau —
+toute la **ligne du haut** est cliquable, pas seulement le caractère — ou appuie sur `Échap`,
+`q` ou `x` : tu reviens à la conversation en cours. `ctrl-c` (ou `ctrl-q`) quitte directement
+depuis le menu. Rien ne peut donc te bloquer dans cet écran.
+
+Si l'agent était en train de travailler au moment du clic sur End session, il est coupé
+proprement avant l'ouverture du menu.
+
+### Style
+
+Interface en palette « aurore », colorée et lisible : **chaque rôle a sa couleur**. Tout ce qui
+vient de toi est **chaud** (or → ambre → orange → corail → rose), tout ce qui vient de l'IA est
+**froid** (magenta → violet → bleu → cyan → menthe), les commandes sont **menthe**, les fichiers
+écrits **vert menthe**, les erreurs **corail**, les sorties **indigo discret** : au premier regard,
+on sait qui parle et ce qui se passe.
+
+Les couleurs s'adaptent au terminal : **truecolor** (24 bits) quand il sait le faire, sinon
+**256 couleurs**, sinon les **16 couleurs de base** — il y a donc toujours de la couleur à l'écran.
+`NO_COLOR=1` coupe tout, `XOZHUB_COLOR=256` force un mode, et `/couleurs` change à chaud dans
+l'application (`truecolor`, `256`, `16`, `none`).
+
+- **en-tête** — logo ASCII au grand dégradé indigo → violet → magenta → rose → cyan → menthe,
+  assombri vers le bas pour lui donner du relief, pastille `.GPT` cyan ; deux étiquettes
+  `▸ Directory` / `▸ code` ; filet dégradé ponctué d'un `◆` violet.
+- **conversation** — messages de l'utilisateur sur un rail **chaud** (or → ambre → orange → corail →
+  rose) avec un badge `TOI` en or ; réponses de l'IA dans une **carte sombre** aux rails dégradés
+  magenta → violet → bleu → cyan → menthe, nom en dégradé et état `écrit…` en vert vif dans le
+  bandeau ; commandes sur un badge `$` menthe ; fichiers écrits sur un badge `✓` vert ; sorties le
+  long d'un rail indigo discret ; erreurs en badge `!` corail ; lignes de service avec une pastille
+  dont la teinte annonce le contenu (✓ menthe, ! or, 🧠 magenta, ⏳ orange, ◆ cyan).
+- **saisie** — **carte sombre pleine largeur** (fond continu, filets haut/bas en dégradé
+  cyan → menthe → lime, rails qui se fondent), invite `❯` rose, et une ligne d'aide où chaque
+  raccourci a sa couleur : `↵ envoyer · /miseajour mise à jour · mode [auto|manuel] · ✕ End
+  session`, le mode en pastille (menthe en auto, or en manuel).
+- **barre du bas** — fond dégradé indigo nuit → bleu nuit, badge `XozHub.GPT` en dégradé
+  magenta → violet → cyan → menthe, pastille d'état (menthe au repos, cyan quand il écrit, or quand
+  il exécute) et bouton `✕ End session` en dégradé violet → rose.
+- **animation** — la spirale d'attente traverse tout le spectre (magenta, violet, bleu, cyan,
+  menthe, lime) et le menu de fin de session s'ouvre sur un titre dégradé avec la ligne choisie en
+  bleu vif.
+
+Tout est calculé en caractères et codes ANSI uniquement — aucune dépendance.
+
+Les réponses de l'IA sont **habillées en teintes vives** : son nom passe en dégradé rose → violet →
+cyan dans l'en-tête du panneau (et pendant qu'il travaille), les titres `#` ressortent en rose ou
+cyan, les puces et numéros en rose/cyan, les citations en violet, `` `code` `` sur un badge sombre,
+`**gras**` en blanc vif, et le mot final `TERMINÉ` s'affiche en badge vert. Les blocs de code sont
+rendus en menthe, leurs délimiteurs en violet vif.
+
+### Raccourcis
+
+- `Entrée` envoyer — pendant une réponse : garder le message pour la fin du tour
+- `■ STOP` (clic) / `Échap` / `ctrl-c` interrompre (pendant une réponse ou une commande)
+- `ctrl-c` sur une saisie vide : quitter directement
+- clic sur **✕ End session** (en bas à droite) : ouvrir le menu de fin de session
+- `↑` `↓` historique, molette ou `Page↑` `Page↓` pour faire défiler
+- `ctrl-l` effacer l'écran, `ctrl-u` vider la ligne
+
+Le **titre de la fenêtre** du terminal suit l'état de l'agent (`écrit…`, `exécute…`, `prêt`) et un
+bip discret retentit à la fin d'un tour qui a duré plus de 8 secondes : tu peux aller faire
+autre chose et revenir quand ça sonne.
+
+## Configuration
+
+Ordre de priorité : variables d'environnement, puis `.env`, puis `.xozhub.json` (écrit automatiquement quand l'agent bascule de modèle).
+
+| Variable | Défaut |
+| --- | --- |
+| `XOZHUB_API_KEY` | *(requis)* |
+| `XOZHUB_BASE_URL` | `https://xgpt-api.xshe.workers.dev/v1` |
+| `XOZHUB_MODEL` | `xgpt-code` (voir `.env.example` : `xgpt-smart`, `xgpt-deepseek`, `xgpt-sol`, `xgpt-kimi`, `xgpt-glm`…) |
+| `XOZHUB_COLOR` | *(auto)* `truecolor`, `256`, `16` ou `none` — l'auto s'adapte au terminal |
+| `XOZHUB_AUTO` | `1` (exécution sans confirmation) |
+| `XOZHUB_TEMPERATURE` | `0.2` (agent concentré ; `off` pour ne pas envoyer le paramètre) |
+| `XOZHUB_MAX_RELANCES` | aucune limite (`3` pour brider les relances automatiques) |
+| `XOZHUB_MAX_ECRITURES` | aucune limite (plafond d'écritures de fichiers d'affilée) |
+| `XOZHUB_RELECTURE` | `on` (relecture du travail livré avant de rendre la main ; `off` pour couper) |
+| `XOZHUB_HISTORIQUE` | `16` (messages renvoyés au modèle ; `off` pour tout garder) |
+| `XOZHUB_MESSAGE_MAX` | `3000` (taille max d'un message envoyé au modèle ; `off` pour ne rien couper) |
+| `XOZHUB_DOCUMENT_MAX` | `40000` (taille max d'un document joint : fichier lu, site analysé) |
+
+Les quatre dernières acceptent `0`, `off` ou `non` pour dire « aucune limite » — l'agent est
+**sans plafond par défaut** sur les relances et les écritures ; ces réglages ne servent qu'à le
+brider si le besoin s'en fait sentir.
+
+Au démarrage, XozHub.GPT interroge `/v1/models` : si le modèle configuré n'existe pas, il bascule
+automatiquement sur le plus récent de sa famille, sinon sur le meilleur disponible du compte. Et si
+le modèle réglé est un ancien modèle « passe-partout » (`xgpt-glm`, `xgpt-mini`, `xgpt-flash`)
+alors que le compte propose mieux, il monte dessus et l'enregistre — l'IA est donc toujours sur le
+meilleur modèle possible, sans rien régler.
+
+## Structure
+
+```
+install.cmd      installateur Windows (une ligne à coller dans cmd)
+fabriquer-exe.cmd fabrique l'installateur XozHub-GPT-Setup.exe (un seul fichier à donner)
+docs/index.html  page d'installation (GitHub Pages) : bouton .exe, ligne de commande, dépannage
+docs/tutoriel.html le tutoriel complet en page web (sommaire, blocs à copier, dépannage)
+TUTORIEL.md      le tutoriel complet en texte, à joindre à l'installateur
+install-en-ligne.ps1 moteur de la ligne à coller dans cmd (télécharge, répare les CRLF, installe)
+UNE-LIGNE.md     comment mettre le projet en ligne et quelle ligne donner à tout le monde
+link-dev.cmd     installation « live » : le dossier du projet devient la commande xozhub
+forcer.cmd       force la commande xozhub à lancer le dossier du projet
+verifier.cmd     diagnostic : quelle version répond quand on tape xozhub
+xoz.cmd          alias garanti, insensible aux conflits de nom
+bin/xozhub.js    point d'entrée
+src/app.js       boucle de l'agent (clavier, streaming, exécution)
+src/ui.js        rendu de l'interface (logo, journal, barre, boîte de saisie)
+src/api.js       client X.GPT (streaming SSE)
+src/ascii.js     logo en blocs + dégradé bleu
+src/theme.js     palette aurore + dégradés (mix, ramp)
+src/config.js    .env / .xozhub.json
+src/context.js   contexte du projet (git, technos, fichiers) + mémoire durable
+src/session.js   sauvegarde et reprise de la conversation
+src/write.js     écriture directe des fichiers demandés par l'agent (blocs write)
+src/exec.js      exécution des commandes shell, presse-papiers, nouvelle fenêtre
+src/keys.js      analyse des touches et de la souris
+src/terminal.js  écran alternatif, mode raw
+```
+
+Aucune dépendance externe : le projet utilise uniquement Node.js.
