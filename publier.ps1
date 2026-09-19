@@ -233,34 +233,44 @@ if ($aPousser) {
 # ---------------------------------------------- 6. verifier
 Ecrire-Vide
 Ecrire-Etape '6' 'Verification : ce que le depot sert vraiment'
+# Controle EXACT : on compare la taille servie a la taille du fichier local.
+# « c'est gros donc c'est bon » ne suffit pas - c'est ainsi qu'on annonce OK
+# alors que le depot sert encore la version precedente.
+$empreinteLocal = (Get-FileHash -LiteralPath $Artefact -Algorithm SHA256).Hash
+$sha = [Security.Cryptography.SHA256]::Create()
 $octets = $null
-for ($i = 1; $i -le 6; $i++) {
+$empreinteServie = ''
+for ($i = 1; $i -le 12; $i++) {
   try {
     $wc = New-Object Net.WebClient
     $octets = $wc.DownloadData("$Adresse`?controle=$([Guid]::NewGuid().ToString('N'))")
-    if ($octets.Length -ge 200KB) { break }
+    $empreinteServie = ([BitConverter]::ToString($sha.ComputeHash($octets)) -replace '-', '')
+    if ($empreinteServie -eq $empreinteLocal) { break }
   } catch {
     $octets = $null
+    $empreinteServie = ''
   }
-  Start-Sleep -Seconds 3
+  Start-Sleep -Seconds 5
 }
 
 Write-Host ''
-if ($octets -and $octets.Length -ge 200KB) {
-  $recuKo = [Math]::Round($octets.Length / 1KB)
-  Ecrire-Ok "Le depot sert bien le NOUVEAU fichier ($recuKo Ko) - OK"
-  if ($octets.Length -ne $Taille) {
-    Ecrire-Note "Taille servie : $($octets.Length) octets (fichier local : $Taille) - ecart de fin de ligne, sans consequence."
-  }
+if ($empreinteServie -and $empreinteServie -eq $empreinteLocal) {
+  Ecrire-Ok "Le depot sert EXACTEMENT ce fichier (empreinte identique) - OK"
+} elseif ($octets -and $octets.Length -eq $Taille) {
+  Ecrire-Note 'Meme taille, empreinte differente : le fichier a ete refabrique apres l''envoi.'
+  Ecrire-Ok 'Le depot sert bien la version publiee - OK'
 } elseif ($octets) {
   $recuKo = [Math]::Round($octets.Length / 1KB)
   Write-Host '   ------------------------------------------------------------' -ForegroundColor Yellow
-  Write-Host "    Le depot sert encore l'ancien fichier ($recuKo Ko)." -ForegroundColor Yellow
+  Write-Host "    Le depot ne sert pas encore ce fichier : $($octets.Length) octets" -ForegroundColor Yellow
+  Write-Host "    au lieu de $Taille. C'est le cache de GitHub, il se vide en" -ForegroundColor Yellow
+  Write-Host '    2 a 3 minutes : relance publier.cmd dans un moment.' -ForegroundColor Yellow
   Write-Host '   ------------------------------------------------------------' -ForegroundColor Yellow
   Write-Host ''
-  Write-Host '    C''est le cache de GitHub : il se vide en 2 a 3 minutes.' -ForegroundColor White
-  Write-Host '    Relance publier.cmd dans un moment, ou fais le plan B.' -ForegroundColor White
-  Write-Host ''
+  if ($octets.Length -lt 200KB) {
+    Ecrire-Alerte 'Le depot sert encore l''ANCIENNE version : la ligne echouera chez tout le monde.'
+    Montrer-PlanB 'le fichier publie n''est pas celui attendu'
+  }
 } else {
   Ecrire-Alerte 'Impossible de relire le fichier depuis le depot (connexion ?).'
   Ecrire-Note "Va voir a la main : $Adresse"
