@@ -329,6 +329,40 @@ Pour modifier, un bloc `edit` remplace **seulement** ce qui change :
 Réécrire un fichier de 400 lignes pour changer trois lignes, c'est perdre du code au passage —
 le prompt lui interdit donc `write` sur un fichier existant quand un `edit` suffit.
 
+### Il copie un site entier, pages comprises
+
+Quand c'est **le même site** qu'on veut, et pas « le même esprit », la reconstruction ne suffit
+pas : il faut la copie. Elle se demande avec un bloc `clone`, et c'est l'application qui fait
+tout le travail — le modèle n'a rien à télécharger à la main.
+
+    ```clone https://exemple.fr mon-site
+
+- elle ne prend pas que la page d'accueil : elle **suit les liens intérieurs** (menu, pied de
+  page, articles, encadrés) et copie chaque page, jusqu'à douze pages sur deux niveaux ;
+- elle ramasse les ressources sous toutes leurs formes : feuilles de style et leurs `url()`,
+  `@import` et `@font-face`, scripts, images — **y compris celles en chargement différé**
+  (`data-src`, `srcset`), les décors en `style="…"`, les icônes, le manifeste, les vidéos et
+  les images de partage `og:image` ;
+- chaque adresse devient un nom de fichier **sûr et unique** : `style.css?v=3` et `style.css?v=4`
+  ne s'écrasent pas, et une image servie par `photo.php?id=7` prend l'extension de ce que le
+  serveur a vraiment renvoyé ;
+- les liens sont réécrits **depuis le dossier de chaque fichier** : une page dans
+  `blog/article.html` pointe vers `../assets/…`, pas vers `assets/…`. La navigation reste dans la
+  copie, d'une sous-page vers l'accueil comme d'une page vers ses styles ;
+- ce qui n'a pas pu être pris (trop lourd, introuvable, hors du site) **garde son adresse
+  d'origine** : un lien qui marche vaut mieux qu'un lien local mort — et l'application dit
+  exactement quoi, y compris les pages du site qu'elle n'a pas copiées faute de place ;
+- si la page est une **coquille rendue par JavaScript** (contenu fabriqué par le navigateur),
+  elle le signale : la copie locale ne peut pas montrer ce contenu, et il vaut mieux le dire que
+  de laisser croire que tout est là ;
+- journal : `⧉ https://exemple.fr → mon-site/ · 156 fichier(s), 13 page(s), 2.1 Mo · 5 non récupéré(s)`.
+
+Après la copie, l'application **vérifie ses propres références** (le même contrôle que pour un
+site écrit à la main : chaque `src`, `href`, `url()` doit tomber sur un fichier qui existe).
+Le prompt interdit ensuite au modèle de réécrire ces fichiers « pour faire joli » : une copie se
+retouche avec des `edit`, et le reste ne bouge pas. Un `CLONE.md` rappelle l'adresse d'origine et
+que le contenu reste la propriété de son éditeur.
+
 ### Il refait un site à partir d'un lien, une maquette à partir d'une capture
 
 Deux entrées de plus, et c'est toujours la même idée : au lieu de deviner, l'application va
@@ -478,10 +512,40 @@ Il n'y a que **deux commandes** : tout le reste se demande en français.
 | Commande | Rôle |
 | --- | --- |
 | `/miseajour` | dernière version du code **et** de l'IA, puis redémarrage — dans une **nouvelle fenêtre cmd**, avec le bandeau « En cours de mise à jour… » |
-| `/couleurs` | règle les couleurs : `truecolor`, `256`, `16` ou `none` |
+| `/couleurs` | règle les couleurs : `truecolor`, `256`, `16` ou `none`, ou une **palette** (`/couleurs ocean`) |
 
 Toute autre ligne commençant par `/` affiche simplement le rappel : écris ta demande en français.
 `/miseajour code` redémarre tel quel, sans chercher de nouveau code ni de nouveau modèle.
+
+### Le bouton ⚙ Paramètres
+
+En bas à droite, à côté de **✕ End session**, un bouton **⚙ Paramètres** ouvre un petit panneau
+dans la zone de saisie : la liste des palettes de couleurs, chacune montrée avec ses **vraies**
+teintes — le nom est peint dans son propre dégradé, à côté de ses couleurs. On choisit donc sur
+pièce, pas sur une description.
+
+Navigation : `↑` `↓` puis `Entrée`, les touches `1` à `6`, ou un **clic** sur la ligne. Le panneau
+reste ouvert après le choix : on essaie les palettes l'une après l'autre et on voit tout de suite
+le résultat. `✕` (toute la ligne du haut), `Échap`, `q` ou `x` referment.
+
+| Palette | Ambiance |
+| --- | --- |
+| **Aurore** | le défaut : violet indigo, cyan et menthe |
+| **Océan** | bleus profonds et turquoise, chaud en ambre |
+| **Forêt** | verts et turquoise, or et miel |
+| **Sunset** | orangés et roses, comme un soir d'été |
+| **Néon** | magenta et cyan saturés |
+| **Crépuscule** | indigo et mauve, rose au bout |
+
+Le choix est **enregistré** dans `.xozhub.json` et repris au lancement suivant. Changer de palette
+change **tout** d'un coup — logo, cadres, rails, badges, spirale — parce qu'une palette est un jeu
+complet de seize teintes, pas un réglage isolé : impossible d'obtenir une interface bariolée dont on
+a oublié un morceau. Deux teintes gardent leur sens dans toutes les palettes : la menthe dit
+« réussi », le corail dit « erreur ».
+
+Sur un terminal trop étroit (« 56 » colonnes), le bouton s'efface pour ne pas pousser la barre hors
+de l'écran ; `/couleurs <palette>` fait alors la même chose. Ajouter une palette se fait dans un seul
+endroit, `src/theme.js` (`PALETTES`) : il suffit de donner seize teintes, tout le reste en dérive.
 
 ### Il connaît déjà ton projet
 
@@ -635,6 +699,7 @@ Ordre de priorité : variables d'environnement, puis `.env`, puis `.xozhub.json`
 | `XOZHUB_BASE_URL` | `https://xgpt-api.xshe.workers.dev/v1` |
 | `XOZHUB_MODEL` | `xgpt-code` (voir `.env.example` : `xgpt-smart`, `xgpt-deepseek`, `xgpt-sol`, `xgpt-kimi`, `xgpt-glm`…) |
 | `XOZHUB_COLOR` | *(auto)* `truecolor`, `256`, `16` ou `none` — l'auto s'adapte au terminal |
+| `XOZHUB_PALETTE` | `aurore` (défaut), `ocean`, `foret`, `sunset`, `neon`, `crepuscule` |
 | `XOZHUB_AUTO` | `1` (exécution sans confirmation) |
 | `XOZHUB_TEMPERATURE` | `0.2` (agent concentré ; `off` pour ne pas envoyer le paramètre) |
 | `XOZHUB_MAX_RELANCES` | aucune limite (`3` pour brider les relances automatiques) |
