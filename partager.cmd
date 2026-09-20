@@ -29,6 +29,9 @@ xcopy "%~dp0bin" "%STAGE%\bin" /E /I /Y /Q >nul
 xcopy "%~dp0src" "%STAGE%\src" /E /I /Y /Q >nul
 copy /Y "%~dp0package.json" "%STAGE%\" >nul 2>nul
 copy /Y "%~dp0xozhub.cmd" "%STAGE%\" >nul 2>nul
+rem Le bandeau (logo XozHub colore) suit install.cmd et xozhub.cmd : sans lui,
+rem l'installation et le lancement retomberaient sur un simple encadre.
+copy /Y "%~dp0banniere.ps1" "%STAGE%\" >nul 2>nul
 copy /Y "%~dp0install.cmd" "%STAGE%\" >nul 2>nul
 copy /Y "%~dp0xoz.cmd" "%STAGE%\" >nul 2>nul
 copy /Y "%~dp0README.md" "%STAGE%\" >nul 2>nul

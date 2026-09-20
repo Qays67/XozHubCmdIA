@@ -26,14 +26,17 @@ set "SRC="
 set "ENV_SRC="
 
 cls
-echo.
-echo    ############################################################
-echo    #                                                          #
-echo    #             X O Z H U B . G P T                          #
-echo    #        agent de developpement en ligne de commande       #
-echo    #                                                          #
-echo    ############################################################
-echo.
+rem Le bandeau vient de banniere.ps1 : meme logo et memes couleurs que le lanceur
+rem et que la mise a jour. S'il manque, on retombe sur un simple encadre.
+if exist "%~dp0banniere.ps1" (
+  powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0banniere.ps1" -Statut "En cours d'installation..."
+) else (
+  echo.
+  echo    ############################################################
+  echo    #             X O Z H U B . G P T                          #
+  echo    ############################################################
+  echo.
+)
 echo    Installation automatique - suis les etapes.
 echo.
 
@@ -132,6 +135,8 @@ xcopy "%SRC%bin" "%INSTALL_DIR%\bin" /E /I /Y /Q >nul
 xcopy "%SRC%src" "%INSTALL_DIR%\src" /E /I /Y /Q >nul
 copy /Y "%SRC%package.json" "%INSTALL_DIR%\package.json" >nul
 copy /Y "%SRC%xozhub.cmd" "%INSTALL_DIR%\xozhub.cmd" >nul
+rem Le bandeau voyage avec le lanceur : la commande xozhub l'affiche a chaque demarrage.
+if exist "%SRC%banniere.ps1" copy /Y "%SRC%banniere.ps1" "%INSTALL_DIR%\banniere.ps1" >nul
 rem Le reste (README, install.cmd, scripts de developpement) n'est PAS recopie :
 rem ce sont des scripts, ils n'ont rien a faire chez la personne qui installe.
 if exist "%SRC%fabriquer-protege.mjs" copy /Y "%SRC%fabriquer-protege.mjs" "%INSTALL_DIR%\fabriquer-protege.mjs" >nul

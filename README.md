@@ -1,13 +1,30 @@
 # XozHub.GPT
 
-Agent de développement en ligne de commande, dans le style de SERVAT HUB : logo ASCII en gros blocs,
-barre de modèle, boîte de saisie encadrée — mais en palette **aurore** : violet indigo, cyan et
+Agent de développement en ligne de commande : logo ASCII **XOZHUB** en gros blocs (bandeau coloré
+au lancement, à l'installation et à la mise à jour), barre de modèle, boîte de saisie encadrée — en
+palette **aurore** : violet indigo, cyan et
 menthe, dégradés horizontaux, filets et panneaux qui se fondent, badges colorés pour le bouton
 d'arrêt et la fin de session.
 
 XozHub.GPT discute avec ton compte X.GPT, peut proposer des commandes shell et les exécute
 **automatiquement** — sans confirmation à valider à chaque étape. Le mode manuel
 (confirmation `o` / `n`) reste disponible avec `/auto off`.
+
+## Le bandeau XozHub
+
+Le logo (blocs pleins, dégradé indigo → violet → magenta → cyan, badge `.GPT`) est défini **une
+seule fois**, dans `banniere.ps1`, et s'affiche dans la fenêtre cmd à chaque moment important :
+
+| Moment | Ligne affichée sous le logo |
+| --- | --- |
+| installation (`install.cmd`, `install-en-ligne.ps1`, lanceur `.exe`) | `En cours d'installation...` |
+| lancement de la commande `xozhub` (ou du raccourci du Bureau) | `En cours de lancement...` |
+| `/miseajour` | `En cours de mise à jour...`, dans une **nouvelle fenêtre cmd** |
+
+Une seule source pour le dessin et les couleurs : les trois fenêtres affichent exactement le même
+logo, et le fichier ne contient que de l'ASCII (les blocs pleins sont construits par le code), donc
+il se lit pareil sur toutes les machines. `banniere.ps1` voyage avec le lanceur : `install.cmd`,
+`partager.cmd`, `fabriquer*.ps1` et `fabriquer-installeur.mjs` l'embarquent à chaque fois.
 
 ## Partager XozHub.GPT
 
@@ -205,7 +222,8 @@ puisque ce nom-là n'entre en conflit avec rien. Pour savoir laquelle répond, l
 
 Tape ta demande puis **Entrée**. XozHub.GPT enchaîne alors tout seul : il propose une commande,
 l'exécute, lit le résultat et continue jusqu'à ce que la demande soit terminée — **aucune
-confirmation à donner**, et aucune limite sur le nombre d'étapes.
+confirmation à donner**, et aucune limite sur l'enchaînement des étapes (un simple garde-fou,
+`XOZHUB_MAX_TOURS`, coupe une boucle qui tournerait sans fin au-delà de 30 tours).
 
 C'est le **mode automatique**, activé par défaut. Il va jusqu'au bout :
 
@@ -396,6 +414,10 @@ typographie, hiérarchie, mobile, finitions) et la *propreté* pour du code (cas
 exécution réelle, restes de debug). S'il reste du bloquant, il a droit à **une seconde
 relecture** — jamais plus de deux, donc jamais de boucle.
 
+Une relecture tient en **un seul tour** : l'agent corrige par blocs `edit` (le passage exact à
+remplacer, pas le fichier entier) et vérifie sa correction dans la même réponse. Réécrire une page
+de 400 lignes pour changer trois valeurs, c'est du temps perdu et du code perdu au passage.
+
 Pour ça, le prompt ne lui donne pas des conseils : il lui donne des **valeurs**. Les jetons CSS
 sont écrits dans le prompt, avec trois directions artistiques complètes (« Nuit douce »,
 « Éditorial clair », « Néon maîtrisé » : fonds, surfaces, textes, accents, polices) plus les
@@ -455,7 +477,7 @@ Il n'y a que **deux commandes** : tout le reste se demande en français.
 
 | Commande | Rôle |
 | --- | --- |
-| `/miseajour` | dernière version du code **et** de l'IA, puis redémarrage |
+| `/miseajour` | dernière version du code **et** de l'IA, puis redémarrage — dans une **nouvelle fenêtre cmd**, avec le bandeau « En cours de mise à jour… » |
 | `/couleurs` | règle les couleurs : `truecolor`, `256`, `16` ou `none` |
 
 Toute autre ligne commençant par `/` affiche simplement le rappel : écris ta demande en français.
@@ -617,14 +639,15 @@ Ordre de priorité : variables d'environnement, puis `.env`, puis `.xozhub.json`
 | `XOZHUB_TEMPERATURE` | `0.2` (agent concentré ; `off` pour ne pas envoyer le paramètre) |
 | `XOZHUB_MAX_RELANCES` | aucune limite (`3` pour brider les relances automatiques) |
 | `XOZHUB_MAX_ECRITURES` | aucune limite (plafond d'écritures de fichiers d'affilée) |
+| `XOZHUB_MAX_TOURS` | `30` (garde-fou : tours de l'agent pour une même demande ; `off` pour aucune limite) |
 | `XOZHUB_RELECTURE` | `on` (relecture du travail livré avant de rendre la main ; `off` pour couper) |
 | `XOZHUB_HISTORIQUE` | `16` (messages renvoyés au modèle ; `off` pour tout garder) |
 | `XOZHUB_MESSAGE_MAX` | `3000` (taille max d'un message envoyé au modèle ; `off` pour ne rien couper) |
 | `XOZHUB_DOCUMENT_MAX` | `40000` (taille max d'un document joint : fichier lu, site analysé) |
 
-Les quatre dernières acceptent `0`, `off` ou `non` pour dire « aucune limite » — l'agent est
-**sans plafond par défaut** sur les relances et les écritures ; ces réglages ne servent qu'à le
-brider si le besoin s'en fait sentir.
+Toutes ces variables de plafond acceptent `0`, `off` ou `non` pour dire « aucune limite » — l'agent
+est **sans plafond par défaut** sur les relances et les écritures ; ces réglages ne servent qu'à le
+brider, ou à le protéger d'une boucle qui n'en finit pas.
 
 Au démarrage, XozHub.GPT interroge `/v1/models` : si le modèle configuré n'existe pas, il bascule
 automatiquement sur le plus récent de sa famille, sinon sur le meilleur disponible du compte. Et si

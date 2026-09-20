@@ -209,7 +209,7 @@ Tu n'as presque rien à retenir : **deux commandes existent**, tout le reste se 
 
 | À taper | Effet |
 | --- | --- |
-| `/miseajour` | récupère la dernière version du code **et** de l'IA, puis redémarre et reprend ta conversation |
+| `/miseajour` | récupère la dernière version du code **et** de l'IA, puis redémarre et reprend ta conversation — **dans une nouvelle fenêtre cmd** : elle affiche le logo XozHub et « En cours de mise à jour... », puis l'IA reprend la main. La fenêtre d'où tu as tapé la commande peut se fermer |
 | `/couleurs` | règle l'affichage des couleurs : `truecolor` (le plus beau), `256` ou `16` pour un vieux terminal, `none` pour couper |
 | *n'importe quelle autre chose* | c'est une demande pour l'IA, écrite en français |
 

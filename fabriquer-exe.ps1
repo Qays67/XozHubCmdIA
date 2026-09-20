@@ -56,7 +56,7 @@ foreach ($dir in @('bin', 'src')) {
   else { Write-Host "  ATTENTION : dossier manquant : $dir" }
 }
 
-foreach ($f in @('package.json', 'xozhub.cmd', 'xoz.cmd', 'install.cmd', 'fabriquer-protege.mjs', '.env')) {
+foreach ($f in @('package.json', 'xozhub.cmd', 'banniere.ps1', 'xoz.cmd', 'install.cmd', 'fabriquer-protege.mjs', '.env')) {
   $p = Join-Path $root $f
   if (Test-Path $p) {
     Copy-Item $p -Destination $stage -Force

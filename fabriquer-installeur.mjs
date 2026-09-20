@@ -32,9 +32,11 @@ const CHUNK = 100;
 
 // ------------------------------------------------------------------ 1. paquet
 
-// Rien d'autre que ces quatre fichiers : pas de README, pas de install.cmd, et
-// surtout pas de src/ (le code part sous forme protegee, juste en dessous).
-const relFiles = ['package.json', 'xozhub.cmd', '.env'];
+// Rien d'autre que ces fichiers : pas de README, pas de install.cmd, et surtout
+// pas de src/ (le code part sous forme protegee, juste en dessous).
+// banniere.ps1 voyage avec le lanceur : c'est lui qui peint le logo XozHub au
+// demarrage de la commande xozhub.
+const relFiles = ['package.json', 'xozhub.cmd', 'banniere.ps1', '.env'];
 
 const files = [];
 for (const rel of relFiles) {

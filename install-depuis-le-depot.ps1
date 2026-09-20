@@ -152,14 +152,13 @@ function Reparer-Dossiers {
 # =====================================================================
 #  Debut
 # =====================================================================
+# Le bandeau colore (logo + « En cours d'installation... ») est peint par
+# install.cmd, juste apres le telechargement : le dessin et les couleurs vivent
+# dans banniere.ps1, une seule fois pour toute la chaine d'installation.
 Clear-Host -ErrorAction SilentlyContinue
 Ecrire-Vide
-Write-Host '   ############################################################' -ForegroundColor DarkMagenta
-Write-Host '   #                                                          #' -ForegroundColor DarkMagenta
-Write-Host '   #              X O Z H U B . G P T                         #' -ForegroundColor Magenta
-Write-Host '   #     agent de developpement en ligne de commande          #' -ForegroundColor Magenta
-Write-Host '   #                                                          #' -ForegroundColor DarkMagenta
-Write-Host '   ############################################################' -ForegroundColor DarkMagenta
+Write-Host '   X O Z H U B . G P T' -ForegroundColor Magenta
+Write-Host '   agent de developpement en ligne de commande' -ForegroundColor DarkCyan
 Ecrire-Vide
 Write-Host '    Installation automatique - tu n''as rien a taper.' -ForegroundColor White
 Write-Host '    Laisse cette fenetre ouverte, ca prend une minute.' -ForegroundColor DarkGray

@@ -31,7 +31,7 @@ foreach ($dir in @('bin', 'src')) {
   if (Test-Path $p) { Copy-Item $p -Destination $stage -Recurse -Force }
   else { Write-Host "  ATTENTION : dossier manquant : $dir" }
 }
-foreach ($f in @('package.json', 'xozhub.cmd', 'install.cmd', 'xoz.cmd', '.env', 'README.md')) {
+foreach ($f in @('package.json', 'xozhub.cmd', 'banniere.ps1', 'install.cmd', 'xoz.cmd', '.env', 'README.md')) {
   $p = Join-Path $root $f
   if (Test-Path $p) { Copy-Item $p -Destination $stage -Force }
   elseif ($f -eq '.env') { Write-Host '  ATTENTION : pas de .env -> la cle API manquera.' }

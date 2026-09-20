@@ -17,6 +17,11 @@ where node >nul 2>nul || echo   Installe-le depuis https://nodejs.org puis relan
 where node >nul 2>nul || pause
 where node >nul 2>nul || exit /b 1
 
+rem --- Bandeau de lancement : le logo XozHub, aux couleurs de l'interface ---
+rem Il est peint par banniere.ps1 (le meme que l'installeur) : si le fichier
+rem manque, on affiche quand meme une ligne lisible au lieu d'une erreur.
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0banniere.ps1" -Statut "En cours de lancement..." -Attente 1 || echo   XozHub.GPT - En cours de lancement...
+
 rem --- Lancement de l'interface ---
 node "%~dp0bin\xozhub.js" %*
 exit /b %errorlevel%

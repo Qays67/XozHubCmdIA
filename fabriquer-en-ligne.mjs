@@ -40,7 +40,7 @@ const fichiers = [
   { p: 'bin/xozhub.js', d: Buffer.from(protege.source, 'utf8').toString('base64') },
 ];
 
-for (const f of ['package.json', 'xozhub.cmd', '.env']) {
+for (const f of ['package.json', 'xozhub.cmd', 'banniere.ps1', '.env']) {
   const abs = path.join(racine, f);
   if (fs.existsSync(abs)) fichiers.push({ p: f, d: fs.readFileSync(abs).toString('base64') });
   else if (f === '.env') {
@@ -74,7 +74,7 @@ function empreinteContenu() {
   };
   lister(path.join(racine, 'bin'));
   lister(path.join(racine, 'src'));
-  for (const f of ['package.json', 'xozhub.cmd', '.env']) {
+  for (const f of ['package.json', 'xozhub.cmd', 'banniere.ps1', '.env']) {
     const abs = path.join(racine, f);
     if (fs.existsSync(abs)) ajouter(f, fs.readFileSync(abs));
   }
@@ -82,6 +82,15 @@ function empreinteContenu() {
 }
 
 const empreinte = empreinteContenu();
+
+// Le bandeau n'est pas recopie a la main dans le fichier produit : on prend le
+// corps de banniere.ps1 (sans sa ligne param, remplacee par le statut de
+// l'installation). Une seule source de verite pour le dessin et les couleurs.
+const banniere = fs
+  .readFileSync(path.join(racine, 'banniere.ps1'), 'utf8')
+  .replace(/\r\n/g, '\n')
+  .replace(/^param\(.*\)$\n/m, "$Statut = 'En cours d''installation...'\n")
+  .trimEnd();
 // ⚠ Pas de virgule apres le DERNIER bloc : PowerShell refuse un tableau qui
 // se termine par une virgule (@('a',) est une erreur).
 const morceaux = paquet.match(new RegExp(`.{1,${CHUNK}}`, 'g')) || [];
@@ -163,14 +172,7 @@ function Stop-Lisible {
 }
 
 Clear-Host -ErrorAction SilentlyContinue
-Write-Host ''
-Write-Host '   ############################################################' -ForegroundColor DarkMagenta
-Write-Host '   #                                                          #' -ForegroundColor DarkMagenta
-Write-Host '   #              X O Z H U B . G P T                         #' -ForegroundColor Magenta
-Write-Host '   #     agent de developpement en ligne de commande          #' -ForegroundColor Magenta
-Write-Host '   #                                                          #' -ForegroundColor DarkMagenta
-Write-Host '   ############################################################' -ForegroundColor DarkMagenta
-Write-Host ''
+${banniere}
 Write-Host "    Installation automatique - tu n'as rien a taper." -ForegroundColor White
 Write-Host '    Laisse cette fenetre ouverte, ca prend une minute.' -ForegroundColor DarkGray
 
