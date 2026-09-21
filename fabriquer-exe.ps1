@@ -27,7 +27,10 @@ $ErrorActionPreference = 'Stop'
 
 $root = $PSScriptRoot
 if (-not $root) { $root = Split-Path -Parent $MyInvocation.MyCommand.Path }
-$out = Join-Path $root 'XozHub-GPT-Setup.exe'
+# Le fichier fabrique va dans dist\ : c'est la que vivent les choses a donner.
+$out = Join-Path $root 'dist\XozHub-GPT-Setup.exe'
+$dossierSortie = Split-Path -Parent $out
+if (-not (Test-Path $dossierSortie)) { New-Item -ItemType Directory -Path $dossierSortie -Force | Out-Null }
 
 Write-Host ''
 Write-Host '  =========================================================='

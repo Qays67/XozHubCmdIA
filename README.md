@@ -1,14 +1,54 @@
 # XozHub.GPT
 
 Agent de développement en ligne de commande : logo ASCII **XOZHUB** en gros blocs (bandeau coloré
-au lancement, à l'installation et à la mise à jour), barre de modèle, boîte de saisie encadrée — en
-palette **aurore** : violet indigo, cyan et
-menthe, dégradés horizontaux, filets et panneaux qui se fondent, badges colorés pour le bouton
+au lancement, à l'installation et à la mise à jour), barre de modèle,boîte de saisie encadrée — en palette **galaxie** : violet profond de nébuleuse,
+cyan glacé et rose stellaire, dégradés horizontaux, filets et panneaux qui se fondent, badges colorés pour le bouton
 d'arrêt et la fin de session.
 
 XozHub.GPT discute avec ton compte X.GPT, peut proposer des commandes shell et les exécute
 **automatiquement** — sans confirmation à valider à chaque étape. Le mode manuel
 (confirmation `o` / `n`) reste disponible avec `/auto off`.
+
+## XozHub.AI — la nouvelle IA, en fenêtre (pas dans le cmd)
+
+La nouvelle IA a **sa propre fenêtre**, aux couleurs de la **galaxie** : ciel profond, nébuleuse
+violette, cyan glacé, logo en spirale qui tourne. Tu **choisis le dossier** où elle travaille (bouton
+« Choisir un dossier… », sélecteur de Windows), tu écris en français, et elle fait : elle écrit les
+fichiers pour de vrai, lance les commandes, lit les erreurs, corrige — puis **se relance une fois
+toute seule pour vérifier son travail** avant de te rendre la main.
+
+| | **XozHub.AI** (la nouvelle) | XozHub.GPT (le terminal) |
+| --- | --- | --- |
+| où ça s'affiche | **sa propre fenêtre**, aucune console | une fenêtre `cmd` |
+| comment on la lance | raccourci **XozHub.AI** du Bureau, ou `ia\lancer.cmd` | `xozhub`, ou raccourci du Bureau |
+| choisir le dossier | bouton dans le panneau de droite, ou chemin collé | `/dir`, ou le dossier de lancement |
+| ce qu'on voit | conversation, dossier, fichiers et journal, en direct | journal coloré dans le terminal |
+| installateur à donner | **`dist/XozHub-AI-Setup.exe`** | `dist/XozHub-GPT-Setup.exe` |
+
+Les deux partagent le **même moteur** (`src/`) et la même façon d'écrire les fichiers (blocs `write`,
+`edit`, `run`) : ce n'est pas une autre IA, c'est la même avec un écran qui va avec. Le code de la
+fenêtre est dans **`ia/`** — tout est détaillé dans `ia/README.md`.
+
+Ce que la fenêtre a en plus :
+
+- **la vraie fenêtre des dossiers de Windows** s'ouvre quand on clique sur « Choisir un dossier… »
+  (celle de l'explorateur, avec l'arborescence) — et le dossier choisi est **retenu** au lancement
+  suivant, dans `~/.xozhub-ai.json` ;
+- **les conversations précédentes** : chacune est enregistrée (`~/.xozhub-ai-conversations.json`) et
+  listée dans le panneau de droite. On clique, et tout revient — les questions, les réponses, le
+  journal (fichiers, commandes, sorties) et le dossier de l'époque, avec le contexte remis au modèle
+  pour continuer la discussion ;
+- **l'icône galaxie** (`ia/xozhub-ai.ico`, dessinée par `node ia/fabriquer-icone.mjs`, six tailles
+  de 16 à 256 px) : elle est sur le raccourci du Bureau, dans la barre des tâches, et dans l'onglet ;
+- **l'accès depuis un téléphone** : `node ia/serveur.mjs --reseau` accepte les connexions du Wi-Fi et
+  affiche l'adresse à taper sur le téléphone. ⚠️ Toute personne sur le même Wi-Fi avec ce lien peut
+  s'en servir — à n'activer que sur un réseau de confiance. Sans ce drapeau, l'IA n'écoute que sur
+  `127.0.0.1`.
+
+```cmd
+ia\lancer.cmd          rem lancer la nouvelle IA depuis le projet
+ia\fabriquer-exe.cmd   rem fabriquer dist\XozHub-AI-Setup.exe
+```
 
 ## Le bandeau XozHub
 
@@ -32,9 +72,16 @@ il se lit pareil sur toutes les machines. `banniere.ps1` voyage avec le lanceur 
 
 Le site, c'est **une seule page HTML pure** (aucune dépendance, aucun fichier à côté) :
 
-- **`docs/index.html`** — **la ligne unique à coller dans `cmd`** avec son bouton « copier », ce qui se
-  passe, comment lancer l'IA, la première demande, **ce qui marche et ce qui peut bloquer**, les autres
-  façons d'installer, le dépannage et les commandes utiles. Rien de plus.
+- **`docs/index.html`** — **la ligne unique à coller dans `cmd`** avec son bouton « copier », le
+  bouton de téléchargement de l'installateur, **le vrai lien du site** (à copier ou à partager tel
+  quel, c'est celui qu'on envoie à quelqu'un), puis ce qui se passe, comment lancer l'IA, la première
+  demande, **ce qui marche et ce qui peut bloquer**, les autres façons d'installer, le dépannage et
+  les commandes utiles. Habillage **galaxie** : ciel profond, nébuleuse violette, cyan glacé, logo en
+  spirale qui tourne, étoiles qui scintillent ;
+- **`dist/`** — ce qui se donne : `XozHub-GPT-Setup.exe` et `XozHub-GPT-Installer.cmd`, déjà
+  fabriqués (voir `dist/README.md` : le lien à envoyer et où mettre le `.exe` pour le bouton du site) ;
+- **`docs/og.png`** — l'aperçu du lien (l'image que voit la personne à qui tu envoies l'adresse,
+  dans WhatsApp, Discord ou Twitter), refabriquée par `node fabriquer-og.mjs`.
 
 Le site est **en ligne** (`https://qays67.github.io/XozHubCmdIA/`), servi par **GitHub Pages** depuis
 `main` / `/docs`. Rien à faire pour le mettre à jour : chaque publication de `publier.cmd` le reconstruit
@@ -256,6 +303,7 @@ Avant chaque tour, XozHub.GPT regarde ce que tu viens d'écrire et en déduit l'
 | Ta demande | Ce qu'il fait |
 | --- | --- |
 | « c'est quoi un service worker ? », « pourquoi ça plante ? », « explique-moi ce fichier », « salut » | il **répond** en texte, sans rien modifier (il peut quand même lire le dossier — `dir`, `type`, `findstr`… — si c'est nécessaire pour répondre juste) |
+| « bravo », « c'est moche », « j'aime pas le bleu », « ok merci beaucoup pour ton aide » | il **répond en une ligne**, et **rien ne se crée** : aucun fichier, aucune commande. Tu ne fais que lui parler — c'est l'application qui refuse d'écrire quoi que ce soit |
 | « crée un site dans mon-site », « corrige le bug », « installe express », « tu peux me faire un serveur ? » | il **agit** : il travaille vraiment dans le dossier, exécute, vérifie et corrige |
 
 En cas de doute, c'est l'action qui gagne : une demande vague le fait travailler plutôt que
@@ -264,6 +312,14 @@ une réponse à ta question n'est jamais relancée toute seule.
 
 Un « ? » **n'importe où** dans la phrase suffit à en faire une question (même mal ponctuée), sauf
 si elle contient un verbe d'action : « tu peux me créer un site ? » reste une demande d'action.
+
+Un avis, un remerciement, une remarque (« c'est joli », « j'aime pas le bleu », « ok merci ») ne
+déclenche **aucun travail** : l'agent répond, et rien d'autre. Ce n'est pas seulement une consigne
+donnée au modèle : quand le message n'est pas une demande d'action, l'application **jette les
+blocs d'écriture et les commandes** avant qu'ils n'atteignent le disque, et lui demande de répondre
+en texte. Un dossier ne se remplit donc plus de scripts parce qu'on a dit « c'est pas mal ».
+Et « ok, continue », « vas-y », « et alors ? » ne sont pas du bavardage : c'est une relance de la
+tâche en cours, et l'agent reprend le travail là où il en était.
 
 ### Il crée les fichiers pour de vrai
 
@@ -517,20 +573,16 @@ Il n'y a que **deux commandes** : tout le reste se demande en français.
 Toute autre ligne commençant par `/` affiche simplement le rappel : écris ta demande en français.
 `/miseajour code` redémarre tel quel, sans chercher de nouveau code ni de nouveau modèle.
 
-### Le bouton ⚙ Paramètres
+### Les palettes de couleurs
 
-En bas à droite, à côté de **✕ End session**, un bouton **⚙ Paramètres** ouvre un petit panneau
-dans la zone de saisie : la liste des palettes de couleurs, chacune montrée avec ses **vraies**
-teintes — le nom est peint dans son propre dégradé, à côté de ses couleurs. On choisit donc sur
-pièce, pas sur une description.
-
-Navigation : `↑` `↓` puis `Entrée`, les touches `1` à `6`, ou un **clic** sur la ligne. Le panneau
-reste ouvert après le choix : on essaie les palettes l'une après l'autre et on voit tout de suite
-le résultat. `✕` (toute la ligne du haut), `Échap`, `q` ou `x` referment.
+`/couleurs <palette>` — par exemple `/couleurs ocean` — change **tout** d'un coup : logo, cadres,
+rails, badges, spirale. Il n'y a plus de bouton dans la barre du bas : la commande suffit, et
+`/couleurs` seul redonne la liste des palettes.
 
 | Palette | Ambiance |
 | --- | --- |
-| **Aurore** | le défaut : violet indigo, cyan et menthe |
+| **Galaxie** | le défaut : nébuleuse violette, cyan glacé et rose stellaire |
+| **Aurore** | violet indigo, cyan et menthe |
 | **Océan** | bleus profonds et turquoise, chaud en ambre |
 | **Forêt** | verts et turquoise, or et miel |
 | **Sunset** | orangés et roses, comme un soir d'été |
@@ -543,9 +595,8 @@ complet de seize teintes, pas un réglage isolé : impossible d'obtenir une inte
 a oublié un morceau. Deux teintes gardent leur sens dans toutes les palettes : la menthe dit
 « réussi », le corail dit « erreur ».
 
-Sur un terminal trop étroit (« 56 » colonnes), le bouton s'efface pour ne pas pousser la barre hors
-de l'écran ; `/couleurs <palette>` fait alors la même chose. Ajouter une palette se fait dans un seul
-endroit, `src/theme.js` (`PALETTES`) : il suffit de donner seize teintes, tout le reste en dérive.
+Ajouter une palette se fait dans un seul endroit, `src/theme.js` (`PALETTES`) : il suffit de donner
+seize teintes, tout le reste en dérive.
 
 ### Il connaît déjà ton projet
 
@@ -637,7 +688,7 @@ proprement avant l'ouverture du menu.
 
 ### Style
 
-Interface en palette « aurore », colorée et lisible : **chaque rôle a sa couleur**. Tout ce qui
+Interface en palette « galaxie », colorée et lisible : **chaque rôle a sa couleur**. Tout ce qui
 vient de toi est **chaud** (or → ambre → orange → corail → rose), tout ce qui vient de l'IA est
 **froid** (magenta → violet → bleu → cyan → menthe), les commandes sont **menthe**, les fichiers
 écrits **vert menthe**, les erreurs **corail**, les sorties **indigo discret** : au premier regard,
@@ -699,7 +750,7 @@ Ordre de priorité : variables d'environnement, puis `.env`, puis `.xozhub.json`
 | `XOZHUB_BASE_URL` | `https://xgpt-api.xshe.workers.dev/v1` |
 | `XOZHUB_MODEL` | `xgpt-code` (voir `.env.example` : `xgpt-smart`, `xgpt-deepseek`, `xgpt-sol`, `xgpt-kimi`, `xgpt-glm`…) |
 | `XOZHUB_COLOR` | *(auto)* `truecolor`, `256`, `16` ou `none` — l'auto s'adapte au terminal |
-| `XOZHUB_PALETTE` | `aurore` (défaut), `ocean`, `foret`, `sunset`, `neon`, `crepuscule` |
+| `XOZHUB_PALETTE` | `galaxie` (défaut), `aurore`, `ocean`, `foret`, `sunset`, `neon`, `crepuscule` |
 | `XOZHUB_AUTO` | `1` (exécution sans confirmation) |
 | `XOZHUB_TEMPERATURE` | `0.2` (agent concentré ; `off` pour ne pas envoyer le paramètre) |
 | `XOZHUB_MAX_RELANCES` | aucune limite (`3` pour brider les relances automatiques) |
@@ -728,6 +779,13 @@ fabriquer-exe.cmd fabrique l'installateur XozHub-GPT-Setup.exe (un seul fichier 
 docs/index.html  LE site (GitHub Pages) : la ligne à coller dans cmd, ce qui marche, les autres méthodes, dépannage
 TUTORIEL.md      le tutoriel complet en texte, à joindre à l'installateur
 fabriquer-protege.mjs rassemble bin/ + src/ en UN SEUL fichier chiffré (le code livré est illisible)
+fabriquer-og.mjs fabrique docs/og.png : l'aperçu galaxie du lien (le carré des partages WhatsApp / Discord)
+ia/              XozHub.AI : la nouvelle IA en fenetre graphique (voir ia/README.md)
+ia/serveur.mjs   le coeur : serveur local, agent (write/edit/run), ouverture de la fenetre, bouton dossier
+ia/ui.html       la fenetre : conversation, dossier, fichiers, journal - palette galaxie
+ia/installer.ps1 ce que le .exe execute : Node.js, installation, raccourci du Bureau, lancement
+ia/fabriquer-exe.ps1 fabrique dist/XozHub-AI-Setup.exe (IExpress, un seul fichier)
+dist/            ce qu'on envoie : XozHub-GPT-Setup.exe + XozHub-GPT-Installer.cmd (voir dist/README.md)
 fabriquer-en-ligne.mjs fabrique install-en-ligne.ps1 : le fichier unique qui contient tout (code chiffré inclus)
 publier.cmd      publie la ligne d'installation : refabrique le fichier, le remonte sur le dépôt, vérifie (double-clic)
 publier.ps1      ce que fait publier.cmd (récupération du dépôt, copie, commit, envoi, contrôle)
@@ -743,7 +801,7 @@ src/app.js       boucle de l'agent (clavier, streaming, exécution)
 src/ui.js        rendu de l'interface (logo, journal, barre, boîte de saisie)
 src/api.js       client X.GPT (streaming SSE)
 src/ascii.js     logo en blocs + dégradé bleu
-src/theme.js     palette aurore + dégradés (mix, ramp)
+src/theme.js     palettes (galaxie par défaut) + dégradés (mix, ramp)
 src/config.js    .env / .xozhub.json
 src/context.js   contexte du projet (git, technos, fichiers) + mémoire durable
 src/session.js   sauvegarde et reprise de la conversation
