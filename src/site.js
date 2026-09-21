@@ -450,17 +450,21 @@ export async function visit(url, { signal } = {}) {
   let cssAll = '';
   const inlineCss = [...html.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/gi)].map((m) => m[1]).join('\n');
   cssAll += inlineCss;
-  for (const href of styleSheets(html, page.url)) {
-    try {
-      const res = await getText(href, { signal, accept: 'text/css,*/*;q=0.1' });
-      if (!res.ok) continue;
-      const css = cleanCss(res.body);
-      sheets.push({ href, css });
-      cssAll += `\n${res.body}`;
-      if (cssAll.length > MAX_TOTAL) break;
-    } catch {
-      /* une feuille de style inaccessible ne bloque pas la visite */
-    }
+  // Les feuilles de style partent ensemble : c'est là que se trouve le vrai design, et huit
+  // allers-retours à la queue leu leu, c'est huit fois l'attente pour la même page.
+  const lues = await Promise.all(
+    styleSheets(html, page.url).map((href) =>
+      getText(href, { signal, accept: 'text/css,*/*;q=0.1' })
+        .then((res) => (res.ok ? { href, css: cleanCss(res.body), brut: res.body } : null))
+        // Une feuille de style inaccessible ne bloque pas la visite.
+        .catch(() => null),
+    ),
+  );
+  for (const lue of lues) {
+    if (!lue) continue;
+    if (cssAll.length > MAX_TOTAL) break;
+    sheets.push({ href: lue.href, css: lue.css });
+    cssAll += `\n${lue.brut}`;
   }
 
   const palette = paletteOf(cssAll || html, [inlineCss]);

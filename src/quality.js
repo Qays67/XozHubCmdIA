@@ -405,9 +405,14 @@ export function reviewMessage(paths, problems = [], findings = [], extra = '') {
   }
   lines.push(
     '',
-    'Réécris UNIQUEMENT les fichiers qui ont besoin d’être corrigés, en entier, en blocs « write »',
-    '(un bloc par fichier). Si tout est déjà bon, ne réécris rien : dis juste ce que tu as vérifié,',
-    'puis termine par TERMINÉ seul sur la dernière ligne.',
+    'Corrige uniquement ce qui ne va pas, avec des blocs « edit » : une paire ANCIEN / NOUVEAU par',
+    'défaut, avec 4 à 8 lignes de contexte pour que le passage soit unique. C’est le moyen le plus',
+    'rapide et le plus sûr — un fichier réécrit en entier pour trois lignes, c’est du code perdu au',
+    'passage. Un bloc « write » seulement si le fichier doit changer de fond en comble.',
+    'Dans la MÊME réponse : vérifie ce que tu viens de corriger (un bloc « run » — lecture du fichier,',
+    'serveur local ou test). Une correction qu’on n’a pas revue n’est pas une correction.',
+    'Si tout est déjà bon, ne touche à rien : dis juste ce que tu as vérifié, puis termine par',
+    'TERMINÉ seul sur la dernière ligne.',
   );
   return lines.filter((l) => l !== '').join('\n');
 }

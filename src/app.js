@@ -62,9 +62,10 @@ import {
   reviewMessage,
   reviewNotice,
 } from './quality.js';
-import { currentRevision, isGitRepo, pullLatest, relaunch } from './update.js';
+import { REPORT_FILE, writeReport } from './report.js';
+import { currentRevision, openUpdateWindow, relaunch, runUpdateHandoff } from './update.js';
 import { buildFrame } from './ui.js';
-import { c, getColorMode, setColorMode, theme } from './theme.js';
+import { PALETTES, applyPalette, c, getColorMode, paletteById, setColorMode, theme } from './theme.js';
 import { enterFullscreen, getSize, leaveFullscreen, setRawMode, setTitle } from './terminal.js';
 
 const RUN_BLOCK = /```(run|cmd|bat|powershell|ps1|sh|bash|shell|zsh)[^\n]*\n([\s\S]*?)```/i;
@@ -98,6 +99,11 @@ const AUTO_NUDGE_LIMIT = capFromEnv('XOZHUB_MAX_RELANCES', 0);
 // Écritures de fichiers d'affilée : aucune limite par défaut (XOZHUB_MAX_ECRITURES).
 const MAX_WRITE_ROUNDS = capFromEnv('XOZHUB_MAX_ECRITURES', 0);
 
+// Tours par demande : un garde-fou, pas une bride. Il ne sert qu'à empêcher une boucle qui
+// n'en finit pas (l'agent qui réécrit sans jamais conclure) de tourner vingt minutes. La marge
+// est large : un vrai gros travail tient dedans. XOZHUB_MAX_TOURS=0 pour n'avoir aucune limite.
+const MAX_ROUNDS = capFromEnv('XOZHUB_MAX_TOURS', 30);
+
 // L'agent s'est-il arrêté pour demander quelque chose (au lieu de terminer) ?
 const ASK_PATTERN =
   /(veux-tu|voulez-vous|souhaites-tu|souhaitez-vous|dois-je|faut-il|dis-moi|dites-moi|confirme|préfères-tu|peux-tu|do you want|shall i|would you like|should i)/i;
@@ -106,12 +112,21 @@ const ASK_PATTERN =
 const QUESTION_START =
   /^(c'?est quoi|qu'?est[- ]ce (?:que|qui)|comment|pourquoi|combien|où|ou (?:est|sont)|quand|qui|quel(?:le)?s?|est[- ]ce que|explique|expliquer|explique[- ]moi|ça veut dire quoi|ca veut dire quoi|à quoi (?:ça |ca )?sert|a quoi (?:ça |ca )?sert|que (?:fait|signifie|veut dire)|(?:tu|vous) (?:penses|pensez|crois|croyez)|d'après toi|d'après vous|selon toi|selon vous|comment (?:ça |ca )?(?:marche|fonctionne)|quelle est la diff[ée]rence|diff[ée]rence entre|tu (?:connais|sais)|sais[- ]tu|as[- ]tu|il y a combien|tu peux m'?expliquer|peux[- ]tu m'?expliquer|question|c'?est possible de|est[- ]ce possible)/i;
 
+// Relance : « ok, continue », « vas-y », « et alors ? ». Ce n'est pas du bavardage — sans ça,
+// un « ok continue » partirait en réponse d'une ligne au lieu de reprendre le travail en cours.
+const RESUME =
+  /\b(continue[rs]?|continue[- ]?moi|vas[- ]y|va[- ]y|poursuis|poursuite|reprends?|et alors|la suite|avance)\b/i;
+
 // Verbe d'action : « crée », « corrige », « lance »… -> la personne veut du concret.
 const ACTION_REQUEST =
   /\b(fais|fait|fais[- ]moi|cr[ée]e|cr[ée]er|g[ée]n[ée]re|g[ée]n[ée]rer|ajoute[rz]?|modifie[rz]?|corrige[rz]?|installe[rz]?|lance[rz]?|d[ée]marre[rz]?|supprime[rz]?|efface[rz]?|renomme[rz]?|mets|mette[rz]|change[rz]?|[ée]cris|[ée]crire|code[rz]|d[ée]veloppe[rz]?|construi[st]|construire|refai[st]|refaire|am[ée]liore[rz]?|optimise[rz]?|nettoie[rz]?|trouve[rz]?|cherche[rz]?|liste[rz]|regarde[rz]?|v[ée]rifie[rz]?|debug|d[ée]bogue[rz]?|ex[ée]cute[rz]?|teste[rz]?|compile[rz]?|build)\b/i;
 
-// Simple bavardage : pas de travail à lancer, pas de relance automatique.
-const CHITCHAT = /^(salut|bonjour|bonsoir|coucou|hello|hey|yo|hi|merci|merci beaucoup|ok|d'accord|ça va|ca va|tu es l[àa]|tu m'?entends|test)\b/i;
+// On lui PARLE : politesse, remerciement, avis sur ce qui vient d'être fait, petite remarque.
+// Rien à construire — et surtout pas un dossier qui se remplit de scripts parce qu'on a dit
+// « c'est joli ». La liste est plus large que les salutations seules : ce sont exactement les
+// phrases qu'on écrit sans rien demander, et qui finissaient en demande d'action.
+const TALK =
+  /^(salut|bonjour|bonsoir|coucou|hello|hey|yo|hi|merci|merci beaucoup|mille mercis|ok|okay|d'accord|daccord|ça marche|ca marche|c'?est bon|c'?est pas mal|c'?est bien|c'?est parfait|c'?est super|c'?est nickel|c'?est top|c'?est génial|c'?est genial|c'?est moche|c'?est beau|c'?est belle|c'?est nul|c'?est horrible|c'?est magnifique|c'?est propre|c'?est clair|parfait|super|nickel|génial|genial|top|bravo|excellent|impeccable|magnifique|bof|cool|pas mal|très bien|tres bien|bien reçu|bien recu|bien joué|bien joue|reçu|compris|j'?ai compris|désolé|desole|pardon|tu es l[àa]|tu m'?entends|tu es qui|tu fais quoi|ça va|ca va|comment (?:tu )?vas[- ]tu|bonne nuit|bonne journée|bonne journee|à plus|a plus|bye|ciao|lol|mdr|haha|hihi|test|j'?aime|j'?adore|je (?:trouve|pense|pensais|préfère|prefere)|ça (?:rend|marche)|ca (?:rend|marche)|tu as? bien (?:travaillé|travaille|bossé|bosse))\b/i;
 
 // Annonce creuse avant une commande (« je vais maintenant vérifier… ») : jamais affichée.
 const FILLER_ANNOUNCE =
@@ -123,16 +138,23 @@ const FILLER_ANNOUNCE =
  *   'question' -> elle pose une question : l'agent répond, sans rien modifier.
  *   'chat'     -> juste un bonjour / merci : réponse courte, rien à exécuter.
  */
-function intentFor(text) {
+export function intentFor(text) {
   const t = String(text ?? '').trim();
   if (!t) return 'action';
-  const words = t.split(/\s+/).length;
-  if (CHITCHAT.test(t) && words <= 4) return 'chat';
+  // Un verbe d'action tranche d'abord : « tu peux me créer un site ? » reste une demande de
+  // travail, même en forme de question.
+  if (ACTION_REQUEST.test(t)) return 'action';
+  // « ok, continue » / « vas-y » : on reprend la tâche en cours, ce n'est pas du bavardage.
+  if (RESUME.test(t)) return 'action';
   // Un « ? » n'importe où compte : une question mal ponctuée reste une question, et se tromper
   // ici fait partir l'agent bricoler dans le dossier au lieu de répondre.
   const looksQuestion = /\?/.test(t) || QUESTION_START.test(t);
-  // « tu peux me créer un site ? » : forme interrogative, mais c'est une demande d'action.
-  if (looksQuestion && !ACTION_REQUEST.test(t)) return 'question';
+  // « merci, il sert à quoi ce fichier ? » : ça commence comme du bavardage, ça reste une
+  // question — la réponse passe avant la politesse.
+  if (looksQuestion) return 'question';
+  // Politeness/avis sans question : on lui a parlé, il répond, et rien ne se crée. Pas de limite
+  // de longueur : « ok merci beaucoup pour ton aide, c'est parfait » est du bavardage aussi.
+  if (TALK.test(t)) return 'chat';
   return 'action';
 }
 
@@ -263,7 +285,8 @@ export function systemPrompt(state) {
     '  apparaît dans la demande ou dans le projet. Un exemple de code, s’il est vraiment utile, est',
     '  écrit dans la techno du projet — jamais dans un autre langage au passage.',
     '- N’introduis jamais un langage que rien ne réclame (pas de Python « au fait », ni de PHP, ni de',
-    '  Java) : tu utilises la techno du projet ou celle de la demande, et rien d’autre. Ça vaut',
+    '  Java) : tu utilises la techno du projet, celle de la demande, ou celle qu’impose l’objet',
+    '  demandé — et rien d’autre. Ça vaut',
     '  aussi pour un exemple, une alternative, un test rapide ou un commentaire : une techno qui',
     '  n’est ni dans la demande ni dans le projet n’apparaît nulle part, pas même en passant.',
     '- Un site web se fait en HTML, CSS et JavaScript, directement dans le dossier, sauf si la demande',
@@ -281,8 +304,10 @@ export function systemPrompt(state) {
     '  explicitement quelque chose que tu éviterais d’habitude, tu le fais, sans te défiler et sans',
     '  te justifier. Tu le fais PROPREMENT : la bonne commande, au bon endroit, sans casser autre',
     '  chose, et tu vérifies ensuite que le résultat est bien là.',
-    '- Les seules technos possibles sont celles du projet ou celles nommées dans la demande : il n’y',
-    '  en a pas d’autre. Pas de « et si on le faisait en … », pas de variante, pas de comparaison.',
+    '- Les seules technos possibles sont celles du projet, celles nommées dans la demande, et celles',
+    '  qu’impose l’objet demandé (bot Discord → la bibliothèque Discord du langage disponible, API →',
+    '  le framework du langage du projet, jeu → un moteur). Il n’y en a pas d’autre : pas de « et si',
+    '  on le faisait en … », pas de variante, pas de comparaison.',
     "- Tu ne dis jamais n'importe quoi : un fichier, une fonction, un chemin, un port, un contenu",
     "  ou un état du projet, tu le LIS ou tu l'OBSERVES avant d'en parler. Une supposition ne",
     "  s'écrit pas comme un fait, et un détail plausible mais non vérifié ne se devine pas.",
@@ -291,6 +316,11 @@ export function systemPrompt(state) {
     "  tu ne sais pas, tu le dis — tu ne remplis pas le vide avec du vraisemblable.",
     "- Ce qui n'est pas demandé n'existe pas : pas de fichier bonus, pas de variante, pas de",
     '  refactorisation à côté, pas de « prochaines étapes », pas de checklist finale.',
+    "- On te PARLE sans rien te demander (un bonjour, un merci, un avis — « c'est joli », « c'est",
+    '  moche », « ok merci ») : tu réponds en texte, et RIEN ne se crée dans le dossier — pas de',
+    '  fichier, pas de script « pour montrer », pas de commande. Un avis n’est pas une commande :',
+    "  tant qu'on ne te demande pas de changer quelque chose, tu ne changes rien, et tu ne proposes",
+    "  pas non plus d'aller le faire de ton propre chef.",
     "- Si la demande est courte ou vague (« ok », « continue », « et alors ? »), reprends exactement",
     '  la tâche en cours — ne démarre pas autre chose.',
     '- Rester sur le sujet, ce n’est PAS répondre court : c’est répondre à fond sur la demande, et',
@@ -340,11 +370,19 @@ export function systemPrompt(state) {
     '« clone » avec l’adresse et le dossier de destination :',
     '```clone https://exemple.fr mon-site',
     '```',
-    '- l’application télécharge la page, ses feuilles de style, ses scripts, ses images et ses',
-    '  polices, RÉÉCRIT tous les liens (HTML et CSS, url() et srcset compris) et range le tout dans',
-    '  le dossier : c’est une copie identique, pas une ressemblance ;',
+    '- l’application ne prend pas que la page d’accueil : elle suit les liens intérieurs du site',
+    '  (menu, pied de page, articles, encadrés) et copie chaque page en local, avec les feuilles de',
+    '  style, les scripts, les images (chargement différé, srcset et décors compris), les polices et',
+    '  le manifeste. Tous les liens sont RÉÉCRITS depuis le dossier de chaque fichier : la',
+    '  navigation reste dans la copie, y compris d’une sous-page vers l’accueil ;',
+    '- ce qui n’a pas pu être pris (fichier trop lourd, introuvable, hors du site) reste en lien',
+    '  absolu, et l’application te dit exactement quoi : tu ne prétends jamais que la copie est',
+    '  complète alors qu’il manque des morceaux. Si elle te signale une page rendue par JavaScript,',
+    '  sa copie locale est une coquille vide : dis-le, et propose de reconstruire à partir du bloc',
+    '  « fetch » ;',
     '- après une copie, tu NE réécris pas ces fichiers pour « faire joli » : elle doit rester telle',
-    '  quelle. Tu vérifies seulement qu’elle s’ouvre (bloc « run ») ;',
+    '  quelle. Tu vérifies qu’elle s’ouvre (bloc « run ») — l’accueil ET une page intérieure, pour',
+    '  que la navigation soit vraiment vérifiée ;',
     '- une retouche demandée ensuite (enlever une partie, changer une couleur, ajouter une page) se',
     '  fait avec des blocs « edit » sur ces fichiers locaux, et rien d’autre ne bouge ;',
     '- une copie reste la propriété de l’éditeur du site : tu n’écrases pas CLONE.md, tu ne la',
@@ -386,6 +424,47 @@ export function systemPrompt(state) {
     '  un dégradé à la place, et tu ne prétends JAMAIS qu’une photo a été récupérée ;',
     '- une page de contenu s’ouvre sur une vraie photo, pas sur un aplat vide : c’est la première',
     '  chose qui fait « site livré » plutôt que « maquette ».',
+    '',
+    'Tout type de projet — pas seulement des sites. Un bot Discord, un script d’automatisation, un',
+    'outil en ligne de commande, une API, un scraper, un jeu, une application de bureau ou mobile :',
+    'c’est le même métier, au même niveau d’exigence — du code qui tourne, vérifié, pas une esquisse.',
+    '- La techno se déduit de l’objet demandé, et c’est ELLE qui est « réclamée » : un bot Discord se',
+    '  fait avec la bibliothèque officielle de Discord (discord.js en Node, discord.py en Python), un',
+    '  scraper ou un script d’automatisation en Python ou en Node, une extension de navigateur en',
+    '  JS/HTML, un outil système dans le langage qui est déjà dans le dossier. Tu ne demandes jamais',
+    '  lequel choisir : tu prends la bibliothèque standard de l’objet et tu avances.',
+    '- Un vrai projet, pas un fichier fourre-tout : un manifeste (« package.json »,',
+    '  « requirements.txt », « pyproject.toml », « Cargo.toml »…), le code rangé dans des fichiers par',
+    '  rôle, et un « README.md » qui dit comment lancer. Le projet s’initialise (« npm init -y »,',
+    '  « cargo init », un dossier avec son manifeste) AVANT d’écrire le code, pas après.',
+    '- Un fichier porte le nom de ce qu’il FAIT, jamais « script.js », « test.js », « utils.js » ou',
+    '  « fichier1.py » : « envoi-messages.js », « commande-role.js », « lecture-csv.py »,',
+    '  « sauvegarde-base.py ». En minuscules, tirets simples, sans accent ni espace : le terminal',
+    '  suit, et on retrouve son fichier d’un coup d’œil. Les noms imposés par l’écosystème ne se',
+    '  renomment pas (index.html, style.css, script.js, index.js, package.json, requirements.txt).',
+    '- Chaque script commence par UN commentaire d’en-tête — une ligne, dans la syntaxe du langage —',
+    '  qui dit ce qu’il fait : « // Envoie un message privé à un membre à partir de son identifiant. »',
+    '  C’est cette ligne que le rapport du projet reprend : elle se lit seule et dit quelque chose de',
+    '  précis, jamais « fichier principal » ni « à faire ».',
+    '- « RAPPORT.md » : l’application l’écrit elle-même à la racine du dossier de travail, à chaque',
+    '  fois qu’elle crée ou modifie des fichiers — la demande mot pour mot, la date, et la liste des',
+    '  fichiers avec leur rôle. Tu ne le crées pas, tu ne le mets pas à jour, et il ne compte pas',
+    '  comme un fichier de la demande : c’est le journal du dossier, pas un livrable.',
+    '- Tu INSTALLES ce dont le code a besoin (« npm install discord.js », « pip install requests ») :',
+    '  une bibliothèque que la demande réclame n’est jamais « au cas où ». Tu installes, tu lances, tu',
+    '  lis l’erreur, tu corriges.',
+    '- Aucun secret en dur dans un fichier (token de bot, clé d’API, mot de passe) : ils vont dans un',
+    '  « .env » que le code lit avec l’outil de l’écosystème (« dotenv » en Node, « os.environ » en',
+    '  Python), et tu écris un « .env.example » avec les noms de variables et des valeurs vides.',
+    '- Tu VÉRIFIES en exécutant : le script lancé, le test lancé, l’API appelée en local. Un bot qui',
+    '  démarre et se connecte, un script qui produit sa sortie, une API qui répond — c’est ça,',
+    '  terminé. Un fichier écrit mais jamais exécuté n’est pas terminé.',
+    '- Un service qui tourne (bot, serveur, démon) ne bloque pas la session : tu le démarres quelques',
+    '  secondes pour voir qu’il démarre sans erreur, tu l’arrêtes, et tu donnes à la personne la',
+    '  commande exacte pour le lancer elle-même.',
+    'Les règles de design qui suivent — palette, « :root », responsive, « og: », pied de page — ne',
+    'concernent QUE les sites et les interfaces web. Pour un bot, un script, un outil ou une API,',
+    'elles ne s’appliquent pas : ce qui compte, c’est du code propre, complet, et qui tourne.',
     '',
     'Créer un site ou une application — et le faire au niveau professionnel :',
     '- Le résultat doit ressembler à un site livré par une agence et payé, pas à une page d’essai :',
@@ -736,6 +815,9 @@ export class App {
   // ---------------------------------------------------------------- cycle de vie
 
   start() {
+    // La palette choisie la dernière fois (/couleurs) s'applique AVANT le premier dessin :
+    // le logo, les cadres et les badges sortent directement aux bonnes couleurs.
+    applyPalette(this.cfg.palette);
     enterFullscreen();
     setRawMode(true);
     process.stdin.setEncoding('utf8');
@@ -1402,6 +1484,12 @@ export class App {
     // qui garantit qu'on ne redemande jamais deux fois la même relecture sans rien de neuf.
     let reviewPasses = 0;
     let writesSinceReview = 0;
+    // Numéro du tour où l'agent corrige ce que la relecture lui a demandé. Ce tour-là ne
+    // relance pas un tour de plus : la relecture a déjà inclus la vérification.
+    let lastReviewRound = -1;
+    // Rappels déjà envoyés parce qu'il écrivait des fichiers alors qu'on lui parlait : un seul,
+    // sinon un modèle entêté ferait durer la conversation toute seule.
+    let talkRefusals = 0;
 
     // Contrôle commun aux fichiers qui viennent de changer, qu'ils aient été écrits en entier
     // ou modifiés par un bloc « edit » : références locales puis contrôle qualité.
@@ -1433,6 +1521,14 @@ export class App {
     for (let round = 0; ; round += 1) {
       // Arrêt demandé (■ STOP, Échap ou ctrl-c) : on ne relance rien.
       if (this.interrupted) break;
+      // Garde-fou : au-delà, on rend la main au lieu de tourner sans fin.
+      if (MAX_ROUNDS > 0 && round >= MAX_ROUNDS) {
+        this.addEntry({
+          kind: 'notice',
+          text: `Arrêt de sécurité après ${MAX_ROUNDS} tours (XOZHUB_MAX_TOURS). Relance-moi pour continuer.`,
+        });
+        break;
+      }
       const entry = this.addEntry({ kind: 'assistant', text: '' });
       this.state.status = 'thinking';
       this.startSpinner();
@@ -1534,7 +1630,7 @@ export class App {
       const photos = parsePhotos(sansImages);
       const clones = parseClones(sansPhotos);
       const fetches = parseFetches(sansClones);
-      const cmd = extractCommand(stripFetches(sansClones));
+      let cmd = extractCommand(stripFetches(sansClones));
       // Les blocs techniques (fichiers, modifications, lectures, commande, mémoire) et le
       // bavardage qui les accompagne sortent de l'écran : chaque action s'annonce déjà.
       this.cleanAssistantEntry(entry, {
@@ -1549,6 +1645,43 @@ export class App {
             fetches.length >
             0,
       });
+
+      // On lui a PARLÉ, on ne lui a rien demandé : rien ne doit sortir de ce message. Sans ce
+      // verrou, un modèle bavard part écrire des scripts dès qu'on lui dit « c'est joli », et
+      // la personne retrouve un dossier rempli de fichiers qu'elle n'a jamais demandés. Les
+      // blocs sont donc jetés AVANT d'atteindre le disque — avec un seul rappel au modèle, qui
+      // répond alors en texte ; s'il recommence, on se contente de jeter.
+      if (this.state.intent !== 'action') {
+        const deborde =
+          writes.length ||
+          edits.length ||
+          photos.length ||
+          clones.length ||
+          (this.state.intent === 'chat' && cmd);
+        if (deborde) {
+          writes.length = 0;
+          edits.length = 0;
+          photos.length = 0;
+          clones.length = 0;
+          // Un bonjour ou un merci ne lance pas de commande non plus : il répond, c'est tout.
+          if (this.state.intent === 'chat') cmd = null;
+          if (!talkRefusals) {
+            talkRefusals += 1;
+            this.addEntry({
+              kind: 'notice',
+              text: 'Rien créé : ce message n’était pas une demande de travail.',
+            });
+            this.state.messages.push({
+              role: 'user',
+              content:
+                "[Application] Attention : le message ci-dessus n'était PAS une demande d'action " +
+                "(on te parle, on ne te demande rien). Aucun fichier n'a été écrit et rien n'a été " +
+                "exécuté. Réponds en texte, sans bloc de fichier ni commande.",
+            });
+            this.render();
+            continue;
+          }        }
+      }
 
       if (writes.length) {
         writeRounds += 1;
@@ -1593,6 +1726,9 @@ export class App {
       // Modifications chirurgicales : l'application remplace exactement ce que l'agent a
       // demandé de remplacer, au lieu de réécrire le fichier en entier et d'y perdre du code.
       if (edits.length) {
+        // Une modification compte comme du travail neuf : la relecture ne se redemande pas
+        // deux fois de suite sans rien de nouveau entre les deux.
+        writesSinceReview += 1;
         const results = applyEdits(this.state.cwd, edits);
         for (const r of results) {
           this.addEntry({
@@ -1624,6 +1760,23 @@ export class App {
           ),
         });
         this.render();
+      }
+
+      // RAPPORT.md — la demande en cours et ce qu'elle a produit dans ce dossier. Tenu par
+      // l'application, il est donc toujours juste, même quand l'agent oublie. Le rappeler à
+      // chaque tour ne duplique rien : c'est la même section qui est rafraîchie.
+      if (writtenPaths.length) {
+        const report = writeReport(this.state.cwd, {
+          request: this.state.request,
+          paths: writtenPaths,
+        });
+        if (report) {
+          this.addEntry({
+            kind: 'notice',
+            text: `📄 ${REPORT_FILE} · ${writtenPaths.length} fichier${writtenPaths.length > 1 ? 's' : ''} décrit${writtenPaths.length > 1 ? 's' : ''}`,
+          });
+          this.render();
+        }
       }
 
       // Lecture directe : l'application lit les fichiers et les rend exactement tels qu'ils
@@ -1732,12 +1885,12 @@ export class App {
       // Lien vers un site : l'application va le chercher elle-même et en tire la structure,
       // les textes, les polices, les images et la palette — de quoi le refaire pour de vrai.
       if (fetches.length) {
-        const results = [];
-        for (const url of fetches) {
-          this.addEntry({ kind: 'notice', text: `🌐 Visite de ${url}…` });
-          this.render();
-          results.push(await visit(url, { signal: this.abort ? this.abort.signal : undefined }));
-        }
+        // Les visites partent ensemble : trois pages à la queue leu leu, c'est trois attentes ;
+        // en parallèle, c'est le temps de la plus lente.
+        const signal = this.abort ? this.abort.signal : undefined;
+        for (const url of fetches) this.addEntry({ kind: 'notice', text: `🌐 Visite de ${url}…` });
+        this.render();
+        const results = await Promise.all(fetches.map((url) => visit(url, { signal })));
         for (const r of results) {
           this.addEntry({ kind: r.ok ? 'notice' : 'error', text: `${r.ok ? '🌐' : '!'} ${describeVisit(r)}` });
         }
@@ -1750,16 +1903,18 @@ export class App {
       }
 
       if (!cmd) {
-        // L'agent vient de travailler sur des fichiers ou de regarder une source : il enchaîne.
-        if (
+        const didWork =
           writes.length ||
           edits.length ||
           reads.length ||
           images.length ||
           photos.length ||
           clones.length ||
-          fetches.length
-        ) {
+          fetches.length;
+        // L'agent vient de travailler sur des fichiers ou de regarder une source : il enchaîne.
+        // Sauf quand ce tour était celui des corrections demandées par la relecture : la relecture
+        // réclame déjà la vérification dans la même réponse, donc on ne paie pas un tour de plus.
+        if (didWork && round !== lastReviewRound) {
           continue;
         }
         // Un travail livré n'est pas terminé tant qu'il n'a pas été relu. La relecture renvoie
@@ -1803,6 +1958,7 @@ export class App {
             role: 'user',
             content: clampMessage(reviewMessage(writtenPaths, refProblems, lintFindings, cible)),
           });
+          lastReviewRound = round + 1;
           this.render();
           continue;
         }
@@ -1937,14 +2093,14 @@ export class App {
   async prefetchLinks(text) {
     const urls = urlsIn(text).filter((u) => !this.prefetched.has(u));
     if (!urls.length) return;
-    const results = [];
+    // Les pages partent ensemble : plusieurs adresses dans la même demande ne s'attendent pas.
+    const signal = this.abort ? this.abort.signal : undefined;
     for (const url of urls) {
       this.prefetched.add(url);
       this.addEntry({ kind: 'notice', text: `🌐 Visite de ${url}…` });
-      this.render();
-      const r = await visit(url, { signal: this.abort ? this.abort.signal : undefined });
-      results.push(r);
     }
+    this.render();
+    const results = await Promise.all(urls.map((url) => visit(url, { signal })));
     for (const r of results) {
       this.addEntry({ kind: r.ok ? 'notice' : 'error', text: `${r.ok ? '🌐' : '!'} ${describeVisit(r)}` });
     }
@@ -2048,53 +2204,61 @@ export class App {
       case 'couleur':
       case 'colors':
       case 'color': {
+        // « /couleurs » seul règle le MODE d'affichage ; un nom de palette (« /couleurs ocean »)
+        // change carrément les couleurs. Les deux se complètent.
+        const wanted = paletteById(arg);
+        if (wanted) {
+          applyPalette(wanted.id);
+          saveConfig({ palette: wanted.id });
+          this.addEntry({
+            kind: 'notice',
+            text: `🎨 Palette « ${wanted.label} » — ${wanted.hint}.`,
+          });
+          break;
+        }
         const mode = setColorMode(arg);
         this.addEntry({
           kind: 'notice',
           text:
             mode === 'none'
               ? 'Couleurs coupées. « /couleurs truecolor » les rallume (ou « /couleurs 256 » pour un vieux terminal).'
-              : `Couleurs : ${mode}. truecolor = le plus beau · 256 ou 16 = vieux terminaux · none = sans couleur.`,
+              : `Couleurs : ${mode}. truecolor = le plus beau · 256 ou 16 = vieux terminaux · none = sans couleur.` +
+                ` Palettes : ${PALETTES.map((p) => p.id).join(', ')} — « /couleurs ocean », par exemple.`,
         });
         break;
       }
       case 'miseajour': {
+        // La mise à jour part dans une NOUVELLE fenêtre cmd : elle y affiche le
+        // bandeau XozHub (« En cours de mise à jour… »), fait le pull, puis la
+        // nouvelle version reprend la conversation dans cette fenêtre-là.
         const restartOnly = /^(code|restart|relance|relancer)$/i.test(arg);
-        // Bandeau affiché pendant toute l'opération, et jusqu'au redémarrage.
+        if (!openUpdateWindow({ restartOnly })) {
+          this.addEntry({
+            kind: 'error',
+            text: 'Fenêtre de mise à jour impossible à ouvrir — relance XozHub.GPT à la main.',
+          });
+          this.render();
+          break;
+        }
+        this.addEntry({
+          kind: 'notice',
+          text: `↗ ${restartOnly ? 'Redémarrage' : 'Mise à jour'} lancé dans une nouvelle fenêtre cmd — la conversation y sera reprise, cette fenêtre-ci peut se fermer.`,
+        });
         this.showBanner(restartOnly ? 'Redémarrage en cours' : 'Mise à jour en cours');
-        let ok = true;
-        let summary = 'Redémarrage sur le code présent dans le dossier…';
-        if (!restartOnly && isGitRepo()) {
-          this.addEntry({ kind: 'notice', text: 'Recherche de la dernière version (git pull)…' });
-          this.render();
-          const res = pullLatest();
-          ok = res.ok;
-          summary = res.ok
-            ? res.changed
-              ? `Code mis à jour (${res.before} → ${res.after}).`
-              : 'Déjà à jour — rien à récupérer.'
-            : `Mise à jour impossible : ${res.message}`;
-        } else if (!restartOnly) {
-          // Installé par .zip : pas de pull possible, donc pas de « mise à jour validée ».
-          ok = false;
-          summary =
-            'Pas de dépôt git ici : redémarrage sur le code présent dans le dossier (remplace les fichiers à la main pour changer de version).';
-        }
-        if (!restartOnly) {
-          this.addEntry({ kind: 'notice', text: 'Vérification de la version de l’IA…' });
-          this.render();
-          const ai = await this.refreshModelVersion();
-          if (ai) summary += ` ${ai}`;
-        }
-        this.addEntry({ kind: 'notice', text: `${summary} Redémarrage de XozHub.GPT…` });
-        this.showBanner(
-          restartOnly ? 'Redémarrage' : ok ? 'Mise à jour validée' : 'Mise à jour incomplète',
-          restartOnly || ok ? 'ok' : 'warn',
-        );
-        // Échec : on laisse le titre à l'écran le temps de le lire. Sinon la nouvelle
-        // instance affiche « MISE À JOUR VALIDÉE » pendant 3 secondes.
-        if (!ok) await new Promise((resolve) => setTimeout(resolve, 3000));
-        this.restart({ updateDone: !restartOnly && ok });
+        this.render();
+        this.saveSessionNow();
+        // Le temps de lire le message, puis on rend le terminal propre : la nouvelle
+        // fenêtre est déjà au travail.
+        setTimeout(() => {
+          try {
+            if (this.child) this.child.kill();
+          } catch {
+            /* ignore */
+          }
+          setRawMode(false);
+          leaveFullscreen();
+          process.exit(0);
+        }, 1200);
         break;
       }
       default:
@@ -2106,6 +2270,13 @@ export class App {
 }
 
 export async function main() {
+  // Relais de mise à jour : cette instance tourne dans la fenêtre cmd ouverte par
+  // « /miseajour ». Le bandeau a déjà été peint ; ici, on met le code à jour puis
+  // on relance l'interface dans cette même fenêtre.
+  if (process.argv.includes('--mise-a-jour')) {
+    const ok = await runUpdateHandoff({ restartOnly: process.argv.includes('--relance-seule') });
+    process.exit(ok ? 0 : 1);
+  }
   const major = Number(String(process.versions.node).split('.')[0]);
   if (!Number.isFinite(major) || major < 18) {
     process.stderr.write(

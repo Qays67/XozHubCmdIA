@@ -4,3 +4,9 @@
 # une cascade d'erreurs « 'xxx' n'est pas reconnu en tant que commande… ».
 *.cmd text eol=crlf
 *.bat text eol=crlf
+
+# L'installateur de XozHub.AI se publie AVEC le site (dans docs\), pour que le
+# bouton « Installer » telecharge un vrai fichier au lieu de tomber sur une page
+# 404. Un binaire : git ne doit surtout pas toucher a ses octets.
+*.exe binary
+*.ico binary

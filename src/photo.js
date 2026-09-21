@@ -321,28 +321,40 @@ export async function fetchPhotos(rootDir, wants, { signal } = {}) {
       continue;
     }
     const base = slug(want.query);
-    let index = 0;
-    for (const candidat of search.results) {
-      if (entry.images.length >= want.count) break;
-      index += 1;
-      const cible = path.join(dir, `${base}-${index}`);
-      try {
-        const got = await download(candidat.url, cible, { signal });
-        // Toujours relatif au dossier du site : c'est ce chemin que l'agent écrit dans son HTML.
-        const rel = `${IMAGES_DIR}/${path.basename(got.file)}`;
-        const credit = { ...candidat, file: path.basename(got.file) };
-        credits.push(credit);
-        entry.images.push({
-          path: rel,
-          bytes: got.bytes,
-          width: candidat.width,
-          height: candidat.height,
-          credit,
-        });
-        entry.ok = true;
-      } catch {
-        /* ce candidat ne passe pas : on essaie le suivant, sans rien dire de faux */
+    // Les téléchargements partent ensemble : six photos une par une, c'est six attentes à la
+    // queue leu leu ; en parallèle, c'est le temps de la plus lente. On tente deux candidates de
+    // plus que demandé, pour qu'un fichier refusé ne se transforme pas en photo manquante.
+    const telecharges = await Promise.all(
+      search.results.slice(0, want.count + 2).map((candidat, i) =>
+        download(candidat.url, path.join(dir, `${base}-${i + 1}`), { signal })
+          .then((got) => ({ candidat, got }))
+          // Ce candidat ne passe pas : on essaie le suivant, sans rien dire de faux.
+          .catch(() => null),
+      ),
+    );
+    for (const t of telecharges) {
+      if (!t) continue;
+      if (entry.images.length >= want.count) {
+        // Téléchargée « au cas où », finalement inutile : pas de fichier orphelin laissé là.
+        try {
+          fs.rmSync(t.got.file, { force: true });
+        } catch {
+          /* tant pis : elle ne sera simplement pas référencée */
+        }
+        continue;
       }
+      // Toujours relatif au dossier du site : c'est ce chemin que l'agent écrit dans son HTML.
+      const rel = `${IMAGES_DIR}/${path.basename(t.got.file)}`;
+      const credit = { ...t.candidat, file: path.basename(t.got.file) };
+      credits.push(credit);
+      entry.images.push({
+        path: rel,
+        bytes: t.got.bytes,
+        width: t.candidat.width,
+        height: t.candidat.height,
+        credit,
+      });
+      entry.ok = true;
     }
     if (!entry.ok) entry.error = entry.error || 'aucune image téléchargeable';
     out.push(entry);

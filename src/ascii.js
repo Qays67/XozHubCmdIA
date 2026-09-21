@@ -1,4 +1,4 @@
-// XozHub.GPT — logo ASCII en gros blocs, dégradé aurore (violet → cyan → menthe).
+// XozHub.GPT — logo ASCII en gros blocs, dégradé galaxie (nébuleuse → cyan → rose stellaire).
 
 import { c, mix, theme } from './theme.js';
 
@@ -110,13 +110,16 @@ export function logoLines(word = 'XOZHUB', gap = '  ') {
   return out;
 }
 
-// Le logo est identique à chaque frame : on le peint une fois et on le garde.
+// Le logo est identique à chaque frame : on le peint une fois et on le garde. La garde est
+// indexée sur les TEINTES, pas sur l'identité du tableau : la palette peut changer à chaud
+// (/couleurs ocean), et le logo doit se repeindre au rendu suivant.
 let logoCache = null;
 
 /** Logo coloré : dégradé horizontal, relief vers le bas, badge « .GPT » vif. */
 export function renderLogo({ gradient = theme.logoGradient, tag = '.GPT' } = {}) {
   const isDefault = gradient === theme.logoGradient && tag === '.GPT';
-  if (isDefault && logoCache) return logoCache;
+  const cacheKey = `${gradient.join('|')}§${tag}`;
+  if (isDefault && logoCache && logoCache.key === cacheKey) return logoCache.lines;
 
   const lines = logoLines().map((line, row) => {
     // Les lignes du bas sont assombries : le logo prend du relief au lieu d'être plat.
@@ -128,7 +131,7 @@ export function renderLogo({ gradient = theme.logoGradient, tag = '.GPT' } = {})
     const idx = Math.min(6, lines.length - 1);
     lines[idx] += '  ' + c(theme.vivid.cyan, tag, { bold: true });
   }
-  if (isDefault) logoCache = lines;
+  if (isDefault) logoCache = { key: cacheKey, lines };
   return lines;
 }
 

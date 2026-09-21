@@ -14,6 +14,8 @@
 #
 #  Ce qu'il fait, dans l'ordre :
 #    1. il refabrique install-en-ligne.ps1 (node fabriquer-en-ligne.mjs) ;
+#   1b. il copie l'installateur de la nouvelle IA dans docs\, pour que le bouton
+#       « Installer XozHub.AI (.exe) » du site ait un fichier a servir ;
 #    2. il recolte la version du depot dans un dossier temporaire ;
 #    3. il y copie le projet tel qu'il est dans ce dossier ;
 #    4. il enregistre la version ;
@@ -136,6 +138,27 @@ if ($Taille -lt 200KB) {
     " Refais-le avec  node fabriquer-en-ligne.mjs  puis relance publier.cmd.")
 }
 Ecrire-Ok 'Artefact complet (code et cle embarques) - OK'
+
+# ------------------------- 1 bis. l'installateur de la nouvelle IA, dans docs\
+#
+# Le bouton « Installer XozHub.AI (.exe) » du site telecharge un fichier qui doit
+# donc se trouver PUBLIE. On le copie ici, a cote de la page : GitHub Pages le
+# sert alors a l'adresse du site, et le bouton marche pour tout le monde sans
+# qu'aucune Release ne soit a fabriquer.
+#
+# ⚠ Exception assumee a la regle « aucun .exe fabrique dans le depot » : ce
+# fichier CONTIENT la cle (.env), comme le .env du depot qui est deja public.
+# Si tu ne veux pas de ca, supprime dist\XozHub-AI-Setup.exe avant de publier.
+$exeIA   = Join-Path $Projet 'dist\XozHub-AI-Setup.exe'
+$exeDans = Join-Path $Projet 'docs\XozHub-AI-Setup.exe'
+if (Test-Path $exeIA) {
+  Copy-Item -LiteralPath $exeIA -Destination $exeDans -Force
+  $koExe = [Math]::Round((Get-Item $exeDans).Length / 1KB, 0)
+  Ecrire-Ok "Installateur de XozHub.AI copie dans docs\ ($koExe Ko) - OK"
+} else {
+  Ecrire-Alerte 'dist\XozHub-AI-Setup.exe absent : le bouton du site ne trouvera rien.'
+  Ecrire-Note 'Fabrique-le : double-clic sur ia\fabriquer-exe.cmd, puis relance publier.cmd.'
+}
 
 # ------------------------------------------- 2. recolter le depot
 Ecrire-Vide

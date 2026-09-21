@@ -14,6 +14,8 @@ export const DEFAULTS = {
   autoRun: true,
   // Température d'échantillonnage : basse, pour un agent concentré sur la demande.
   temperature: 0.2,
+  // Palette de couleurs de l'interface : voir PALETTES dans theme.js.
+  palette: 'galaxie',
 };
 
 // Ordre de préférence : le premier de cette liste qui existe sur le compte est choisi.
@@ -202,7 +204,11 @@ export function loadConfig() {
     DEFAULTS.temperature,
   );
 
-  return { apiKey, baseUrl, model, autoRun, temperature };
+  // Palette de couleurs choisie dans le panneau « ⚙ Paramètres » de l'interface.
+  const palette =
+    process.env.XOZHUB_PALETTE || fileEnv.XOZHUB_PALETTE || fileCfg.palette || DEFAULTS.palette;
+
+  return { apiKey, baseUrl, model, autoRun, temperature, palette };
 }
 
 /** Enregistre un réglage dans .xozhub.json (dossier courant). */

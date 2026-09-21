@@ -3,295 +3,941 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>XozHub.GPT — installation en une ligne</title>
-<meta name="description" content="Installer XozHub.GPT sur Windows : une ligne à coller dans cmd. Ce qui marche, ce qui peut bloquer, et les commandes utiles.">
-<meta name="theme-color" content="#07061A">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%2307061A'/><text x='16' y='23' font-size='18' font-family='monospace' font-weight='bold' text-anchor='middle' fill='%2322D6F5'>X</text></svg>">
+<title>XozHub.AI — une IA qui vit dans sa propre fenêtre</title>
+<meta name="description" content="XozHub.GPT : l'IA qui vit dans ta fenêtre cmd — elle écrit les fichiers, exécute les commandes, vérifie et corrige. Installe-la en une seule ligne, ou télécharge l'installateur. Habillage galaxie.">
+<meta name="theme-color" content="#0B0B11">
+<meta property="og:type" content="website">
+<meta property="og:title" content="XozHub.AI — une IA qui vit dans sa propre fenêtre">
+<meta property="og:description" content="Tu choisis le dossier, elle écrit les fichiers, lance les commandes et corrige jusqu'à ce que ça marche. Fenêtre graphique galaxie, installateur .exe en un clic.">
+<meta property="og:image" content="https://qays67.github.io/XozHubCmdIA/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="XozHub.GPT — une IA de développement dans une fenêtre cmd">
+<meta property="og:url" content="https://qays67.github.io/XozHubCmdIA/">
+<meta property="og:locale" content="fr_FR">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PGRlZnM+PHJhZGlhbEdyYWRpZW50IGlkPSJnIiBjeD0iNTAlIiBjeT0iNTAlIiByPSI1MCUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNGRkZGRkYiLz48c3RvcCBvZmZzZXQ9IjQ1JSIgc3RvcC1jb2xvcj0iI0U4NzlGOSIvPjxzdG9wIG9mZnNldD0iODAlIiBzdG9wLWNvbG9yPSIjN0MzQUVEIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMjJEM0VFIiBzdG9wLW9wYWNpdHk9Ii4yNSIvPjwvcmFkaWFsR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgcng9IjgiIGZpbGw9IiMwQjA2MTgiLz48Y2lyY2xlIGN4PSIxNiIgY3k9IjE2IiByPSIxMCIgZmlsbD0idXJsKCNnKSIvPjxlbGxpcHNlIGN4PSIxNiIgY3k9IjE2IiByeD0iMTMuNSIgcnk9IjUiIHRyYW5zZm9ybT0icm90YXRlKC0yNSAxNiAxNikiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzIyRDNFRSIgc3Ryb2tlLW9wYWNpdHk9Ii44NSIgc3Ryb2tlLXdpZHRoPSIxLjMiLz48L3N2Zz4=">
 <style>
 :root{
-  --violet:#8B7BFF; --blue:#4D9BFF; --cyan:#22D6F5; --ice:#7FE9FF; --mint:#4BF0B4;
-  --amber:#FFC46B;
-  --text:#E9EDFB; --muted:#9AA4CC; --faint:#5F6A9A;
-  --panel:#0F0D20; --panel2:#1A1740; --border:#4A44A8; --borderSoft:#332F6B;
-  --code:#1C1A44; --codeFg:#8BFFE0;
+  /* Surfaces — le ciel profond, teinté de violet */
+  --bg:#06040F; --panel:#0E0A20; --panel2:#14102E; --line:#2A2255; --line-soft:#1C1740;
+  /* Textes */
+  --ink:#F3F0FF; --ink-soft:#B4ABDA; --ink-faint:#7E76A8;
+  /* Un seul accent : le violet de nébuleuse, éclairci pour rester lisible */
+  --accent:#B79BFF; --accent-rgb:183 155 255; --accent-ink:#0B0218;
+  /* Les deux autres teintes de la galaxie : halos, bordures et dégradés */
+  --nebula:#E879F9; --nebula-rgb:232 121 249; --ice:#22D3EE; --ice-rgb:34 211 238;
+  /* Statuts, en sourdine — les seules autres couleurs de la page */
+  --ok:#6EE7B7; --ok-rgb:110 231 183; --warn:#F2C063; --warn-rgb:242 192 99;
+  /* Code */
+  --code:#0A0722; --code-ink:#CFC8F2;
+  /* Échelle d'espacement */
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px; --s8:64px; --s9:96px;
+  --radius:12px;
+  --shadow:0 12px 30px rgb(0 0 0 / .35);
+  --font:'Segoe UI Variable Display','Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
+  --mono:'Cascadia Mono','Cascadia Code',Consolas,'SF Mono','DejaVu Sans Mono',monospace;
 }
 *{box-sizing:border-box}
-html,body{margin:0;padding:0}
+html{scroll-behavior:smooth}
 body{
+  margin:0;
   background:
-    radial-gradient(1100px 560px at 8% -12%, rgba(110,92,255,.30), transparent 62%),
-    radial-gradient(900px 480px at 100% 2%, rgba(34,214,245,.16), transparent 58%),
-    #07061A;
-  color:var(--text);
-  font:16px/1.65 'Segoe UI',system-ui,-apple-system,'Helvetica Neue',sans-serif;
+    radial-gradient(1200px 620px at 50% -12%, rgb(var(--nebula-rgb) / .16), transparent 68%),
+    radial-gradient(900px 520px at 88% 6%, rgb(var(--accent-rgb) / .13), transparent 70%),
+    radial-gradient(1000px 620px at 4% 96%, rgb(var(--ice-rgb) / .10), transparent 72%),
+    var(--bg);
+  background-attachment:fixed;
+  color:var(--ink);
+  font:16px/1.7 var(--font);
   -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
 }
-.wrap{max-width:920px;margin:0 auto;padding:40px 22px 80px}
-a{color:var(--cyan)}
-a:hover{color:var(--ice)}
-a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--ice);outline-offset:3px;border-radius:6px}
+.wrap{max-width:1060px;margin:0 auto;padding:0 22px}
+a{color:var(--accent);text-decoration:none}
+a:hover{color:#8FDBFF;text-decoration:underline;text-underline-offset:3px}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:8px}
+code,.k{font-family:var(--mono);font-size:.9em}
 
-h1{font-size:28px;margin:0 0 8px;letter-spacing:.2px}
-h1 .tag{
-  font-size:14px;vertical-align:6px;margin-left:8px;padding:2px 9px;border-radius:999px;
-  background:linear-gradient(90deg,rgba(34,214,245,.22),rgba(75,240,180,.18));
-  color:var(--ice);border:1px solid rgba(34,214,245,.45);font-weight:600;
+/* ---------------------------------------------------------------- barre du haut */
+.top{
+  position:sticky;top:0;z-index:20;
+  background:rgb(11 11 17 / .85);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line-soft);
 }
-.lead{color:var(--muted);margin:0;max-width:72ch}
-.rule{height:1px;margin:26px 0;background:linear-gradient(90deg,#6E5CFF,#4D9BFF,#22D6F5,#4BF0B4);opacity:.65}
+.bar{display:flex;align-items:center;gap:var(--s5);height:62px}
+.brand{display:flex;align-items:center;gap:10px;color:var(--ink);font-weight:700;letter-spacing:.2px}
+.brand:hover{text-decoration:none;color:var(--ink)}
+.mark{
+  display:grid;place-items:center;width:30px;height:30px;border-radius:9px;
+  background:var(--accent);
+  color:var(--accent-ink);font:800 16px/1 var(--font);
+}
+.name .gpt{color:var(--accent)}
+.top nav{margin-left:auto;display:flex;align-items:center;gap:var(--s5)}
+.top nav a{color:var(--ink-soft);font-size:15px;font-weight:500}
+.top nav a:hover{color:var(--ink);text-decoration:none}
+.top nav .gh{
+  color:var(--ink);border:1px solid var(--line);border-radius:999px;
+  padding:5px 14px;background:var(--panel);
+}
+.top nav .gh:hover{border-color:var(--accent)}
 
-h2{font-size:20px;margin:38px 0 4px}
-h2 .n{
-  display:inline-block;min-width:28px;height:28px;line-height:28px;text-align:center;border-radius:9px;
-  font-size:14px;margin-right:10px;color:#0B0A1F;font-weight:700;padding:0 6px;
-  background:linear-gradient(135deg,var(--violet),var(--cyan));
+/* ---------------------------------------------------------------- héros */
+.hero{padding:var(--s9) 0 var(--s7)}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:var(--s2);
+  margin:0 0 var(--s4);padding:5px 14px;border-radius:999px;
+  font-size:13.5px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;
+  color:var(--ink-soft);background:transparent;border:1px solid var(--line);
 }
-.card{
-  background:linear-gradient(180deg,var(--panel2),var(--panel));
-  border:1px solid var(--border);border-radius:14px;padding:20px 22px;margin:14px 0 0;
+.eyebrow::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--accent)}
+h1{
+  margin:0 0 var(--s5);font-size:clamp(2.1rem,5.4vw,3.5rem);line-height:1.1;
+  letter-spacing:-.025em;font-weight:800;
 }
-.card.hi{border-color:var(--cyan);box-shadow:0 0 0 1px rgba(34,214,245,.25),0 18px 50px rgba(34,214,245,.10)}
-.card p{margin:0 0 10px}
-.card p:last-child{margin-bottom:0}
-.muted{color:var(--muted)}
-.small{font-size:14.5px}
+h1 .grad{color:var(--accent)}
+.lead{margin:0;max-width:62ch;font-size:18px;color:var(--ink-soft)}
 
-pre.cmd{
-  position:relative;margin:14px 0 0;padding:16px;border-radius:12px;
-  background:var(--code);border:1px solid var(--borderSoft);
-  color:var(--codeFg);font-family:'Cascadia Mono','Consolas','DejaVu Sans Mono',monospace;
-  font-size:13.5px;line-height:1.55;overflow-x:auto;white-space:pre;
+/* ---------------------------------------------------------------- fenêtre de terminal */
+.term{
+  margin:var(--s6) 0 0;border:1px solid var(--line);border-radius:var(--radius);
+  background:var(--code);
+  box-shadow:var(--shadow);overflow:hidden;
 }
-pre.big{border-color:rgba(34,214,245,.55);box-shadow:inset 0 0 0 1px rgba(34,214,245,.12);font-size:14px}
+.term-top{
+  display:flex;align-items:center;gap:var(--s3);
+  padding:11px var(--s4);border-bottom:1px solid var(--line-soft);
+  background:var(--panel2);
+}
+.dots{display:flex;gap:6px}
+.dots i{width:10px;height:10px;border-radius:50%;background:#2E2E3A}
+.term-title{font-size:13.5px;color:var(--ink-faint);letter-spacing:.3px}
+.term-body{
+  margin:0;padding:var(--s5);overflow-x:auto;
+  font-family:var(--mono);font-size:14px;line-height:1.7;
+  color:var(--code-ink);white-space:pre-wrap;word-break:break-word;
+}
+.term-body .ps{color:var(--accent);font-weight:700;user-select:none}
+
+/* bouton copier */
 .copy{
-  position:absolute;top:9px;right:9px;cursor:pointer;
-  font:600 12px 'Segoe UI',system-ui,sans-serif;
-  color:var(--ice);background:rgba(20,17,48,.9);
-  border:1px solid var(--border);border-radius:8px;padding:5px 10px;
+  margin-left:auto;cursor:pointer;flex:none;
+  font:600 13px var(--font);letter-spacing:.2px;
+  color:var(--accent-ink);background:var(--accent);
+  border:0;border-radius:8px;padding:7px 15px;
+  transition:filter .16s ease,background-color .16s ease;
 }
-.copy:hover{border-color:var(--cyan)}
-.copy.ok{color:#0B0A1F;background:linear-gradient(90deg,var(--mint),var(--ice));border-color:transparent}
+.copy:hover{filter:brightness(1.08)}
+.copy.ok{background:var(--ok);color:#0A1A12;filter:none}
 
-ol.steps{margin:10px 0 0;padding-left:24px}
-ol.steps li{margin:8px 0}
-ul.flat{margin:10px 0 0;padding-left:22px}
-ul.flat li{margin:6px 0}
-.k{color:var(--ice);font-family:'Cascadia Mono','Consolas',monospace;font-size:14.5px;
-   background:rgba(34,214,245,.10);border:1px solid rgba(34,214,245,.30);border-radius:6px;padding:1px 6px}
-table{width:100%;border-collapse:collapse;margin:12px 0 0;font-size:15px}
-th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--borderSoft);vertical-align:top}
-th{color:var(--faint);font-size:13px;letter-spacing:.6px;text-transform:uppercase;font-weight:600}
-tr:last-child td{border-bottom:0}
-.yes{color:var(--mint);font-weight:700}
-.no{color:var(--amber);font-weight:700}
+.facts{
+  display:flex;flex-wrap:wrap;gap:var(--s2) var(--s3);
+  margin:var(--s5) 0 0;padding:0;list-style:none;
+}
+.facts li{
+  display:flex;align-items:center;gap:8px;
+  padding:7px 14px;border-radius:999px;font-size:14.5px;color:var(--ink-soft);
+  background:var(--panel);border:1px solid var(--line-soft);
+}
+.facts svg{flex:none;color:var(--ok)}
 
-details{border:1px solid var(--borderSoft);border-radius:12px;padding:12px 16px;margin:10px 0;background:rgba(15,13,32,.7)}
-details[open]{border-color:var(--border)}
-summary{cursor:pointer;font-weight:600;color:var(--text)}
-summary::marker{color:var(--violet)}
-details p{margin:10px 0 0;color:var(--muted);font-size:15px}
+/* ---------------------------------------------------------------- sections */
+section{padding:var(--s7) 0}
+.rule{height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent)}
+h2{
+  display:flex;align-items:center;gap:var(--s3);
+  margin:0 0 var(--s2);font-size:clamp(1.25rem,2.4vw,1.6rem);
+  letter-spacing:-.012em;font-weight:700;
+}
+.num{
+  flex:none;display:grid;place-items:center;width:30px;height:30px;border-radius:9px;
+  background:rgb(var(--accent-rgb) / .10);border:1px solid rgb(var(--accent-rgb) / .25);
+  color:var(--accent);font:700 14px/1 var(--font);
+}
+.sub{margin:0 0 var(--s5);color:var(--ink-soft);max-width:70ch}
+h3{margin:0 0 var(--s2);font-size:16.5px;font-weight:700}
 
-footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--borderSoft);color:var(--faint);font-size:14px}
+/* ---------------------------------------------------------------- cartes */
+.grid{display:grid;gap:var(--s4)}
+.grid.two{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.grid.auto{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.card{
+  padding:var(--s5);border-radius:var(--radius);
+  background:var(--panel);
+  border:1px solid var(--line);
+  transition:border-color .2s ease;
+}
+.card:hover{border-color:#33333F}
+.card p{margin:0;color:var(--ink-soft);font-size:15.5px}
+.card p + p{margin-top:var(--s2)}
+.card .ico{
+  display:grid;place-items:center;width:36px;height:36px;margin-bottom:var(--s3);
+  border-radius:10px;background:rgb(var(--accent-rgb) / .08);border:1px solid rgb(var(--accent-rgb) / .22);
+  color:var(--accent);font:700 15px var(--mono);
+}
+.step{position:relative;padding-left:var(--s5)}
+.step .n{
+  position:absolute;left:var(--s5);top:var(--s5);
+  display:grid;place-items:center;width:26px;height:26px;border-radius:8px;
+  background:rgb(var(--accent-rgb) / .10);border:1px solid rgb(var(--accent-rgb) / .25);
+  color:var(--accent);font:700 13px/1 var(--mono);
+}
+.step .body{margin-left:40px}
+.step h3{font-size:16px}
+.step p{font-size:15px}
+
+/* encadré d'appel */
+.callout{
+  padding:var(--s5);border-radius:var(--radius);
+  background:var(--panel);
+  border:1px solid var(--line);border-left:2px solid var(--accent);
+}
+
+/* ---------------------------------------------------------------- listes */
+.ticks{margin:var(--s3) 0 0;padding:0;list-style:none}
+.ticks li{position:relative;padding-left:26px;margin:var(--s2) 0;color:var(--ink-soft);font-size:15.5px}
+.ticks li::before{
+  content:'';position:absolute;left:6px;top:.62em;width:6px;height:6px;border-radius:50%;
+  background:var(--ok);
+}
+.ticks strong{color:var(--ink)}
+
+/* ---------------------------------------------------------------- tableaux */
+.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel)}
+table{width:100%;border-collapse:collapse;font-size:15px;min-width:520px}
+th,td{text-align:left;padding:12px 16px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+th{
+  font-size:12.5px;letter-spacing:.7px;text-transform:uppercase;font-weight:700;
+  color:var(--ink-faint);background:var(--panel2);
+}
+td{color:var(--ink-soft)}
+td:first-child{color:var(--ink)}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover td{background:rgb(var(--accent-rgb) / .04)}
+.yes,.no{display:inline-flex;align-items:center;gap:7px;font-weight:600;white-space:nowrap}
+.yes{color:var(--ok)}
+.no{color:var(--warn)}
+.yes::before,.no::before{
+  display:grid;place-items:center;width:18px;height:18px;border-radius:6px;
+  font-size:13px;line-height:1;font-weight:800;
+}
+.yes::before{content:'✓';background:rgb(var(--ok-rgb) / .14)}
+.no::before{content:'!';background:rgb(var(--warn-rgb) / .14)}
+
+/* ---------------------------------------------------------------- accordéons */
+details{
+  border:1px solid var(--line);border-radius:var(--radius);
+  background:var(--panel);margin:0 0 var(--s3);overflow:hidden;
+  transition:border-color .2s ease;
+}
+details:hover{border-color:#33333F}
+details[open]{border-color:rgb(var(--accent-rgb) / .30)}
+summary{
+  cursor:pointer;list-style:none;padding:var(--s4) var(--s4) var(--s4) 46px;
+  position:relative;font-weight:600;font-size:15.5px;color:var(--ink);
+}
+summary::-webkit-details-marker{display:none}
+summary::before{
+  content:'+';position:absolute;left:16px;top:50%;transform:translateY(-50%);
+  display:grid;place-items:center;width:20px;height:20px;border-radius:6px;
+  background:rgb(var(--accent-rgb) / .10);color:var(--accent);font:800 14px/1 var(--font);
+}
+details[open] summary::before{content:'−'}
+details .inner{padding:0 var(--s4) var(--s4) 46px;color:var(--ink-soft);font-size:15.5px}
+details .inner p{margin:0}
+details .inner p + p{margin-top:var(--s3)}
+
+/* ---------------------------------------------------------------- pied */
+footer{border-top:1px solid var(--line);margin-top:var(--s8);padding:var(--s7) 0 var(--s8)}
+.foot{display:grid;gap:var(--s6);grid-template-columns:1.4fr 1fr 1fr}
+.foot h4{margin:0 0 var(--s3);font-size:13px;letter-spacing:.7px;text-transform:uppercase;color:var(--ink-faint)}
+.foot ul{margin:0;padding:0;list-style:none}
+.foot li{margin:var(--s2) 0;font-size:15px;color:var(--ink-soft)}
+.foot .about{color:var(--ink-soft);font-size:15px;max-width:44ch;margin:var(--s3) 0 0}
+.foot-note{
+  margin-top:var(--s6);padding-top:var(--s5);border-top:1px solid var(--line-soft);
+  color:var(--ink-faint);font-size:13.5px;
+}
+
+/* ---------------------------------------------------------------- apparition douce */
+.reveal{opacity:0}
+.reveal.in{opacity:1;transition:opacity .45s ease}
+
+@media (max-width:760px){
+  .hero{padding:var(--s7) 0 var(--s6)}
+  .top nav a:not(.gh){display:none}
+  .foot{grid-template-columns:1fr}
+}
+@media (max-width:520px){
+  .wrap{padding:0 16px}
+  .term-body{font-size:12.5px;padding:var(--s4)}
+  .term-top{flex-wrap:wrap}
+  .copy{margin-left:0;width:100%;text-align:center}
+}
+/* ======================================================================== galaxie
+   Le ciel de la page : des étoiles fixes qui scintillent, et une galaxie en
+   spirale dessinée en SVG, qui tourne lentement. Tout est en dégradés et en
+   SVG — aucune image à côté : la page reste UN SEUL fichier. */
+body::before{
+  content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:
+    radial-gradient(1.7px 1.7px at 8% 12%, rgb(255 255 255 / .9), transparent 55%),
+    radial-gradient(1.3px 1.3px at 22% 34%, rgb(214 231 255 / .75), transparent 55%),
+    radial-gradient(2.1px 2.1px at 37% 8%, rgb(255 255 255 / .8), transparent 55%),
+    radial-gradient(1.2px 1.2px at 46% 24%, rgb(var(--nebula-rgb) / .85), transparent 55%),
+    radial-gradient(1.8px 1.8px at 58% 15%, rgb(255 255 255 / .85), transparent 55%),
+    radial-gradient(1.4px 1.4px at 71% 30%, rgb(var(--ice-rgb) / .85), transparent 55%),
+    radial-gradient(2px 2px at 84% 9%, rgb(255 255 255 / .8), transparent 55%),
+    radial-gradient(1.2px 1.2px at 94% 41%, rgb(214 231 255 / .7), transparent 55%),
+    radial-gradient(1.6px 1.6px at 15% 62%, rgb(255 255 255 / .7), transparent 55%),
+    radial-gradient(1.3px 1.3px at 31% 78%, rgb(var(--nebula-rgb) / .75), transparent 55%),
+    radial-gradient(1.9px 1.9px at 52% 68%, rgb(255 255 255 / .75), transparent 55%),
+    radial-gradient(1.2px 1.2px at 67% 88%, rgb(var(--ice-rgb) / .8), transparent 55%),
+    radial-gradient(1.7px 1.7px at 80% 64%, rgb(255 255 255 / .7), transparent 55%),
+    radial-gradient(1.4px 1.4px at 92% 84%, rgb(214 231 255 / .65), transparent 55%);
+  animation:twinkle 5.5s ease-in-out infinite alternate;
+}
+@keyframes twinkle{from{opacity:.5}to{opacity:1}}
+
+/* --- le logo : la galaxie --- */
+.hero-logo{display:flex;align-items:center;gap:var(--s4);margin:0 0 var(--s5)}
+.galaxy{width:104px;height:104px;flex:none;filter:drop-shadow(0 0 24px rgb(124 58 237 / .55))}
+.galaxy .spin{transform-origin:100px 100px;animation:turn 26s linear infinite}
+@keyframes turn{to{transform:rotate(360deg)}}
+.galaxy .st{animation:pulse 3.4s ease-in-out infinite}
+.galaxy .st:nth-child(2n){animation-delay:.8s}
+.galaxy .st:nth-child(3n){animation-delay:1.7s}
+@keyframes pulse{0%,100%{opacity:.35}50%{opacity:1}}
+.wordmark{
+  font-size:clamp(1.5rem,4vw,2.1rem);font-weight:800;letter-spacing:-.02em;line-height:1.1;
+  background:linear-gradient(96deg,#FFFFFF,#E879F9 34%,#A78BFA 62%,#22D3EE);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.wordmark .gpt{font-weight:700}
+svg.mark{background:transparent;border-radius:9px}
+
+/* --- les boutons d'action --- */
+.cta{display:flex;flex-wrap:wrap;gap:var(--s3);margin:var(--s5) 0 0}
+.btn{
+  display:inline-flex;align-items:center;gap:9px;cursor:pointer;
+  border:1px solid transparent;border-radius:12px;padding:13px 22px;
+  font:700 15.5px var(--font);letter-spacing:.2px;color:#0B0218;
+  background:linear-gradient(96deg,#A78BFA,#E879F9 46%,#22D3EE);
+  box-shadow:0 12px 28px rgb(124 58 237 / .38);
+  transition:transform .16s ease,box-shadow .2s ease,filter .16s ease;
+}
+.btn:hover{transform:translateY(-1px);filter:brightness(1.06);box-shadow:0 16px 34px rgb(124 58 237 / .48);color:#0B0218;text-decoration:none}
+.btn.big{padding:15px 26px;font-size:16.5px}
+.btn.ghost{background:var(--panel);border-color:var(--line);color:var(--ink);box-shadow:none}
+.btn.ghost:hover{border-color:var(--accent);background:var(--panel2);color:var(--ink)}
+.hint{margin:var(--s4) 0 0;color:var(--ink-faint);font-size:14.5px;max-width:72ch}
+.hint strong{color:var(--ink-soft)}
+
+/* --- la carte « le vrai lien à envoyer » --- */
+.link-card{
+  border-color:rgb(var(--accent-rgb) / .3);
+  background:
+    radial-gradient(760px 260px at 10% -40%, rgb(var(--nebula-rgb) / .14), transparent 70%),
+    radial-gradient(600px 240px at 96% 120%, rgb(var(--ice-rgb) / .12), transparent 70%),
+    var(--panel);
+}
+.reallink{
+  display:block;margin:var(--s4) 0 0;padding:14px 16px;
+  font-family:var(--mono);font-size:clamp(.82rem,2.3vw,1.05rem);
+  color:#EFE4FF;word-break:break-all;
+  background:var(--code);border:1px solid var(--line);border-radius:10px;
+}
+.reallink:hover{border-color:var(--accent);color:#fff;text-decoration:none}
+
+/* --- le bandeau « ouvert depuis ton dossier » --- */
+.localbar{
+  margin:var(--s5) 0 0;padding:var(--s4) var(--s5);border-radius:var(--radius);
+  border:1px solid rgb(var(--warn-rgb) / .45);background:rgb(var(--warn-rgb) / .08);
+  color:var(--ink-soft);font-size:15px;
+}
+.localbar[hidden]{display:none}
+.localbar strong{color:var(--ink)}
+
+/* --- petits utilitaires : le style reste dans la feuille, pas dans les balises --- */
+p.mt-3,pre.mt-3{margin-top:var(--s3)}
+div.mt-4,p.mt-4{margin-top:var(--s4)}
+h3.mb-3{margin-bottom:var(--s3)}
+div.mb-2{margin-bottom:var(--s2)}
+p.small{font-size:14.5px}
+p.plain{margin:0;color:var(--ink-soft)}
+table.narrow{min-width:0}
+
+/* --- l'aperçu de la fenêtre de la nouvelle IA : un vrai dessin, pas une capture --- */
+.fenetre{margin:var(--s5) 0 0;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;
+  background:var(--code);box-shadow:var(--shadow)}
+.fenetre-top{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line-soft);
+  background:linear-gradient(180deg,#1A1440,#14102E)}
+.fenetre-top svg{width:24px;height:24px;flex:none}
+.fenetre-titre{font-weight:800;font-size:14.5px;
+  background:linear-gradient(96deg,#FFFFFF,#E879F9 45%,#22D3EE);-webkit-background-clip:text;background-clip:text;color:transparent}
+.fenetre-etat{margin-left:auto;font:12.5px var(--mono);color:var(--ink-faint)}
+.fenetre-corps{display:grid;grid-template-columns:1fr 250px}
+.fenetre-conv{padding:16px;display:flex;flex-direction:column;gap:10px}
+.fb{font-size:13.5px;border-radius:12px;padding:9px 12px;max-width:90%}
+.fb.moi{align-self:flex-end;border:1px solid rgb(var(--accent-rgb) / .32);
+  background:linear-gradient(135deg,rgb(232 121 249 / .18),rgb(183 155 255 / .15))}
+.fb.ia{align-self:flex-start;background:rgb(10 7 34 / .8);border:1px solid var(--line)}
+.fb.ia b{display:block;font-size:10.5px;letter-spacing:.5px;text-transform:uppercase;color:var(--ice);margin-bottom:3px}
+.fenetre-cote{border-left:1px solid var(--line-soft);padding:14px;font-size:12.5px;background:rgb(20 16 46 / .5)}
+.fenetre-cote h4{margin:0 0 7px;font-size:10.5px;letter-spacing:.7px;text-transform:uppercase;color:var(--ink-faint)}
+.fenetre-cote h4:not(:first-child){margin-top:14px}
+.fenetre-cote .disque{margin:0;font:12px var(--mono);color:var(--accent);word-break:break-all}
+.fenetre-cote ul{margin:0;padding:0;list-style:none;color:var(--ink-soft)}
+.fenetre-cote li{padding:1.5px 0}
+.fenetre-cote .ligne{margin:0 0 6px;padding:2px 0 2px 8px;border-left:2px solid rgb(var(--ice-rgb) / .5);
+  color:var(--ink-soft);font:12px var(--mono)}
+
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .reveal{opacity:1}
+  body::before,.galaxy .spin,.galaxy .st{animation:none}
+}
+@media (max-width:760px){
+  .fenetre-corps{grid-template-columns:1fr}
+  .fenetre-cote{display:none}
+}
+@media (max-width:520px){
+  .hero-logo{flex-direction:column;align-items:flex-start;gap:var(--s3)}
+  .galaxy{width:82px;height:82px}
+  .btn{width:100%;justify-content:center}
+}
 </style>
 </head>
-<body>
+<body id="top">
+
+<div class="top">
+  <div class="wrap bar">
+    <a class="brand" href="#top">
+      <svg class="mark" viewBox="0 0 32 32" aria-hidden="true"><defs><radialGradient id="mkh" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#FFFFFF"/><stop offset="45%" stop-color="#E879F9"/><stop offset="80%" stop-color="#7C3AED"/><stop offset="100%" stop-color="#22D3EE" stop-opacity=".25"/></radialGradient></defs><rect width="32" height="32" rx="9" fill="#0B0618"/><circle cx="16" cy="16" r="10" fill="url(#mkh)"/><ellipse cx="16" cy="16" rx="13.5" ry="5" transform="rotate(-25 16 16)" fill="none" stroke="#22D3EE" stroke-opacity=".85" stroke-width="1.3"/></svg>
+      <span class="name">XozHub<span class="gpt">.AI</span></span>
+    </a>
+    <nav>
+      <a href="#installer">Installer</a>
+      <a href="#lien">Le lien</a>
+      <a href="#compat">Compatibilité</a>
+      <a href="#depannage">Dépannage</a>
+      <a class="gh" href="https://github.com/Qays67/XozHubCmdIA">GitHub</a>
+    </nav>
+  </div>
+</div>
+
 <div class="wrap">
 
-<h1>XozHub.GPT<span class="tag">Windows</span></h1>
-<p class="lead">Une IA de développement dans une fenêtre de commandes : tu lui écris en français, elle crée
-les fichiers, exécute les commandes, vérifie et corrige. Installation en <b>une seule ligne</b>.</p>
+  <div class="localbar" id="localbar" hidden>
+    <strong>Ce fichier est ouvert depuis ton dossier</strong> (l'adresse commence par
+    <code class="k">file:///C:/…</code>). Cette page-là n'existe que sur ta machine&nbsp;: personne
+    d'autre ne peut l'ouvrir. Le lien qui marche pour tes amis est celui du site —
+    <a href="#lien">il est juste en dessous</a>.
+  </div>
 
-<div class="rule"></div>
+  <section class="hero" id="installer">
+    <div class="hero-logo">
+      <svg class="galaxy" viewBox="0 0 200 200" role="img" aria-label="XozHub.GPT : une galaxie en spirale">
+        <defs>
+          <radialGradient id="gx-core" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#FFFFFF" stop-opacity="1"/>
+            <stop offset="22%" stop-color="#F0ABFC" stop-opacity=".9"/>
+            <stop offset="52%" stop-color="#7C3AED" stop-opacity=".5"/>
+            <stop offset="100%" stop-color="#22D3EE" stop-opacity="0"/>
+          </radialGradient>
+          <linearGradient id="gx-arm" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#E879F9"/>
+            <stop offset="52%" stop-color="#8B5CF6"/>
+            <stop offset="100%" stop-color="#22D3EE"/>
+          </linearGradient>
+          <linearGradient id="gx-arm2" x1="1" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#22D3EE"/>
+            <stop offset="55%" stop-color="#A78BFA"/>
+            <stop offset="100%" stop-color="#F472B6"/>
+          </linearGradient>
+          <filter id="gx-soft" x="-35%" y="-35%" width="170%" height="170%">
+            <feGaussianBlur stdDeviation="3"/>
+          </filter>
+        </defs>
+        <g class="spin">
+          <ellipse cx="100" cy="100" rx="88" ry="40" transform="rotate(-24 100 100)" fill="none" stroke="url(#gx-arm)" stroke-width="2" opacity=".45" filter="url(#gx-soft)"/>
+          <path d="M100 100 C 148 66 182 118 142 152 C 122 169 94 162 90 138" fill="none" stroke="url(#gx-arm)" stroke-width="3.2" stroke-linecap="round" opacity=".8" filter="url(#gx-soft)"/>
+          <path d="M100 100 C 52 134 18 82 58 48 C 78 31 106 38 110 62" fill="none" stroke="url(#gx-arm2)" stroke-width="3.2" stroke-linecap="round" opacity=".8" filter="url(#gx-soft)"/>
+        </g>
+        <ellipse cx="100" cy="100" rx="80" ry="80" fill="url(#gx-core)"/>
+        <circle cx="100" cy="100" r="30" fill="none" stroke="#FFFFFF" stroke-opacity=".3" stroke-width="1" stroke-dasharray="1.5 7"/>
+        <g fill="#FFFFFF">
+          <circle class="st" cx="30" cy="52" r="1.6" opacity=".9"/>
+          <circle class="st" cx="62" cy="26" r="1.2" opacity=".7"/>
+          <circle class="st" cx="140" cy="34" r="1.8" opacity=".85"/>
+          <circle class="st" cx="170" cy="74" r="1.3" opacity=".7"/>
+          <circle class="st" cx="158" cy="140" r="1.6" opacity=".8"/>
+          <circle class="st" cx="108" cy="176" r="1.2" opacity=".65"/>
+          <circle class="st" cx="46" cy="160" r="1.7" opacity=".8"/>
+          <circle class="st" cx="20" cy="112" r="1.2" opacity=".6"/>
+          <circle class="st" cx="86" cy="60" r="1.1" opacity=".6"/>
+          <circle class="st" cx="126" cy="122" r="1.1" opacity=".6"/>
+        </g>
+        <text x="100" y="110" text-anchor="middle" font-family="'Segoe UI',system-ui,sans-serif" font-size="30" font-weight="800" fill="#FFFFFF" opacity=".95">X</text>
+      </svg>
+      <span class="wordmark">XOZHUB<span class="gpt">.GPT</span></span>
+    </div>
+    <p class="eyebrow">Nouvelle IA · sa propre fenêtre · Windows</p>
+    <h1>Une IA qui vit dans<br><span class="grad">sa propre fenêtre</span></h1>
+    <p class="lead">
+      Pas un terminal, pas une boîte de commandes&nbsp;: une vraie fenêtre, aux couleurs de la galaxie.
+      Tu lui parles en français, <strong>tu choisis le dossier</strong> où elle travaille, et elle fait
+      le reste&nbsp;: elle écrit les fichiers pour de vrai, lance les commandes, lit les erreurs et
+      corrige jusqu'à ce que ça marche. Rien à installer avant, rien à configurer après.
+    </p>
 
-<h2><span class="n">1</span>Colle cette ligne dans cmd</h2>
-<div class="card hi">
-  <p>Ouvre l'<b>invite de commandes</b> (touche <span class="k">Windows</span>, tape <span class="k">cmd</span>,
-  Entrée), colle la ligne ci-dessous (<b>clic droit</b> = coller), puis appuie sur <b>Entrée</b> :</p>
-  <pre class="cmd big"><button class="copy" data-copy="powershell -NoProfile -ExecutionPolicy Bypass -Command &quot;irm https://raw.githubusercontent.com/Qays67/XozHubCmdIA/main/install-en-ligne.ps1 | iex&quot;">copier</button>powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/Qays67/XozHubCmdIA/main/install-en-ligne.ps1 | iex"</pre>
-  <p class="small muted" style="margin-top:14px">
-    Laisse la fenêtre ouverte, ça prend une minute. Rien à télécharger à la main, rien à décompresser, rien
-    d'autre à taper. Si une version plus ancienne est déjà installée, elle est remplacée.
-  </p>
-</div>
+    <div class="term">
+      <div class="term-top">
+        <span class="dots"><i></i><i></i><i></i></span>
+        <span class="term-title">Invite de commandes</span>
+        <button class="copy" type="button" data-copy="powershell -NoProfile -ExecutionPolicy Bypass -Command &quot;irm https://raw.githubusercontent.com/Qays67/XozHubCmdIA/main/install-en-ligne.ps1 | iex&quot;">Copier la ligne</button>
+      </div>
+      <pre class="term-body"><span class="ps">C:\&gt;</span> powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/Qays67/XozHubCmdIA/main/install-en-ligne.ps1 | iex"</pre>
+    </div>
 
-<h2><span class="n">2</span>Ce qui se passe</h2>
-<div class="card">
-  <ol class="steps">
-    <li>Node.js 18+ est vérifié, et installé automatiquement s'il manque (sinon le lien officiel t'est donné) ;</li>
-    <li>l'IA est écrite dans <span class="k">%LOCALAPPDATA%\XozHub</span> : le code voyage <b>dans cette
-        ligne</b>, donc rien d'autre n'est téléchargé ;</li>
-    <li>la commande <span class="k">xozhub</span> est ajoutée, et le raccourci <b>XozHub.GPT</b> posé sur le
-        <b>Bureau</b> ;</li>
-    <li>le dossier est <b>masqué</b> et n'y contient <b>aucun script lisible</b> : le code y est chiffré ;
-    </li>
-    <li>la clé X.GPT est fournie dedans : <b>tu n'as rien à saisir</b>.</li>
-  </ol>
-</div>
+    <ul class="facts">
+      <li><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 8.5l3.5 3.5 7.5-8" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg>Node.js installé tout seul si besoin</li>
+      <li><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 8.5l3.5 3.5 7.5-8" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg>Rien à télécharger à la main</li>
+      <li><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 8.5l3.5 3.5 7.5-8" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg>Raccourci posé sur le Bureau</li>
+      <li><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 8.5l3.5 3.5 7.5-8" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg>Aucune clé à saisir</li>
+    </ul>
 
-<h2><span class="n">3</span>Lancer l'IA, et retrouver tes fichiers</h2>
-<div class="card">
-  <p><b>Double-clique sur l'icône XozHub.GPT</b> du Bureau — ou, dans une <b>nouvelle</b> fenêtre cmd :</p>
-  <pre class="cmd"><button class="copy" data-copy="xozhub">copier</button>xozhub</pre>
-  <p class="small muted" style="margin-top:14px">
-    Tes fichiers arrivent dans le dossier que tu nommes dans ta demande (« dans le dossier
-    <span class="k">mon-site</span> »), à côté de l'endroit où tu as lancé l'IA. <span class="k">/miseajour</span>
-    récupère la dernière version du code et de l'IA, puis redémarre sans perdre ta conversation.
-  </p>
-</div>
+    <div class="cta">
+      <a class="btn big" id="telecharger" data-telecharger href="XozHub-AI-Setup.exe">⬇ Installer XozHub.AI (.exe)</a>
+      <a class="btn ghost big" href="#nouvelle-ia">Voir la fenêtre</a>
+    </div>
+    <p class="hint" id="dl-note" hidden>
+      L'installateur n'est pas encore en ligne là où cette page le cherche. Deux façons de régler ça
+      en une minute&nbsp;: <strong>publier le site</strong> (la commande <code class="k">publier.cmd</code>
+      emporte l'installateur avec elle, il se retrouve à côté de cette page), ou le
+      <strong>glisser sur une version GitHub</strong>. En attendant, la ligne à coller plus bas installe
+      la même IA, sans rien télécharger.
+    </p>
+    <p class="hint">
+      Le lien de téléchargement marche <strong>depuis n'importe quel appareil</strong> — téléphone,
+      Mac, Linux, Windows&nbsp;: c'est un simple fichier. L'installation, elle, se fait sur Windows, où
+      <strong>Node.js est installé tout seul</strong> si la machine ne l'a pas. Aucune clé à saisir.
+    </p>
+  </section>
 
-<h2><span class="n">4</span>Ta première demande</h2>
-<div class="card">
-  <p>Écris en français, appuie sur <b>Entrée</b>, et laisse faire — chaque commande part toute seule, tu ne
-  confirmes rien. Un premier essai, à copier tel quel :</p>
-  <pre class="cmd"><button class="copy" data-copy="crée un site vitrine pour un salon de coiffure dans le dossier coiffure-et-vous">copier</button>crée un site vitrine pour un salon de coiffure dans le dossier coiffure-et-vous</pre>
-  <p class="small muted" style="margin-top:14px">Trois choses qui changent tout :</p>
-  <ul class="flat small">
-    <li><b>donne un nom de dossier</b> — sinon tout se retrouve mélangé dans le dossier courant ;</li>
-    <li><b>dis à qui ça s'adresse et dans quel style</b> — « pour des parents d'élèves, sobre et
-        rassurant », deux mots suffisent à changer tout le design ;</li>
-    <li><b>une demande à la fois</b> — tu regardes le résultat, puis tu demandes la retouche.</li>
-  </ul>
-</div>
+  <div class="rule"></div>
 
-<div class="rule"></div>
+  <section class="reveal" id="nouvelle-ia">
+    <h2><span class="num">✦</span>La nouvelle IA : une fenêtre, pas un terminal</h2>
+    <p class="sub">
+      Voilà exactement ce que tu obtiens en double-cliquant sur l'installateur. À gauche, la
+      conversation&nbsp;; à droite, le dossier où elle travaille, les fichiers qui apparaissent, et le
+      journal de tout ce qu'elle fait — tu vois le travail se faire, en direct.
+    </p>
 
-<h2>Ce qui marche, et ce qui peut bloquer</h2>
-<div class="card">
-  <table>
-    <tr><th>Ton cas</th><th>Résultat</th></tr>
-    <tr><td>Windows 8, 10 ou 11, en 32 ou 64 bits</td><td><span class="yes">marche</span></td></tr>
-    <tr><td>Ligne collée dans <span class="k">cmd</span> <b>ou</b> dans PowerShell</td><td><span class="yes">marche</span></td></tr>
-    <tr><td>Node.js 18 ou plus déjà installé</td><td><span class="yes">marche</span></td></tr>
-    <tr><td>Pas de Node.js, avec <span class="k">winget</span></td>
-        <td><span class="yes">marche</span> — réponds <span class="k">O</span> à la question ; Windows peut
-        demander une autorisation</td></tr>
-    <tr><td>Pas de Node.js, sans <span class="k">winget</span></td>
-        <td><span class="yes">marche</span> après avoir installé Node.js <b>LTS</b> depuis
-        <a href="https://nodejs.org">nodejs.org</a> : le message te le dit, puis relance la ligne</td></tr>
-    <tr><td>Une version plus ancienne est déjà installée</td>
-        <td><span class="yes">marche</span> — l'ancienne est remplacée et ses scripts lisibles effacés</td></tr>
-    <tr><td>Windows 7 ou antérieur</td>
-        <td><span class="no">non</span> — Node.js 18 ne s'y installe pas. L'installation le dit et s'arrête
-        proprement</td></tr>
-    <tr><td>Un antivirus bloque les scripts</td>
-        <td><span class="no">non</span> — utilise le <span class="k">.exe</span> : lui ne télécharge rien</td></tr>
-    <tr><td>Réseau qui bloque <span class="k">github.com</span> (école, entreprise)</td>
-        <td><span class="no">non</span> — fais-toi envoyer le <span class="k">.exe</span> ou le
-        <span class="k">.zip</span></td></tr>
-    <tr><td>PC d'entreprise verrouillé (logiciels signés obligatoires)</td>
-        <td><span class="no">non</span> — rien à faire côté installation, c'est la machine qui décide</td></tr>
-  </table>
-  <p class="small muted" style="margin-top:14px">La ligne a besoin d'<b>internet</b> et d'un dépôt GitHub
-  <b>public</b>. Si ce dépôt est supprimé ou renommé, la ligne ne marche plus pour personne : garde
-  l'installeur comme solution de secours.</p>
-</div>
+    <div class="fenetre" role="img" aria-label="Aperçu de la fenêtre de XozHub.AI : la conversation, le dossier, les fichiers et le journal">
+      <div class="fenetre-top">
+        <svg viewBox="0 0 200 200" aria-hidden="true">
+          <defs>
+            <radialGradient id="fg" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#FFFFFF"/><stop offset="45%" stop-color="#E879F9"/>
+              <stop offset="80%" stop-color="#7C3AED"/><stop offset="100%" stop-color="#22D3EE" stop-opacity=".2"/>
+            </radialGradient>
+          </defs>
+          <ellipse cx="100" cy="100" rx="88" ry="38" transform="rotate(-24 100 100)" fill="none" stroke="#22D3EE" stroke-opacity=".7" stroke-width="5"/>
+          <circle cx="100" cy="100" r="62" fill="url(#fg)"/>
+        </svg>
+        <span class="fenetre-titre">XozHub.AI</span>
+        <span class="fenetre-etat">écrit index.html…</span>
+      </div>
+      <div class="fenetre-corps">
+        <div class="fenetre-conv">
+          <div class="fb moi">crée un site vitrine pour un salon de coiffure, dans le dossier coiffure-et-vous</div>
+          <div class="fb ia"><b>XozHub.AI</b>J'écris les quatre fichiers, puis je lance le serveur local pour vérifier que la page et ses styles répondent.</div>
+          <div class="fb moi">enlève la section tarifs</div>
+        </div>
+        <div class="fenetre-cote">
+          <h4>Dossier de travail</h4>
+          <p class="disque">C:\Users\toi\XozHub</p>
+          <h4>Fichiers</h4>
+          <ul>
+            <li>▸ coiffure-et-vous</li>
+            <li>&nbsp;&nbsp;index.html</li>
+            <li>&nbsp;&nbsp;style.css</li>
+            <li>&nbsp;&nbsp;script.js</li>
+          </ul>
+          <h4>Journal</h4>
+          <p class="ligne">✓ index.html · 84 lignes · 2.1 Ko</p>
+          <p class="ligne">$ node --check script.js</p>
+          <p class="ligne">◉ 4 fichiers · 0 erreur</p>
+        </div>
+      </div>
+    </div>
 
-<h2>Autres façons d'installer</h2>
-<p class="small muted" style="margin:0">Sert quand la ligne ne passe pas : antivirus, réseau qui bloque
-GitHub, ou machine d'entreprise.</p>
+    <div class="grid auto mt-4">
+      <div class="card">
+        <span class="ico">1</span>
+        <h3>Tu choisis le dossier</h3>
+        <p>Un bouton ouvre le sélecteur de dossiers de Windows — ou tu colles un chemin. Tout ce qu'elle crée va là, et nulle part ailleurs.</p>
+      </div>
+      <div class="card">
+        <span class="ico">2</span>
+        <h3>Elle écrit pour de vrai</h3>
+        <p>Les fichiers sont écrits par l'application, jamais par des <code class="k">echo</code>&nbsp;: accents, guillemets et sauts de ligne arrivent exactement comme prévu.</p>
+      </div>
+      <div class="card">
+        <span class="ico">3</span>
+        <h3>Elle vérifie son travail</h3>
+        <p>Elle lance le script, lit l'erreur, corrige, relance. La sortie de chaque commande s'affiche dans le journal, en clair.</p>
+      </div>
+      <div class="card">
+        <span class="ico">4</span>
+        <h3>Tu l'arrêtes quand tu veux</h3>
+        <p>Le bouton <strong>STOP</strong> ou la touche <code class="k">Échap</code> coupe proprement ce qui tourne, et tu reprends la main tout de suite.</p>
+      </div>
+    </div>
 
-<details>
-  <summary>Un seul fichier <span class="k">XozHub-GPT-Installer.cmd</span> (le plus sûr sans internet)</summary>
-  <p>On te l'envoie (Discord, mail, clé USB), tu <b>double-cliques dessus</b> : l'IA s'installe et s'ouvre.
-  Rien n'est téléchargé, donc ni l'antivirus ni le réseau ne peuvent le bloquer.</p>
-</details>
+    <div class="cta">
+      <a class="btn big" data-telecharger href="XozHub-AI-Setup.exe">⬇ Installer XozHub.AI (.exe)</a>
+    </div>
+    <p class="hint">
+      Un seul fichier, quelques centaines de Ko&nbsp;: tu le double-cliques, la fenêtre s'ouvre. Node.js
+      est installé au passage s'il manque, le raccourci <strong>XOZHUB.AI</strong> arrive sur le Bureau
+      <strong>avec son logo galaxie</strong>, et <strong>aucune console ne reste à l'écran</strong>.
+    </p>
+    <p class="hint">
+      Le dossier de travail se choisit dans <strong>la fenêtre des dossiers de Windows</strong> (celle de
+      l'explorateur), et il est retenu la fois suivante. Tes conversations sont gardées&nbsp;: le panneau
+      de droite les liste, tu cliques et tu reprends où tu t'étais arrêté — réponses, fichiers et
+      commandes comprises.
+    </p>
+  </section>
 
-<details>
-  <summary>Un fichier <span class="k">XozHub-GPT-Setup.exe</span></summary>
-  <p><b>Double-clique dessus</b> : tout est dedans, rien n'est téléchargé. Windows affichera « Windows a
-  protégé votre PC » (le programme n'a pas de signature payante) : clique sur <b>Informations
-  complémentaires</b> → <b>Exécuter quand même</b>.</p>
-</details>
+  <div class="rule"></div>
 
-<details>
-  <summary>Un dossier ou un <span class="k">.zip</span> du projet</summary>
-  <p>Décompresse le <span class="k">.zip</span>, entre dans le dossier et <b>double-clique sur
-  <span class="k">install.cmd</span></b>. La clé est déjà dans le dossier : rien à saisir.</p>
-</details>
+  <section class="reveal link-card" id="lien">
+    <h2><span class="num">★</span>Ça, c'est le vrai lien à envoyer</h2>
+    <p class="sub">
+      Cette page a une adresse sur internet. Ton ami clique dessus et elle s'ouvre chez lui&nbsp;—
+      sur son téléphone comme sur son PC&nbsp;: rien à installer pour la voir, et de là il installe
+      l'IA. C'est ce lien-là qu'on envoie, jamais le fichier de ton dossier.
+    </p>
+    <a class="reallink" href="https://qays67.github.io/XozHubCmdIA/">https://qays67.github.io/XozHubCmdIA/</a>
+    <div class="cta">
+      <button class="btn" type="button" data-copy="https://qays67.github.io/XozHubCmdIA/">Copier le lien</button>
+      <button class="btn ghost" type="button" id="partager">Partager</button>
+      <a class="btn ghost" href="https://qays67.github.io/XozHubCmdIA/" target="_blank" rel="noopener">Ouvrir le site</a>
+    </div>
+    <p class="hint">
+      Un fichier ouvert en double-clic commence par <code class="k">file:///C:/…</code>&nbsp;: il ne
+      marche que sur ta machine. Le lien ci-dessus, lui, marche pour tout le monde, partout.
+    </p>
+  </section>
 
-<h2>Ça ne marche pas ?</h2>
+  <div class="rule"></div>
 
-<details>
-  <summary>Erreur rouge tout de suite : la ligne n'a rien fait</summary>
-  <p>La ligne n'a pas réussi à télécharger l'installation : ta connexion, un DNS filtrant, ou un réseau qui
-  bloque <span class="k">github.com</span> (école, entreprise). Essaie depuis un autre réseau ; sinon
-  fais-toi envoyer le <span class="k">.exe</span> ou le <span class="k">.zip</span>, qui n'ont besoin
-  d'aucun téléchargement.</p>
-</details>
+  <section class="reveal">
+    <h2><span class="num">1</span>Comment on installe</h2>
+    <p class="sub">
+      Ouvre l'invite de commandes (touche <code class="k">Windows</code>, tape <code class="k">cmd</code>,
+      Entrée), colle la ligne ci-dessus (clic droit = coller), puis Entrée. Laisse la fenêtre ouverte
+      une minute : tout se fait tout seul.
+    </p>
+    <div class="grid auto">
+      <div class="card step">
+        <span class="n">1</span>
+        <div class="body">
+          <h3>Node.js est vérifié</h3>
+          <p>Si la version 18 ou plus manque, elle est installée automatiquement. Sinon le lien officiel t'est donné.</p>
+        </div>
+      </div>
+      <div class="card step">
+        <span class="n">2</span>
+        <div class="body">
+          <h3>L'IA s'écrit sur le disque</h3>
+          <p>Dans <code class="k">%LOCALAPPDATA%\XozHub</code>. Le code voyage <strong>dans cette ligne</strong>&nbsp;: rien d'autre n'est téléchargé.</p>
+        </div>
+      </div>
+      <div class="card step">
+        <span class="n">3</span>
+        <div class="body">
+          <h3>La commande est créée</h3>
+          <p><code class="k">xozhub</code> est ajouté au PATH, et le raccourci <strong>XozHub.GPT</strong> est posé sur le Bureau.</p>
+        </div>
+      </div>
+      <div class="card step">
+        <span class="n">4</span>
+        <div class="body">
+          <h3>Le dossier est masqué</h3>
+          <p>Il ne contient <strong>aucun script lisible</strong>&nbsp;: le code y est chiffré, et seule l'icône du Bureau reste visible.</p>
+        </div>
+      </div>
+      <div class="card step">
+        <span class="n">5</span>
+        <div class="body">
+          <h3>La clé est déjà dedans</h3>
+          <p>Aucun compte à créer, aucun identifiant à taper&nbsp;: <strong>tu n'as rien à saisir</strong>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<details>
-  <summary>« Le fichier d'installation est incomplet ou abîmé »</summary>
-  <p>Le téléchargement s'est mal terminé : relance <b>la même ligne</b>, elle reprend tout depuis le début.
-  Si ça recommence, c'est un antivirus ou un réseau qui coupe le fichier : passe par le
-  <span class="k">.exe</span>.</p>
-</details>
+  <div class="rule"></div>
 
-<details>
-  <summary>L'antivirus bloque ou supprime des fichiers</summary>
-  <p>Un script qui télécharge et exécute du code, c'est aussi ce que fait un virus : certains antivirus le
-  refusent. Utilise le <span class="k">.exe</span> (il ne télécharge rien), ou autorise le dossier
-  <span class="k">%LOCALAPPDATA%\XozHub</span>.</p>
-</details>
+  <section class="reveal">
+    <h2><span class="num">2</span>Lancer l'IA, et retrouver tes fichiers</h2>
+    <div class="grid two">
+      <div class="card">
+        <span class="ico">▶</span>
+        <h3>Double-clique sur l'icône XozHub.GPT</h3>
+        <p>Elle est sur ton Bureau. La fenêtre s'ouvre, l'IA démarre, tu peux lui parler. C'est la façon la plus simple, et elle marche même si le PATH de Windows n'est pas encore à jour.</p>
+      </div>
+      <div class="card">
+        <span class="ico">&gt;_</span>
+        <h3>Ou tape la commande</h3>
+        <p>Dans une <strong>nouvelle</strong> fenêtre cmd&nbsp;:</p>
+        <pre class="term-body mt-3"><span class="ps">C:\&gt;</span> xozhub</pre>
+        <p class="mt-3"><code class="k">/miseajour</code> récupère la dernière version du code et de l'IA, puis redémarre sans perdre ta conversation.</p>
+      </div>
+    </div>
+    <div class="callout mt-4">
+      <h3>Tes fichiers atterrissent là où tu le dis</h3>
+      <p class="plain">
+        Nomme le dossier dans ta demande («&nbsp;dans le dossier <code class="k">mon-site</code>&nbsp;») et tout
+        arrive dedans. Sinon, c'est le dossier depuis lequel tu as lancé l'IA. Un
+        <code class="k">RAPPORT.md</code> y est tenu à jour tout seul&nbsp;: il redit ce que tu as demandé et
+        à quoi sert chaque fichier créé.
+      </p>
+    </div>
+  </section>
 
-<details>
-  <summary>« 'xozhub' n'est pas reconnu en tant que commande »</summary>
-  <p>Windows ne relit le chemin des commandes qu'à l'ouverture d'une fenêtre : ferme-la et
-  <b>ouvre-en une nouvelle</b>, puis retape <span class="k">xozhub</span>. Ça marche toujours aussi :
-  double-clique sur le raccourci <b>XozHub.GPT</b> du Bureau.</p>
-</details>
+  <div class="rule"></div>
 
-<details>
-  <summary>« XozHub.GPT a besoin de Node.js 18 ou plus »</summary>
-  <p>L'installation propose de l'installer pour toi : réponds <span class="k">O</span> (Windows peut demander
-  une autorisation). Sinon, installe la version <b>LTS</b> depuis <a href="https://nodejs.org">nodejs.org</a>,
-  puis relance la ligne.</p>
-</details>
+  <section class="reveal">
+    <h2><span class="num">3</span>Ta première demande</h2>
+    <p class="sub">Écris en français, appuie sur Entrée, et laisse faire. À copier tel quel pour un premier essai&nbsp;:</p>
+    <div class="term">
+      <div class="term-top">
+        <span class="dots"><i></i><i></i><i></i></span>
+        <span class="term-title">XozHub.GPT</span>
+        <button class="copy" type="button" data-copy="crée un bot Discord qui répond aux commandes /salut et /infos, dans le dossier mon-bot">Copier</button>
+      </div>
+      <pre class="term-body">crée un bot Discord qui répond aux commandes /salut et /infos, dans le dossier mon-bot</pre>
+    </div>
+    <ul class="ticks">
+      <li><strong>Donne un nom de dossier</strong> — sinon tout se retrouve mélangé dans le dossier courant.</li>
+      <li><strong>Dis à qui ça s'adresse et dans quel style</strong> — «&nbsp;pour des parents d'élèves, sobre et rassurant&nbsp;»&nbsp;: deux mots suffisent à changer tout le design.</li>
+      <li><strong>Une demande à la fois</strong> — tu regardes le résultat, puis tu demandes la retouche.</li>
+    </ul>
+  </section>
 
-<details>
-  <summary>« Aucune clé API détectée »</summary>
-  <p>La clé X.GPT (<span class="k">xgpt_…</span>) voyage dans l'installation : elle se pose toute seule. Si ce
-  message apparaît quand même, demande une clé à la personne qui t'a donné XozHub.GPT, puis relance
-  l'installation.</p>
-</details>
+  <div class="rule"></div>
 
-<h2>Les commandes et les raccourcis</h2>
-<div class="card">
-  <table>
-    <tr><th>Commande</th><th>Effet</th></tr>
-    <tr><td class="k">/miseajour</td><td>dernière version du code et de l'IA, puis redémarrage</td></tr>
-    <tr><td class="k">/couleurs</td><td>régler les couleurs : <span class="k">truecolor</span>,
-        <span class="k">256</span>, <span class="k">16</span> ou <span class="k">none</span></td></tr>
-  </table>
-  <table>
-    <tr><th>Touche / clic</th><th>Effet</th></tr>
-    <tr><td class="k">Entrée</td><td>envoyer · pendant qu'elle travaille : <b>garder</b> le message pour après</td></tr>
-    <tr><td class="k">Échap</td><td>interrompre ce qu'elle est en train de faire</td></tr>
-    <tr><td class="k">↑</td><td>revoir tes demandes précédentes</td></tr>
-    <tr><td class="k">ctrl-l</td><td>nettoyer l'écran</td></tr>
-    <tr><td>clic sur <b>✕ End session</b></td><td>menu de fin de session : nouvelle, reprendre, redémarrer, quitter</td></tr>
-  </table>
-</div>
+  <section class="reveal" id="compat">
+    <h2><span class="num">4</span>Ce qui marche, et ce qui peut bloquer</h2>
+    <p class="sub">Regarde ta ligne avant de commencer&nbsp;: dans la plupart des cas, tout se passe bien.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Ton cas</th><th>Résultat</th></tr></thead>
+        <tbody>
+          <tr><td>Windows 8, 10 ou 11, en 32 ou 64 bits</td><td><span class="yes">marche</span></td></tr>
+          <tr><td>Ligne collée dans <code class="k">cmd</code> <strong>ou</strong> dans PowerShell</td><td><span class="yes">marche</span></td></tr>
+          <tr><td>Node.js 18 ou plus déjà installé</td><td><span class="yes">marche</span></td></tr>
+          <tr><td>Pas de Node.js, avec <code class="k">winget</code></td><td><span class="yes">marche</span> — réponds <code class="k">O</code> à la question ; Windows peut demander une autorisation</td></tr>
+          <tr><td>Pas de Node.js, sans <code class="k">winget</code></td><td><span class="yes">marche</span> après avoir installé Node.js <strong>LTS</strong> depuis <a href="https://nodejs.org">nodejs.org</a> : le message te le dit, puis relance la ligne</td></tr>
+          <tr><td>Une version plus ancienne est déjà installée</td><td><span class="yes">marche</span> — l'ancienne est remplacée et ses scripts lisibles effacés</td></tr>
+          <tr><td>Windows 7 ou antérieur</td><td><span class="no">non</span> — Node.js 18 ne s'y installe pas. L'installation le dit et s'arrête proprement</td></tr>
+          <tr><td>Un antivirus bloque les scripts</td><td><span class="no">non</span> — utilise le <code class="k">.exe</code> : lui ne télécharge rien</td></tr>
+          <tr><td>Réseau qui bloque <code class="k">github.com</code> (école, entreprise)</td><td><span class="no">non</span> — fais-toi envoyer le <code class="k">.exe</code> ou le <code class="k">.zip</code></td></tr>
+          <tr><td>PC d'entreprise verrouillé (logiciels signés obligatoires)</td><td><span class="no">non</span> — rien à faire côté installation, c'est la machine qui décide</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="sub mt-4 small">
+      La ligne a besoin d'<strong>internet</strong> et d'un dépôt GitHub <strong>public</strong>. Si ce dépôt est
+      supprimé ou renommé, la ligne ne marche plus pour personne&nbsp;: garde l'installeur comme solution de secours.
+    </p>
+  </section>
 
-<footer>
-  <a href="https://github.com/Qays67/XozHubCmdIA">Le code sur GitHub</a> · la même chose en texte :
-  <span class="k">TUTORIEL.md</span> dans le dépôt.
-</footer>
+  <div class="rule"></div>
+
+  <section class="reveal">
+    <h2><span class="num">5</span>Si la ligne ne passe pas</h2>
+    <p class="sub">Trois autres façons d'installer, pour les cas où le réseau ou l'antivirus s'en mêle.</p>
+    <div class="grid auto">
+      <div class="card">
+        <span class="ico">1</span>
+        <h3>Un seul fichier <code class="k">.cmd</code></h3>
+        <p>On te l'envoie (Discord, mail, clé USB), tu <strong>double-cliques dessus</strong>&nbsp;: l'IA s'installe et s'ouvre. Rien n'est téléchargé, donc ni l'antivirus ni le réseau ne peuvent le bloquer.</p>
+      </div>
+      <div class="card">
+        <span class="ico">2</span>
+        <h3><code class="k">XozHub-GPT-Setup.exe</code></h3>
+        <p><strong>Double-clique dessus</strong>&nbsp;: tout est dedans, rien n'est téléchargé. Windows affichera «&nbsp;Windows a protégé votre PC&nbsp;» (pas de signature payante)&nbsp;: clique sur <strong>Informations complémentaires</strong> → <strong>Exécuter quand même</strong>.</p>
+      </div>
+      <div class="card">
+        <span class="ico">3</span>
+        <h3>Un dossier ou un <code class="k">.zip</code></h3>
+        <p>Décompresse le <code class="k">.zip</code>, entre dans le dossier et <strong>double-clique sur <code class="k">install.cmd</code></strong>. La clé est déjà dans le dossier&nbsp;: rien à saisir.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="rule"></div>
+
+  <section class="reveal" id="depannage">
+    <h2><span class="num">6</span>Ça ne marche pas&nbsp;?</h2>
+    <p class="sub">Cherche ton message dans la liste&nbsp;: chaque ligne donne la cause et le geste exact.</p>
+
+    <details>
+      <summary>Erreur rouge tout de suite : la ligne n'a rien fait</summary>
+      <div class="inner">
+        <p>La ligne n'a pas réussi à télécharger l'installation&nbsp;: ta connexion, un DNS filtrant, ou un réseau qui bloque <code class="k">github.com</code> (école, entreprise).</p>
+        <p>Essaie depuis un autre réseau. Sinon, fais-toi envoyer le <code class="k">.exe</code> ou le <code class="k">.zip</code>&nbsp;: ils n'ont besoin d'aucun téléchargement.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>« Le fichier d'installation est incomplet ou abîmé »</summary>
+      <div class="inner">
+        <p>Le téléchargement s'est mal terminé. Relance <strong>la même ligne</strong>&nbsp;: elle reprend tout depuis le début.</p>
+        <p>Si ça recommence, c'est un antivirus ou un réseau qui coupe le fichier&nbsp;: passe par le <code class="k">.exe</code>.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>L'antivirus bloque ou supprime des fichiers</summary>
+      <div class="inner">
+        <p>Un script qui télécharge et exécute du code, c'est aussi ce que fait un virus&nbsp;: certains antivirus le refusent, sans que ce soit une erreur de ta part.</p>
+        <p>Utilise le <code class="k">.exe</code> (il ne télécharge rien), ou autorise le dossier <code class="k">%LOCALAPPDATA%\XozHub</code>.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>« 'xozhub' n'est pas reconnu en tant que commande »</summary>
+      <div class="inner">
+        <p>Windows ne relit le chemin des commandes qu'à l'ouverture d'une fenêtre.</p>
+        <p>Ferme-la, <strong>ouvre-en une nouvelle</strong>, puis retape <code class="k">xozhub</code>. Ça marche aussi tout de suite&nbsp;: double-clique sur le raccourci <strong>XozHub.GPT</strong> du Bureau.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>« XozHub.GPT a besoin de Node.js 18 ou plus »</summary>
+      <div class="inner">
+        <p>L'installation propose de l'installer pour toi&nbsp;: réponds <code class="k">O</code> (Windows peut demander une autorisation).</p>
+        <p>Sinon, installe la version <strong>LTS</strong> depuis <a href="https://nodejs.org">nodejs.org</a>, puis relance la ligne.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>« Aucune clé API détectée »</summary>
+      <div class="inner">
+        <p>La clé X.GPT (<code class="k">xgpt_…</code>) voyage dans l'installation&nbsp;: elle se pose toute seule.</p>
+        <p>Si ce message apparaît quand même, demande une clé à la personne qui t'a donné XozHub.GPT, puis relance l'installation.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>L'IA répond mais ne crée pas mes fichiers</summary>
+      <div class="inner">
+        <p>Vérifie que ta demande est bien une demande d'<strong>action</strong> («&nbsp;crée…&nbsp;», «&nbsp;corrige…&nbsp;», «&nbsp;fais-moi…&nbsp;») et pas une question.</p>
+        <p>Une phrase qui contient un «&nbsp;?&nbsp;» reste une question, sauf si elle porte un verbe d'action&nbsp;: «&nbsp;tu peux me créer un site&nbsp;?&nbsp;» déclenche bien le travail.</p>
+        <p>À l'inverse, si tu lui parles sans rien demander — «&nbsp;c'est joli&nbsp;», «&nbsp;j'aime pas le bleu&nbsp;», «&nbsp;ok merci beaucoup&nbsp;» — elle répond en texte et ne crée <strong>rien</strong>&nbsp;: aucun fichier, aucune commande. C'est voulu. Dis-lui «&nbsp;change-le&nbsp;» pour qu'elle passe à l'action.</p>
+      </div>
+    </details>
+  </section>
+
+  <div class="rule"></div>
+
+  <section class="reveal">
+    <h2><span class="num">7</span>Commandes et raccourcis</h2>
+    <p class="sub">Il n'y a que deux commandes&nbsp;: tout le reste se demande en français.</p>
+    <div class="grid two">
+      <div>
+        <h3 class="mb-3">Commandes</h3>
+        <div class="table-wrap">
+          <table class="narrow">
+            <thead><tr><th>Commande</th><th>Effet</th></tr></thead>
+            <tbody>
+              <tr><td><code class="k">/miseajour</code></td><td>dernière version du code et de l'IA, puis redémarrage</td></tr>
+              <tr><td><code class="k">/couleurs</code></td><td>régler les couleurs : <code class="k">truecolor</code>, <code class="k">256</code>, <code class="k">16</code> ou <code class="k">none</code> — ou choisir une <b>palette</b> (<code class="k">/couleurs ocean</code>)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div>
+        <h3 class="mb-3">Touches et clics</h3>
+        <div class="table-wrap">
+          <table class="narrow">
+            <thead><tr><th>Touche / clic</th><th>Effet</th></tr></thead>
+            <tbody>
+              <tr><td><code class="k">Entrée</code></td><td>envoyer · pendant qu'elle travaille : <strong>garder</strong> le message pour après</td></tr>
+              <tr><td><code class="k">Échap</code></td><td>interrompre ce qu'elle est en train de faire</td></tr>
+              <tr><td><code class="k">↑</code></td><td>revoir tes demandes précédentes</td></tr>
+              <tr><td><code class="k">ctrl-l</code></td><td>nettoyer l'écran</td></tr>
+              <tr><td>clic sur <strong>✕ End session</strong></td><td>menu de fin de session : nouvelle, reprendre, redémarrer, quitter</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="foot">
+      <div>
+        <div class="brand mb-2">
+          <svg class="mark" viewBox="0 0 32 32" aria-hidden="true"><defs><radialGradient id="mkf" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#FFFFFF"/><stop offset="45%" stop-color="#E879F9"/><stop offset="80%" stop-color="#7C3AED"/><stop offset="100%" stop-color="#22D3EE" stop-opacity=".25"/></radialGradient></defs><rect width="32" height="32" rx="9" fill="#0B0618"/><circle cx="16" cy="16" r="10" fill="url(#mkf)"/><ellipse cx="16" cy="16" rx="13.5" ry="5" transform="rotate(-25 16 16)" fill="none" stroke="#22D3EE" stroke-opacity=".85" stroke-width="1.3"/></svg>
+          <span class="name">XozHub<span class="gpt">.AI</span></span>
+        </div>
+        <p class="about">Une IA de développement qui vit dans sa propre fenêtre&nbsp;: tu choisis le dossier, elle écrit les fichiers, lance les commandes, lit les erreurs et corrige — sans jamais demander de confirmation. La version terminal (XozHub.GPT) existe toujours, juste en dessous.</p>
+      </div>
+      <div>
+        <h4>Le projet</h4>
+        <ul>
+          <li><a href="https://github.com/Qays67/XozHubCmdIA">Le code sur GitHub</a></li>
+          <li><a href="https://github.com/Qays67/XozHubCmdIA/blob/main/TUTORIEL.md">Le tutoriel complet</a></li>
+          <li><a href="https://github.com/Qays67/XozHubCmdIA/releases">Les versions à télécharger</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Cette page</h4>
+        <ul>
+          <li><a href="#installer">Installer</a></li>
+          <li><a href="#compat">Compatibilité</a></li>
+          <li><a href="#depannage">Dépannage</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="foot-note">
+      Windows · PowerShell · Node.js 18+. Page unique, sans dépendance ni fichier à côté&nbsp;: elle s'héberge
+      n'importe où, et la même chose en texte se trouve dans <code class="k">TUTORIEL.md</code>.
+    </p>
+  </footer>
 
 </div>
 
 <script>
-// « copier » sur chaque bloc : le texte à copier est figé dans data-copy, donc
-// jamais pollué par le bouton lui-même.
-document.querySelectorAll('.copy').forEach(function (btn) {
+// « Copier » : le texte à copier est figé dans data-copy, donc jamais pollué par le libellé
+// du bouton. navigator.clipboard quand il existe, repli par textarea sinon (http, vieux
+// navigateurs), et confirmation visuelle dans les deux cas.
+document.querySelectorAll('[data-copy]').forEach(function (btn) {
+  var label = btn.textContent;
   btn.addEventListener('click', function () {
-    var code = btn.dataset.copy;
-    if (!code) code = btn.parentNode.textContent.replace('copier', '').trim();
+    var code = btn.dataset.copy || '';
+    if (!code) return;
+
     function done() {
-      var old = btn.textContent;
-      btn.textContent = 'copié ✓';
+      btn.textContent = 'Copié ✓';
       btn.classList.add('ok');
-      setTimeout(function () { btn.textContent = old; btn.classList.remove('ok'); }, 1600);
+      setTimeout(function () {
+        btn.textContent = label;
+        btn.classList.remove('ok');
+      }, 1600);
     }
+
     function fallback() {
       var ta = document.createElement('textarea');
       ta.value = code;
@@ -303,6 +949,7 @@ document.querySelectorAll('.copy').forEach(function (btn) {
       try { document.execCommand('copy'); done(); } catch (e) { /* rien */ }
       document.body.removeChild(ta);
     }
+
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(code).then(done, fallback);
     } else {
@@ -310,6 +957,111 @@ document.querySelectorAll('.copy').forEach(function (btn) {
     }
   });
 });
+
+// Apparition douce au défilement — sautée si la personne a demandé moins d'animation.
+var calm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+var blocks = document.querySelectorAll('.reveal');
+if (calm || !('IntersectionObserver' in window)) {
+  blocks.forEach(function (b) { b.classList.add('in'); });
+} else {
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) {
+        e.target.classList.add('in');
+        io.unobserve(e.target);
+      }
+    });
+  }, { rootMargin: '0px 0px -8% 0px' });
+  blocks.forEach(function (b) { io.observe(b); });
+}
+
+// Le lien du site : c'est LUI qu'on envoie. Il est figé ici une fois, pour que
+// le bouton « copier », le bouton « partager » et l'adresse affichée ne puissent
+// pas diverger.
+var LIEN_DU_SITE = 'https://qays67.github.io/XozHubCmdIA/';
+var ADRESSE_DEPOT = 'https://github.com/Qays67/XozHubCmdIA';
+
+// Fichier ouvert en double-clic (file://) : cette page n'est visible que sur ta
+// machine. On le dit tout de suite, au lieu de laisser croire que c'est en ligne.
+var localbar = document.getElementById('localbar');
+if (localbar && location.protocol === 'file:') localbar.hidden = false;
+
+// Partager : la feuille de partage du téléphone quand elle existe (l'ami reçoit
+// le lien dans WhatsApp, SMS, mail…), sinon on copie le lien.
+var partager = document.getElementById('partager');
+if (partager) {
+  partager.addEventListener('click', function () {
+    if (navigator.share) {
+      navigator.share({
+        title: 'XozHub.GPT',
+        text: "L'IA qui code pour toi, dans la fenêtre cmd : clique, et installe-la.",
+        url: LIEN_DU_SITE
+      }).catch(function () { /* partage annulé : rien à faire */ });
+      return;
+    }
+    var label = partager.textContent;
+    var fait = function () {
+      partager.textContent = 'Lien copié ✓';
+      setTimeout(function () { partager.textContent = label; }, 1600);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(LIEN_DU_SITE).then(fait, function () {});
+    } else {
+      window.prompt('Copie ce lien :', LIEN_DU_SITE);
+    }
+  });
+}
+
+// Télécharger l'installateur, depuis n'importe quel appareil.
+//
+// Le fichier est cherché à plusieurs endroits, dans l'ordre, et le premier qui
+// répond gagne : à côté de cette page (c'est le cas normal — l'installateur est
+// publié avec le site), sur une version GitHub, puis dans le dépôt. Le bouton ne
+// peut donc plus tomber sur une page 404 : si rien n'est encore en ligne, il le
+// dit et propose la ligne à copier, qui marche tout de suite.
+var dlNote = document.getElementById('dl-note');
+var OU_TROUVER_L_EXE = [
+  ADRESSE_DEPOT + '/releases/latest/download/XozHub-AI-Setup.exe',
+  'https://raw.githubusercontent.com/Qays67/XozHubCmdIA/main/XozHub-AI-Setup.exe',
+  'https://raw.githubusercontent.com/Qays67/XozHubCmdIA/main/docs/XozHub-AI-Setup.exe'
+];
+
+if (window.fetch) {
+  document.querySelectorAll('[data-telecharger]').forEach(function (bouton) {
+    bouton.addEventListener('click', function (e) {
+      // Une fois basculé sur la page des versions, on laisse le lien faire son
+      // travail : plus besoin de vérifier quoi que ce soit.
+      if (bouton.dataset.pret) return;
+      // Page ouverte en double-clic : le fichier est à côté, le lien suffit.
+      // (fetch ne lit pas les adresses file://, donc on ne vérifie rien.)
+      if (location.protocol === 'file:') return;
+
+      e.preventDefault();
+      var premier = bouton.getAttribute('href');
+      var liste = [premier].concat(OU_TROUVER_L_EXE.filter(function (u) { return u !== premier; }));
+
+      var essayer = function (i) {
+        if (i >= liste.length) {
+          if (dlNote) dlNote.hidden = false;
+          bouton.dataset.pret = '1';
+          bouton.textContent = '⬇ Ouvrir les versions téléchargeables';
+          bouton.setAttribute('href', ADRESSE_DEPOT + '/releases');
+          bouton.setAttribute('target', '_blank');
+          bouton.setAttribute('rel', 'noopener');
+          return;
+        }
+        fetch(liste[i], { method: 'HEAD' })
+          .then(function (r) { return r.ok ? liste[i] : null; })
+          .catch(function () { return null; })
+          .then(function (trouve) {
+            if (trouve) location.href = trouve;
+            else essayer(i + 1);
+          });
+      };
+      essayer(0);
+    });
+  });
+}
 </script>
 </body>
 </html>

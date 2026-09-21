@@ -1,4 +1,5 @@
-// XozHub.GPT — palette « aurore » : un dégradé complet indigo → violet → magenta → rose → cyan →
+// XozHub.GPT — palette « galaxie » (le défaut) : violet profond de nébuleuse, cyan glacé et rose
+// stellaire, un dégradé complet indigo → violet → magenta → rose → cyan →
 // menthe, avec des familles de couleurs bien séparées selon le rôle du contenu (chaud pour toi,
 // froid pour l'IA, menthe pour les commandes, corail pour les erreurs).
 // Toutes les teintes sont calculées ici : rien à installer.
@@ -305,28 +306,116 @@ export function fit(s, width) {
 
 // --------------------------------------------------------------------- palette
 
-// Teintes de base : vives, mais accordées entre elles. Elles viennent toutes de la même famille
-// (indigo → violet → magenta d'un côté, cyan → menthe de l'autre) : posées côte à côte, elles se
-// répondent au lieu de se disputer l'œil. C'est ce qui donne une interface « propre » plutôt
-// qu'une interface bariolée.
-const INDIGO = '#6366F1';
-const VIOLET = '#8B5CF6';
-const PURPLE = '#A78BFA';
-const BLUE = '#60A5FA';
-const SKY = '#38BDF8';
-const CYAN = '#22D3EE';
-const TEAL = '#2DD4BF';
-const MINT = '#34D399';
-const LIME = '#A3E635';
-const GOLD = '#FBBF24';
-const AMBER = '#F59E0B';
-const ORANGE = '#FB923C';
-const CORAL = '#FB7185';
-const PINK = '#F472B6';
-const MAGENTA = '#E879F9';
-const ROSE = '#FF5D8F';
+// --------------------------------------------------------------------- palettes
+//
+// Une palette, c'est SEIZE teintes de base, dans cet ordre :
+//
+//   indigo · violet · mauve · bleu · ciel · cyan · turquoise · menthe · lime
+//   · or · ambre · orange · corail · rose · magenta · rose vif
+//
+// Tout le reste du thème (dégradés du logo, rails, badges, cadres, boutons) est DÉRIVÉ de ces
+// seize teintes : changer de palette, c'est donc changer le thème entier d'un coup, sans
+// risquer de laisser un élément de l'ancienne couleur. C'est ce qui rend une palette toujours
+// cohérente — impossible d'obtenir une interface bariolée.
+//
+// Deux teintes ont un rôle SÉMANTIQUE et restent vertes et rouges dans toutes les palettes :
+// la menthe dit « réussi », le corail dit « erreur ». Une info juste est plus utile qu'une
+// jolie teinte mal placée.
 
-export const theme = {
+/** Les seize teintes, dans l'ordre attendu par `buildTheme`. */
+function hues(...list) {
+  if (list.length !== 16) throw new Error(`palette : 16 teintes attendues, ${list.length} reçues`);
+  return list;
+}
+
+export const PALETTES = [
+  {
+    // Le défaut : le cœur profond de la galaxie — indigo de vide, violet de nébuleuse, cyan glacé,
+    // magenta stellaire. Les trois premières teintes sont la marque, les suivantes l'arc complet.
+    id: 'galaxie',
+    label: 'Galaxie',
+    hint: 'le défaut : nébuleuse violette, cyan glacé et rose stellaire',
+    hues: hues(
+      '#4C1D95', '#7C3AED', '#C4B5FD', '#6366F1', '#7DD3FC', '#22D3EE', '#2DD4BF', '#34D399',
+      '#A3E635', '#FDE047', '#FBBF24', '#FB923C', '#FB7185', '#F472B6', '#E879F9', '#FF4FA3',
+    ),
+  },
+  {
+    id: 'aurore',
+    label: 'Aurore',
+    hint: 'le défaut : violet indigo, cyan et menthe',
+    hues: hues(
+      '#6366F1', '#8B5CF6', '#A78BFA', '#60A5FA', '#38BDF8', '#22D3EE', '#2DD4BF', '#34D399',
+      '#A3E635', '#FBBF24', '#F59E0B', '#FB923C', '#FB7185', '#F472B6', '#E879F9', '#FF5D8F',
+    ),
+  },
+  {
+    id: 'ocean',
+    label: 'Océan',
+    hint: 'bleus profonds et turquoise, chaud en ambre',
+    hues: hues(
+      '#3B5BDB', '#4263EB', '#5C7CFA', '#4DABF7', '#3BC9DB', '#22B8CF', '#12B886', '#20C997',
+      '#51CF66', '#FFD43B', '#FAB005', '#FF922B', '#FF8787', '#748FFC', '#9775FA', '#B197FC',
+    ),
+  },
+  {
+    id: 'foret',
+    label: 'Forêt',
+    hint: 'verts et turquoise, or et miel',
+    hues: hues(
+      '#15803D', '#16A34A', '#22C55E', '#34D399', '#2DD4BF', '#14B8A6', '#0D9488', '#4ADE80',
+      '#86EFAC', '#FDE047', '#FACC15', '#F59E0B', '#FB7185', '#A3E635', '#84CC16', '#65A30D',
+    ),
+  },
+  {
+    id: 'sunset',
+    label: 'Sunset',
+    hint: 'orangés et roses, comme un soir d’été',
+    hues: hues(
+      '#9A3412', '#C2410C', '#EA580C', '#F97316', '#FB923C', '#FDBA74', '#FCD34D', '#4ADE80',
+      '#FDE68A', '#FBBF24', '#F59E0B', '#EA580C', '#F43F5E', '#F472B6', '#E11D48', '#FF5D8F',
+    ),
+  },
+  {
+    id: 'neon',
+    label: 'Néon',
+    hint: 'magenta et cyan saturés, pour un écran qui claque',
+    hues: hues(
+      '#4F46E5', '#7C3AED', '#A855F7', '#6366F1', '#06B6D4', '#22D3EE', '#2DD4BF', '#4ADE80',
+      '#A3E635', '#FDE047', '#FACC15', '#FB923C', '#F43F5E', '#EC4899', '#D946EF', '#FF2D95',
+    ),
+  },
+  {
+    id: 'crepuscule',
+    label: 'Crépuscule',
+    hint: 'indigo et mauve, rose au bout',
+    hues: hues(
+      '#4338CA', '#6D28D9', '#8B5CF6', '#6366F1', '#818CF8', '#A5B4FC', '#C4B5FD', '#4ADE80',
+      '#DDD6FE', '#FCD34D', '#FBBF24', '#FB923C', '#FB7185', '#F472B6', '#C026D3', '#E11D48',
+    ),
+  },
+];
+
+const DEFAULT_PALETTE = PALETTES[0];
+
+/** Retrouve une palette par son identifiant (insensible à la casse). */
+export function paletteById(id) {
+  const want = String(id ?? '').trim().toLowerCase();
+  return PALETTES.find((p) => p.id === want || p.label.toLowerCase() === want) || null;
+}
+
+/**
+ * Construit le thème complet à partir des seize teintes de base.
+ * Toutes les valeurs affichées par l'interface viennent d'ici : c'est le seul endroit à
+ * toucher pour ajouter une palette.
+ */
+function buildTheme(H) {
+  const [
+    INDIGO, VIOLET, PURPLE, BLUE, SKY, CYAN, TEAL, MINT, LIME, GOLD, AMBER, ORANGE, CORAL, PINK,
+    MAGENTA, ROSE,
+  ] = H;
+
+  return {
   // ------------------------------------------------------------------ dégradés
   // Chaque dégradé reste court (3 à 4 teintes) et suit un seul chemin dans le cercle
   // chromatique. Un dégradé qui traverse tout le spectre fait « arc-en-ciel » ; un dégradé
@@ -361,9 +450,9 @@ export const theme = {
   // un texte gris trop sombre, c'est la première chose qui fait « bâclé ».
   text: '#EEF2FF',
   bright: '#FFFFFF',
-  // « accent » sert de couleur de TEXTE (citations, repères) : c'est donc le violet clair,
+  // « accent » sert de couleur de TEXTE (citations, repères) : c'est donc le mauve clair,
   // pas celui des dégradés — à 4.4:1 le foncé tombait juste sous le seuil de lisibilité.
-  accent: PURPLE, // violet clair : identité de l'agent, lisible sur le fond
+  accent: PURPLE, // mauve clair : identité de l'agent, lisible sur le fond
   accent2: CYAN, // cyan : l'utilisateur, les commandes
   muted: '#B8C2EC',
   faint: '#7E8AC0',
@@ -413,7 +502,7 @@ export const theme = {
   codeFg: '#9BFFE6',
 
   // ------------------------------------------------------------------ boutons
-  // Les deux pastilles cliquables de l'interface. Leurs fonds sont choisis pour que
+  // Les pastilles cliquables de l'interface. Leurs fonds sont choisis pour que
   // l'encre posée dessus passe le seuil de lisibilité sur TOUTE la longueur du dégradé —
   // un bouton dont la fin du mot devient illisible est un bouton raté.
   stopGradient: ['#9F1239', '#BE123C'], // STOP : cramoisi profond, encre blanche
@@ -439,4 +528,27 @@ export const theme = {
   chipCmd: '#0F3F38',
   chipAccent: MAGENTA,
   chipAccentDeep: '#7A1B63',
-};
+  };
+}
+
+/** Le thème vivant : un seul objet, partagé par toute l'interface. */
+export const theme = buildTheme(DEFAULT_PALETTE.hues);
+
+let activePaletteId = DEFAULT_PALETTE.id;
+
+/** Identifiant de la palette active (« galaxie » au démarrage). */
+export function getPaletteId() {
+  return activePaletteId;
+}
+
+/**
+ * Applique une palette. Le thème est reconstruit EN PLACE : tout ce qui a importé `theme`
+ * (interface, logo, cadres) voit les nouvelles couleurs au rendu suivant, sans rien recharger.
+ * Renvoie la palette appliquée, ou null si l'identifiant est inconnu.
+ */
+export function applyPalette(id) {
+  const palette = paletteById(id) || DEFAULT_PALETTE;
+  Object.assign(theme, buildTheme(palette.hues));
+  activePaletteId = palette.id;
+  return palette;
+}

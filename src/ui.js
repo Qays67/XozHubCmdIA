@@ -8,7 +8,9 @@ export const SPINNER = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', 
 
 const END_SESSION = '✕ End session ';
 const STOP_LABEL = '■ STOP';
-const MAX_BOX_ROWS = 8;
+// Hauteur maximale de la boîte de saisie. Elle n'est atteinte que si le contenu le réclame
+// (menu de fin de session) : c'est un plafond, pas une taille fixe.
+const MAX_BOX_ROWS = 10;
 
 // Noms affichés dans la conversation : « Toi » pour l'utilisateur, « XozHub.GPT » pour l'IA.
 const USER_NAME = 'Toi';
@@ -93,7 +95,7 @@ function wrapWithCursor(text, cursor, width) {
   return { lines, curLine, curCol };
 }
 
-/** Remplit `n` caractères avec un filet en dégradé aurore (violet → cyan). */
+/** Remplit `n` caractères avec un filet en dégradé de la palette (violet → cyan). */
 function gradientRule(n, stops = theme.ruleGradient) {
   if (n <= 0) return '';
   const seg = Math.max(1, Math.ceil(n / stops.length));
@@ -596,12 +598,15 @@ function modelBar(state, cols) {
     offset += size;
   }
 
-  return (
-    paintGradient(brand, theme.brandGradient) +
-    dot +
-    mid +
-    gradientChip(END_SESSION, theme.endGradient[0], theme.endGradient[1], theme.onCool, { bold: true })
-  );
+  return {
+    text:
+      paintGradient(brand, theme.brandGradient) +
+      dot +
+      mid +
+      gradientChip(END_SESSION, theme.endGradient[0], theme.endGradient[1], theme.onCool, {
+        bold: true,
+      }),
+  };
 }
 
 /**
@@ -678,8 +683,9 @@ export function buildFrame(state, size) {
   for (const l of renderLog(state, cols, logHeight)) out.push(l);
 
   const barRow = out.length + 2; // index de la barre + 1 -> ligne terminal 1-based
+  const bar = modelBar(state, cols);
   out.push('');
-  out.push(modelBar(state, cols));
+  out.push(bar.text);
 
   // Cadre de la zone de saisie : une carte au fond continu, avec des filets dégradés
   // en haut et en bas et des rails qui se fondent verticalement.
